@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Presentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PWS.xsd">
+  <documentInfo>
+    <Title>Test</Title>
+    <Author>Callum Silver</Author>
+    <Version>1.0</Version>
+    <Comment>(C) Stammtisch; First version created by: Callum Silver; Date of first version: 17/02/16; Description: A test PWS file;</Comment>
+  </documentInfo>
+  <defaults>
+    <backgroundColour>000000</backgroundColour>
+    <font>font</font>
+    <fontsize>12</fontsize>
+    <fontColour>FFFFFF</fontColour>
+    <lineColour>FFFFFF</lineColour>
+    <fillColour>FFFFFF</fillColour>
+  </defaults>
+  <slide slideID="1" nextSlide="2">
+  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0"
+  		font="Calibri" fontcolour="FFFFFF" fontsize="12">
+  		This is a test for
+  		<b>PWS</b>
+  		testing
+  		<i>Good job</i>
+  	</text>
+  </slide>
+  <slide slideID="2" nextSlide="3" duration="10000">
+  	<backgroundColour>FFFFFF</backgroundColour>
+  	<image height="0.2" ystart="0.5" xstart="0.5" sourceFile="InsertPicture.jpg"
+  		width="0.2" starttime="0" duration="0" /></slide>
+  <slide slideID="3" nextSlide="4"></slide>
+</Presentation>
