@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Presentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PWS.xsd">
+  <documentInfo>
+    <Title>Test</Title>
+    <Author>Callum Silver</Author>
+    <Version>1.0</Version>
+    <Comment>(C) Stammtisch; First version created by: Callum Silver; Date of first version: 17/02/16; Description: A test PWS file;</Comment>
+  </documentInfo>
+  <defaults>
+    <backgroundColour>000000</backgroundColour>
+    <font>font</font>
+    <fontsize>12</fontsize>
+    <fontColour>FFFFFF</fontColour>
+    <lineColour>FFFFFF</lineColour>
+    <fillColour>FFFFFF</fillColour>
+  </defaults>
+  <slide slideID="1" nextSlide="2">
+  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0"
+  		font="Calibri" fontcolour="FFFFFF" fontsize="12">
+  		This is a test for
+  		<b>PWS</b>
+  		testing
+  		<i>Good job</i>
+  	</text>
+  </slide>
+  <slide slideID="2" nextSlide="3" duration="10000">
+  	<backgroundColour>FFFFFF</backgroundColour>
+  	<image height="0.2" ystart="0.5" xstart="0.5" sourceFile="InsertPicture.jpg"
+  		width="0.2" starttime="0" duration="0" /></slide>
+  <slide slideID="3" nextSlide="4">
+  	<shape width="0.1" ystart="0.1" duration="0" type="circle" starttime="0"
+  		xstart="0.1" height="0.1">
+  		<shading x2="0.1" x1="0.2" y2="0.2" y1="0.1" colour2="ffffff"
+  			colour1="000000" />
+  	</shape>
+  	<shape width="0.1" ystart="0.3" duration="0" type="rectangle" starttime="0"
+  		xstart="0.1" height="0.1">
+  	</shape>
+  	<shape width="0.1" ystart="0.5" duration="0" type="roundedRectangle" starttime="0"
+  		xstart="0.1" height="0.1">
+  	</shape>
+  	<polygon sourceFile="insertFile.csv" starttime="0" duration="0"></polygon></slide>
+  <slide slideID="4" nextSlide="5">
+  	<audio loop="true" sourceFile="Audio.aac" starttime="0" duration="0" /></slide>
+  <slide slideID="5" nextSlide="6">
+  	<video ystart="0.0" loop="true" xstart="0.0" sourceFile="Video.mp4"
+  		starttime="0" duration="0" /></slide>
+</Presentation>
