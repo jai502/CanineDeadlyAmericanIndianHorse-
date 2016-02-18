@@ -39,5 +39,10 @@
   	<shape width="0.1" ystart="0.5" duration="0" type="roundedRectangle" starttime="0"
   		xstart="0.1" height="0.1">
   	</shape>
-  	<polygon sourceFile="inserFile.csv" starttime="0" duration="0"></polygon></slide>
+  	<polygon sourceFile="insertFile.csv" starttime="0" duration="0"></polygon></slide>
+  <slide slideID="4" nextSlide="5">
+  	<audio loop="true" sourceFile="Audio.aac" starttime="0" duration="0" /></slide>
+  <slide slideID="5" nextSlide="6">
+  	<video ystart="0.0" loop="true" xstart="0.0" sourceFile="Video.mp4"
+  		starttime="0" duration="0" /></slide>
 </Presentation>
