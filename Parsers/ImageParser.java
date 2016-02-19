@@ -5,9 +5,9 @@
 * 
 * Last version by: Joseph Ingleby
 * Date of last update: 19th February 2016
-* Version number: 0.1
+* Version number: 0.2
 * 
-* Commit date:
+* Commit date: 19th February 2016
 * Description: This class parses an xml file for an image and returns it for later use.
 */
 
@@ -19,20 +19,23 @@ import javax.xml.parsers.*;
 import java.awt.Image;
 import java.io.*;
 
-public class imageParser
+public class ImageParser
 {
-	
 	private Image parsedImage;
 	private String sourceFile;
 	private int startTime, duration;
 	private double xStart, yStart, width, height;
 		
-	public void parseImage(String fileName)
+	public ImageParser(String xmlFileName)
+	{
+		parseImage(xmlFileName);
+	}
+	
+	public boolean parseImage(String xmlFileName)
 	{
 		try
 		{
-			File toParse = new File(fileName);
-		
+			File toParse = new File(xmlFileName);
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			Document document = documentBuilder.parse(toParse);
@@ -43,22 +46,24 @@ public class imageParser
 			{
 				Node node = nodeList.item(i);
 				System.out.println("\nCurrent Element :" + node.getNodeName());
-            if (node.getNodeType() == Node.ELEMENT_NODE)
-            {
-               Element element = (Element) node;
-               System.out.println("Source File: "+ element.getAttribute("sourceFile"));
-               System.out.println("Start Time : " + element.getElementsByTagName("starttime").item(0).getTextContent());
-               System.out.println("Duration : " + element.getElementsByTagName("duration").item(0).getTextContent());
-               System.out.println("XStart : " + element.getElementsByTagName("xstart").item(0).getTextContent());
-               System.out.println("YStart : " + element.getElementsByTagName("ystart").item(0).getTextContent());
-               System.out.println("Width: " + element.getElementsByTagName("width").item(0).getTextContent());
-               System.out.println("Height: " + element.getElementsByTagName("height").item(0).getTextContent());
-            }
-         }
+				if (node.getNodeType() == Node.ELEMENT_NODE)
+				{
+					Element element = (Element) node;
+					setSourceFile(element.getAttribute("sourceFile"));
+					setStartTime(Integer.parseInt(element.getElementsByTagName("starttime").item(0).getTextContent()));
+					setDuration(Integer.parseInt(element.getElementsByTagName("duration").item(0).getTextContent()));
+					setxStart(Double.parseDouble(element.getElementsByTagName("xstart").item(0).getTextContent()));
+					setyStart(Double.parseDouble(element.getElementsByTagName("ystart").item(0).getTextContent()));
+					setWidth(Double.parseDouble(element.getElementsByTagName("width").item(0).getTextContent()));
+					setHeight(Double.parseDouble(element.getElementsByTagName("height").item(0).getTextContent()));
+				} 
+			}
+			return true;
       } 
 		catch (Exception e) 
       {
          e.printStackTrace();
+         return false;
       }
 	}
 	
