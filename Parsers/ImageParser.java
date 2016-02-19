@@ -5,7 +5,7 @@
 * 
 * Last version by: Joseph Ingleby
 * Date of last update: 19th February 2016
-* Version number: 0.2
+* Version number: 0.3
 * 
 * Commit date: 19th February 2016
 * Description: This class parses an xml file for an image and returns it for later use.
@@ -15,6 +15,8 @@
 package Parsers;
 
 import org.w3c.dom.*;
+
+import javax.imageio.ImageIO;
 import javax.xml.parsers.*;
 import java.awt.Image;
 import java.io.*;
@@ -22,7 +24,6 @@ import java.io.*;
 public class ImageParser
 {
 	private Image parsedImage;
-	private String sourceFile;
 	private int startTime, duration;
 	private double xStart, yStart, width, height;
 		
@@ -49,7 +50,7 @@ public class ImageParser
 				if (node.getNodeType() == Node.ELEMENT_NODE)
 				{
 					Element element = (Element) node;
-					setSourceFile(element.getAttribute("sourceFile"));
+					setParsedImage(ImageIO.read(new File(element.getAttribute("sourceFile"))));
 					setStartTime(Integer.parseInt(element.getElementsByTagName("starttime").item(0).getTextContent()));
 					setDuration(Integer.parseInt(element.getElementsByTagName("duration").item(0).getTextContent()));
 					setxStart(Double.parseDouble(element.getElementsByTagName("xstart").item(0).getTextContent()));
@@ -77,16 +78,6 @@ public class ImageParser
 	public void setParsedImage(Image parsedImage) 
 	{
 		this.parsedImage = parsedImage;
-	}
-
-	public String getSourceFile()
-	{
-		return sourceFile;
-	}
-
-	public void setSourceFile(String sourceFile) 
-	{
-		this.sourceFile = sourceFile;
 	}
 
 	public int getStartTime() 
