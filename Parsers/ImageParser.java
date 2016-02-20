@@ -5,10 +5,11 @@
 * 
 * Last version by: Joseph Ingleby
 * Date of last update: 19th February 2016
-* Version number: 0.3
+* Version number: 0.4.1
 * 
 * Commit date: 19th February 2016
 * Description: This class parses an xml file for an image and returns it for later use.
+* This class will read a presentation slide and load all images it parses and their metadata into a linked list.
 */
 
 
@@ -20,19 +21,19 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.*;
 import java.awt.Image;
 import java.io.*;
+import java.util.LinkedList;
 
 public class ImageParser
 {
-	private Image parsedImage;
-	private int startTime, duration;
-	private double xStart, yStart, width, height;
+	private LinkedList<ParsedImage> parsedImages;
+;
 		
-	public ImageParser(String xmlFileName)
+	public ImageParser(String xmlFileName, int slideNumber)
 	{
-		parseImage(xmlFileName);
+		parseImage(xmlFileName, slideNumber);
 	}
 	
-	public boolean parseImage(String xmlFileName)
+	public boolean parseImage(String xmlFileName, int slideNumber)
 	{
 		try
 		{
@@ -42,100 +43,41 @@ public class ImageParser
 			Document document = documentBuilder.parse(toParse);
 			document.getDocumentElement().normalize();
 			
-			NodeList nodeList = document.getElementsByTagName("imageType");
-			for (int i= 0; i< nodeList.getLength(); i++) 
+			NodeList nodeList = document.getElementsByTagName("image");
+			//NodeList nodeList = document.getElementsByTagName("slide");
+			//nodeList = ((Document) nodeList).getElementsByTagName("image");
+			
+			for(int i=0; i<nodeList.getLength(); i++) 
 			{
 				Node node = nodeList.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE)
+				if(node.getNodeType() == Node.ELEMENT_NODE)
 				{
+					ParsedImage tempImage = new ParsedImage();
 					Element element = (Element) node;
-					setParsedImage(ImageIO.read(new File(element.getAttribute("sourceFile"))));
-					setStartTime(Integer.parseInt(element.getElementsByTagName("starttime").item(0).getTextContent()));
-					setDuration(Integer.parseInt(element.getElementsByTagName("duration").item(0).getTextContent()));
-					setxStart(Double.parseDouble(element.getElementsByTagName("xstart").item(0).getTextContent()));
-					setyStart(Double.parseDouble(element.getElementsByTagName("ystart").item(0).getTextContent()));
-					setWidth(Double.parseDouble(element.getElementsByTagName("width").item(0).getTextContent()));
-					setHeight(Double.parseDouble(element.getElementsByTagName("height").item(0).getTextContent()));
+					tempImage.setParsedImage(ImageIO.read(new File(element.getAttribute("sourceFile"))));
+					tempImage.setStartTime(Integer.parseInt(element.getElementsByTagName("starttime").item(0).getTextContent()));
+					tempImage.setDuration(Integer.parseInt(element.getElementsByTagName("duration").item(0).getTextContent()));
+					tempImage.setxStart(Double.parseDouble(element.getElementsByTagName("xstart").item(0).getTextContent()));
+					tempImage.setyStart(Double.parseDouble(element.getElementsByTagName("ystart").item(0).getTextContent()));
+					tempImage.setWidth(Double.parseDouble(element.getElementsByTagName("width").item(0).getTextContent()));
+					tempImage.setHeight(Double.parseDouble(element.getElementsByTagName("height").item(0).getTextContent()));
+					parsedImages.add(tempImage);
 				} 
 			}
 			return true;
       } 
-		catch (Exception e) 
+		catch(Exception e) 
       {
          e.printStackTrace();
          return false;
       }
 	}
-	
 
-
-	public Image getParsedImage() 
-	{
-		return parsedImage;
+	public LinkedList<ParsedImage> getParsedImages() {
+		return parsedImages;
 	}
 
-	public void setParsedImage(Image parsedImage) 
-	{
-		this.parsedImage = parsedImage;
-	}
-
-	public int getStartTime() 
-	{
-		return startTime;
-	}
-
-	public void setStartTime(int startTime)
-	{
-		this.startTime = startTime;
-	}
-
-	public int getDuration() 
-	{
-		return duration;
-	}
-
-	public void setDuration(int duration) 
-	{
-		this.duration = duration;
-	}
-
-	public double getxStart() 
-	{
-		return xStart;
-	}
-
-	public void setxStart(double xStart) 
-	{
-		this.xStart = xStart;
-	}
-
-	public double getyStart() 
-	{
-		return yStart;
-	}
-
-	public void setyStart(double yStart) 
-	{
-		this.yStart = yStart;
-	}
-
-	public double getWidth()
-	{
-		return width;
-	}
-
-	public void setWidth(double width) 
-	{
-		this.width = width;
-	}
-
-	public double getHeight() 
-	{
-		return height;
-	}
-
-	public void setHeight(double height) 
-	{
-		this.height = height;
+	public void setParsedImages(LinkedList<ParsedImage> parsedImages) {
+		this.parsedImages = parsedImages;
 	}
 }
