@@ -46,7 +46,6 @@ public class ImageParser
 			for (int i= 0; i< nodeList.getLength(); i++) 
 			{
 				Node node = nodeList.item(i);
-				System.out.println("\nCurrent Element :" + node.getNodeName());
 				if (node.getNodeType() == Node.ELEMENT_NODE)
 				{
 					Element element = (Element) node;
