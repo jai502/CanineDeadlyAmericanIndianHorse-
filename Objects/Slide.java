@@ -14,142 +14,133 @@
 package Objects;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 public class Slide {
 	private int slideId, nextSlide, duration;
 	private Color backgroundColor;
-	private Text text;
-	private Shape shape;
-	private Polygon polygon;
-	private Image image;
-	private Video video;
-	private Audio audio;
-	private Interactable interactable;
+	private ArrayList<Text> textList;
+	private ArrayList<Shape> shapeList;
+	private ArrayList<Polygon> polygonList;
+	private ArrayList<Image> imageList;
+	private ArrayList<Video> videoList;
+	private ArrayList<Audio> audioList;
+	private ArrayList<Interactable> interactableList;
 	
-	public Slide(int slideId, int nextSlide, int duration,Color backgroundColor, Text text, Shape shape, Polygon polygon, Image image, Video video, Audio audio, Interactable interactable) 
-	{
+	public Slide(){
+		super();
+	}
+	
+	public Slide(int slideId, int nextSlide, int duration,
+			Color backgroundColor, ArrayList<Text> textList,
+			ArrayList<Shape> shapeList, ArrayList<Polygon> polygonList,
+			ArrayList<Image> imageList, ArrayList<Video> videoList,
+			ArrayList<Audio> audioList, ArrayList<Interactable> interactableList) {
 		super();
 		this.slideId = slideId;
 		this.nextSlide = nextSlide;
 		this.duration = duration;
 		this.backgroundColor = backgroundColor;
-		this.text = text;
-		this.shape = shape;
-		this.polygon = polygon;
-		this.image = image;
-		this.video = video;
-		this.audio = audio;
-		this.interactable = interactable;
+		this.textList = textList;
+		this.shapeList = shapeList;
+		this.polygonList = polygonList;
+		this.imageList = imageList;
+		this.videoList = videoList;
+		this.audioList = audioList;
+		this.interactableList = interactableList;
 	}
+
+
 
 	public int getSlideId()
 	{
 		return slideId;
 	}
 
-	public void setSlideId(int slideId) 
-	{
-		this.slideId = slideId;
-	}
-
-	public int getNextSlide()
-	{
+	public int getNextSlide() {
 		return nextSlide;
 	}
 
-	public void setNextSlide(int nextSlide)
-	{
-		this.nextSlide = nextSlide;
+	public void setNextSlide(String string) {
+		this.nextSlide = Integer.parseInt(string);
 	}
 
-	public int getDuration() 
-	{
+	public int getDuration() {
 		return duration;
 	}
 
-	public void setDuration(int duration) 
-	{
-		this.duration = duration;
+	public void setDuration(String string) {
+		this.duration = Integer.parseInt(string);
 	}
 
-	public Color getBackgroundColor()
-	{
+	public Color getBackgroundColor() {
 		return backgroundColor;
 	}
 
-	public void setBackgroundColor(Color backgroundColor)
-	{
+	public void setBackgroundColor(Color backgroundColor) {
 		this.backgroundColor = backgroundColor;
 	}
 
-	public Text getText()
-	{
-		return text;
+	public ArrayList<Text> getTextList() {
+		return textList;
 	}
 
-	public void setText(Text text) 
-	{
-		this.text = text;
+	public void setTextList(ArrayList<Text> textList) {
+		this.textList = textList;
 	}
 
-	public Shape getShape() 
-	{
-		return shape;
+	public ArrayList<Shape> getShapeList() {
+		return shapeList;
 	}
 
-	public void setShape(Shape shape) 
-	{
-		this.shape = shape;
+	public void setShapeList(ArrayList<Shape> shapeList) {
+		this.shapeList = shapeList;
 	}
 
-	public Polygon getPolygon() 
-	{
-		return polygon;
+	public ArrayList<Polygon> getPolygonList() {
+		return polygonList;
 	}
 
-	public void setPolygon(Polygon polygon)
-	{
-		this.polygon = polygon;
+	public void setPolygonList(ArrayList<Polygon> polygonList) {
+		this.polygonList = polygonList;
 	}
 
-	public Image getImage() 
-	{
-		return image;
+	public ArrayList<Image> getImageList() {
+		return imageList;
 	}
 
-	public void setImage(Image image)
-	{
-		this.image = image;
+	public void setImageList(ArrayList<Image> imageList) {
+		this.imageList = imageList;
 	}
 
-	public Video getVideo()
-	{
-		return video;
+	public ArrayList<Video> getVideoList() {
+		return videoList;
 	}
 
-	public void setVideo(Video video) 
-	{
-		this.video = video;
+	public void setVideoList(ArrayList<Video> videoList) {
+		this.videoList = videoList;
 	}
 
-	public Audio getAudio()
-	{
-		return audio;
+	public ArrayList<Audio> getAudioList() {
+		return audioList;
 	}
 
-	public void setAudio(Audio audio)
-	{
-		this.audio = audio;
+	public void setAudioList(ArrayList<Audio> audioList) {
+		this.audioList = audioList;
 	}
 
-	public Interactable getInteractable()
-	{
-		return interactable;
+	public ArrayList<Interactable> getInteractableList() {
+		return interactableList;
 	}
 
-	public void setInteractable(Interactable interactable) 
-	{
-		this.interactable = interactable;
+	public void setInteractableList(ArrayList<Interactable> interactableList) {
+		this.interactableList = interactableList;
 	}
+
+	public void setSlideId(String string) {
+		this.slideId =Integer.parseInt(string);
+	}
+
+	
 	
 }

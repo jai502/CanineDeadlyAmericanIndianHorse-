@@ -21,6 +21,10 @@ public class Presentation
 	private Defaults defaults;
 	private ArrayList slides = new ArrayList<Slide>() ;
 	
+	public Presentation() {
+		super();
+	}
+
 	public Presentation(DocumentInfo docInfo, Defaults defaults,ArrayList slides)
 	{
 		super();
