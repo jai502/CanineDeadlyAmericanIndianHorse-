@@ -24,18 +24,13 @@ public class MainClient
 
 	public static void main(String args[]) 
 	{
-		
-		//Local host for testing
-		String localHost = "127.0.0.1";
-		int localPort = 4444;
-		
 		//Remote host for remote connection
 		String remoteHost = "2.102.60.24";
 		int remotePort = 26656;
 		Socket serverSocket = null;
 		RequestObject request = null;
-		String id;
-		Object parameter;
+		String id = null;
+		Object parameter = null;
 		
 		try 
 		{
