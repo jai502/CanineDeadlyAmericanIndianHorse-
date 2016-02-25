@@ -199,7 +199,7 @@ public class XMLParser extends DefaultHandler {
 		{
 			currentDefaults.setFillColour(newContent);
 		}
-		
+		//
 		// Slides setting
 		
 		if (qName.equalsIgnoreCase("text"))

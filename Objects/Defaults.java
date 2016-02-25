@@ -28,7 +28,7 @@ public class Defaults {
 	//	fillColour = myFillColour;
 	//	font = myFont;
 	//	fontSize = myFontSize;
-	//}
+	//}/
 	
 	public Color getBackground() 
 	{
