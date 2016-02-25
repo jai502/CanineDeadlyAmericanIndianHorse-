@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class Slide {
 	private int slideId, nextSlide, duration;
-	private Color backgroundColor;
+	private Color backgroundColour;
 	private ArrayList<Text> textList;
 	private ArrayList<Shape> shapeList;
 	private ArrayList<Polygon> polygonList;
@@ -32,7 +32,7 @@ public class Slide {
 	}
 	
 	public Slide(int slideId, int nextSlide, int duration,
-			Color backgroundColor, ArrayList<Text> textList,
+			Color backgroundColour, ArrayList<Text> textList,
 			ArrayList<Shape> shapeList, ArrayList<Polygon> polygonList,
 			ArrayList<Image> imageList, ArrayList<Video> videoList,
 			ArrayList<Audio> audioList, ArrayList<Interactable> interactableList) {
@@ -40,7 +40,7 @@ public class Slide {
 		this.slideId = slideId;
 		this.nextSlide = nextSlide;
 		this.duration = duration;
-		this.backgroundColor = backgroundColor;
+		this.backgroundColour = backgroundColour;
 		this.textList = textList;
 		this.shapeList = shapeList;
 		this.polygonList = polygonList;
@@ -73,12 +73,30 @@ public class Slide {
 		this.duration = Integer.parseInt(string);
 	}
 
-	public Color getBackgroundColor() {
-		return backgroundColor;
+	public Color getBackgroundColour() {
+		return backgroundColour;
 	}
 
-	public void setBackgroundColor(Color backgroundColor) {
-		this.backgroundColor = backgroundColor;
+	public void setBackgroundColour(Color backgroundColour) {
+		this.backgroundColour = backgroundColour;
+	}
+	
+	public void setBackgroundColour(String colour) {
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,1);
+			String g = colour.substring(2,3);
+			String b = colour.substring(4,5);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			backgroundColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nAn error occured when setting colour");
+		}
 	}
 
 	public ArrayList<Text> getTextList() {

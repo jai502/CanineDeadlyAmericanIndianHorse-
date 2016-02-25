@@ -32,15 +32,22 @@ public class XMLParser extends DefaultHandler {
 
 	private String inputFile;
 	private String fileLocation;
-	DocumentInfo currentDocInfo;
+	private String newContent;
+	private Text currentText;
+	private Shape currentShape;
+	private Polygon currentPolygon;
+	private Image currentImage;
+	private Video currentVideo;
+	private Audio currentAudio;
+	private Interactable currentInteractable;
+	private Shading currentShading;
+	private boolean isInteractable;
+	private DocumentInfo currentDocInfo;
 	private Defaults currentDefaults;
 	private Slide currentSlide;
-	private String currentPresSubElement;
-	private String currentDocSubElement;
-	private String currentDefSubElement;
-	private String currentSlideSubElement;
 	private Presentation currentPres;
 	private ArrayList<Slide> slideList;
+	
 	
 
 	public XMLParser(String inputToParse, String inputLocation) {
@@ -104,116 +111,138 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
 		}
-//		
-//		
-//		switch (elementName)
-//		{
-//		case "documentInfo" :
-//			currentDocInfo = new DocumentInfo();
-//			break;
-//		case "Title" :
-//			currentDocSubElement = "Title";
-//			break;
-//		case "Author" :
-//			currentDocSubElement = "Author";
-//			break;
-//		case "Version" :
-//			currentDocSubElement = "Version";
-//			break;
-//		case "Comment" :
-//			currentDocSubElement = "Comment";
-//			break;
-//			
-//		
-//		case "efaults" :
-//			currentDefaults = new Defaults();
-//			break;
-//		case "backgroundColour" :
-//			currentDefSubElement = "backgroundColour";
-//			break;
-//		case "font" :
-//			currentDefSubElement = "font";
-//			break;
-//		case "fontSize" :
-//			currentDefSubElement = "fontSize";
-//			break;
-//		case "fontColour" :
-//			currentDefSubElement = "fontColour";
-//			break;
-//		case "lineColour" :
-//			currentDefSubElement = "lineColour";
-//			break;
-//		case "fillColour" :
-//			currentDefSubElement = "fillColour";
-//			break;
-//			
-//			
-//		case "slide" :
-//			currentSlide = new Slide();
-//			break;
-//		case "backgroundColour" :
-//			currentSlideSubElement = "backgroundColour";
-//			break;
-//		case "text" :
-//			currentSlideSubElement = "text";
-//			break;
-//		case "shape" :
-//			currentSlideSubElement = "shape";
-//			break;
-//		case "polygon" :
-//			currentSlideSubElement = "polygon";
-//			break;
-//		case "image" :
-//			currentSlideSubElement = "image";
-//			break;
-//		case "video" :
-//			currentSlideSubElement = "video";
-//			break;
-//		case "audio" :
-//			currentSlideSubElement = "uudio";
-//			break;
-//		case "interactable" :
-//			currentSlideSubElement = "interactable";
-//			break;
-//			
-//			
-//		}
-//		
-//		if (qName.equals("documentInfo")) 
-//		{
-//			presentation.getDocInfo().setTitle(attributes.getValue("Title"));
-//			presentation.getDocInfo().setAuthor(attributes.getValue("Author"));
-//			presentation.getDocInfo().setVersion(attributes.getValue("Version"));
-//			presentation.getDocInfo().setComment(attributes.getValue("Comment"));
-//		}
-//		if (elementName.equals("defaults")) 
-//		{
-//			presentation.getDefaults().setBackground(attributes.getValue("backgroundColour"));
-//			presentation.getDefaults().setFont(attributes.getValue("font"));
-//			presentation.getDefaults().setFontSize(attributes.getValue("fontsize"));
-//			presentation.getDefaults().setFontColour(attributes.getValue("fontColour"));
-//			presentation.getDefaults().setLineColour(attributes.getValue("lineColour"));
-//			presentation.getDefaults().setFillColour(attributes.getValue("fillColour"));
-//				
-//		}
-//		if (elementName.equals("slide"))
-//		{
-//			Slide slideTemp = new Slide();
-//			slideTemp.setSlideId(attributes.getValue("slideID"));
-//			slideTemp.setNextSlide(attributes.getValue("nextSlide"));
-//			slideTemp.setDuration(attributes.getValue("duration"));
-//			slideTemp.setBackgroundColor(attributes.getValue("backgroundColor"));
-//			
-//			
-//			
-//			
-//			
-//			
-//			presentation.getSlides().add(slideTemp);			
-//		}
-//
 	}
+	
+	@Override
+    public void endElement(String uri, String localName, String qName) throws SAXException 
+    {
+		if (qName.equalsIgnoreCase("presentation"))
+		{
+			currentPres.setSlides(slideList);
+		}
+		
+		if (qName.equalsIgnoreCase("documentInfo"))
+		{
+			currentPres.setDocInfo(currentDocInfo);
+			currentDocInfo = null;
+		}
+		
+		if (qName.equalsIgnoreCase("defaults"))
+		{
+			currentPres.setDefaults(currentDefaults);
+			currentDefaults = null;
+		}
+		
+		if (qName.equalsIgnoreCase("slide"))
+		{
+			slideList.add(currentSlide);
+			currentSlide = null;
+		}
+		
+		// Document info setting
+		
+		if (qName.equalsIgnoreCase("Title"))
+		{
+			currentDocInfo.setTitle(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("Author"))
+		{
+			currentDocInfo.setAuthor(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("Version"))
+		{
+			currentDocInfo.setVersion(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("Comment"))
+		{
+			currentDocInfo.setComment(newContent);
+		}
+		
+		// Defaults setting
+		
+		if (qName.equalsIgnoreCase("backgroundColour"))
+		{
+			if (currentDefaults.getBackground()==null)
+			{
+				currentDefaults.setBackground(newContent);
+			}
+			else
+			{
+				currentSlide.setBackgroundColour(newContent);
+			}
+		}
+		
+		if (qName.equalsIgnoreCase("font"))
+		{
+			currentDefaults.setFont(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("fontSize"))
+		{
+			currentDefaults.setFontSize(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("fontColour"))
+		{
+			currentDefaults.setFontColour(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("lineColour"))
+		{
+			currentDefaults.setLineColour(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("fillColour"))
+		{
+			currentDefaults.setFillColour(newContent);
+		}
+		
+		// Slides setting
+		
+		if (qName.equalsIgnoreCase("text"))
+		{
+			if (isInteractable == true){
+				currentText.setText(newContent);
+				currentInteractable.getTextList().add(currentText);
+			}
+			currentText.setText(newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("shape"))
+		{
+			if (isInteractable == true){
+				currentInteractable.setShape(currentShape);
+			}
+		}
+		
+		if (qName.equalsIgnoreCase("text"))
+		{
+			if (isInteractable == true){
+				currentText.setText(newContent);
+				currentInteractable.setText(currentText);
+			}
+			currentText.setText(newContent);
+		}
+		
+		//TODO finish from here
+		
+		
+		
+		
+		
+			
+		
+	}
+	
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException 
+	{
+		newContent = new String(ch, start, length);
 
+	}	
 	public String getInputFile() {
 		return inputFile;
 	}

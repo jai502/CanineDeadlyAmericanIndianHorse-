@@ -13,73 +13,97 @@
 
 package Objects;
 
+import java.util.ArrayList;
+
 public class Interactable 
 {
-	private Text text;
-	private Shape shape;
-	private Polygon polygon;
-	private Image image;
-	private Video video;
-	
-	public Interactable(Text text, Shape shape, Polygon polygon, Image image, Video video)
-	{
+	private ArrayList<Text> textList;
+	private ArrayList<Shape> shapeList;
+	private ArrayList<Polygon> polygonList;
+	private ArrayList<Image> imageList;
+	private ArrayList<Video> videoList;
+	private ArrayList<Audio> audioList;
+		
+	public Interactable(ArrayList<Text> textList, ArrayList<Shape> shapeList,
+			ArrayList<Polygon> polygonList, ArrayList<Image> imageList,
+			ArrayList<Video> videoList, ArrayList<Audio> audioList) {
 		super();
-		this.text = text;
-		this.shape = shape;
-		this.polygon = polygon;
-		this.image = image;
-		this.video = video;
+		this.textList = textList;
+		this.shapeList = shapeList;
+		this.polygonList = polygonList;
+		this.imageList = imageList;
+		this.videoList = videoList;
+		this.audioList = audioList;
 	}
 
-	public Text getText()
+
+	public Interactable() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	public ArrayList<Text> getTextList()
 	{
-		return text;
+		return textList;
 	}
-
-	public void setText(Text text) 
+	
+	public void setTextList(ArrayList<Text> textList) 
 	{
-		this.text = text;
+		this.textList = textList;
 	}
-
-	public Shape getShape() 
+	
+	public ArrayList<Shape> getShapeList() 
 	{
-		return shape;
+		return shapeList;
 	}
-
-	public void setShape(Shape shape)
+	
+	public void setShapeList(ArrayList<Shape> shapeList)
 	{
-		this.shape = shape;
+		this.shapeList = shapeList;
 	}
-
-	public Polygon getPolygon()
-{
-		return polygon;
-	}
-
-	public void setPolygon(Polygon polygon)
+	
+	public ArrayList<Polygon> getPolygonList() 
 	{
-		this.polygon = polygon;
+		return polygonList;
 	}
-
-	public Image getImage() 
+	
+	public void setPolygonList(ArrayList<Polygon> polygonList)
 	{
-		return image;
+		this.polygonList = polygonList;
 	}
-
-	public void setImage(Image image) 
+	
+	public ArrayList<Image> getImageList() 
 	{
-		this.image = image;
+		return imageList;
 	}
-
-	public Video getVideo() 
+	
+	public void setImageList(ArrayList<Image> imageList)
 	{
-		return video;
+		this.imageList = imageList;
 	}
-
-	public void setVideo(Video video) 
+	
+	public ArrayList<Video> getVideoList()
 	{
-		this.video = video;
+		return videoList;
 	}
+	
+	public void setVideoList(ArrayList<Video> videoList) 
+	{
+		this.videoList = videoList;
+	}
+	
+	public ArrayList<Audio> getAudioList() 
+	{
+		return audioList;
+	}
+	
+	public void setAudioList(ArrayList<Audio> audioList)
+	{
+		this.audioList = audioList;
+	}
+	
+
 	
 	
 	
