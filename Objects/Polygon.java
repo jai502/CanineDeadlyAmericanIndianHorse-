@@ -32,30 +32,86 @@ public class Polygon {
 		shading = myShading;
 	}
 	
+	public Polygon() {
+		super();
+	}
+
 	public int getStartTime() {
 		return startTime;
 	}
 	public void setStartTime(int startTime) {
 		this.startTime = startTime;
 	}
+	
+	public void setStartTime(String startTime) 
+	{
+		this.startTime = Integer.parseInt(startTime);
+	}
+	
 	public int getDuration() {
 		return duration;
 	}
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
+	
+	public void setDuration(String duration)
+	{
+		this.duration = Integer.parseInt(duration);
+	}
+	
 	public Color getLineColour() {
 		return lineColour;
 	}
 	public void setLineColour(Color lineColour) {
 		this.lineColour = lineColour;
 	}
+	
+	public void setLineColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,1);
+			String g = colour.substring(2,3);
+			String b = colour.substring(4,5);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			this.lineColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nAn error occured when setting colour");
+		}
+	}
+	
 	public Color getFillColour() {
 		return fillColour;
 	}
 	public void setFillColour(Color fillColour) {
 		this.fillColour = fillColour;
 	}
+	
+	public void setFillColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,1);
+			String g = colour.substring(2,3);
+			String b = colour.substring(4,5);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			this.fillColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nAn error occured when setting colour");
+		}
+	}
+	
 	public String getSourceFile() {
 		return sourceFile;
 	}

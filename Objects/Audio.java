@@ -27,6 +27,10 @@ public class Audio {
 		this.loop = loop;
 	}
 
+	public Audio() {
+		super();
+	}
+
 	public int getStartTime()
 	{
 		return startTime;
@@ -35,6 +39,11 @@ public class Audio {
 	public void setStartTime(int startTime)
 	{
 		this.startTime = startTime;
+	}
+	
+	public void setStartTime(String startTime) 
+	{
+		this.startTime = Integer.parseInt(startTime);
 	}
 
 	public int getDuration() 
@@ -46,6 +55,12 @@ public class Audio {
 	{
 		this.duration = duration;
 	}
+	
+	public void setDuration(String duration)
+	{
+		this.duration = Integer.parseInt(duration);
+	}
+	
 
 	public String getSourceFile() 
 	{
@@ -65,6 +80,11 @@ public class Audio {
 	public void setLoop(boolean loop) 
 	{
 		this.loop = loop;
+	}
+	
+	public void setLoop(String loop) 
+	{
+		this.loop = Boolean.parseBoolean("loop");
 	}
 	
 	

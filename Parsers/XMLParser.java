@@ -15,10 +15,8 @@ package Parsers;
 
 import Objects.*;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -33,6 +31,7 @@ public class XMLParser extends DefaultHandler {
 	private String inputFile;
 	private String fileLocation;
 	private String newContent;
+	private boolean ShapeOrPolyShade = false; // true for shape, false for poly
 	private Text currentText;
 	private Shape currentShape;
 	private Polygon currentPolygon;
@@ -41,7 +40,7 @@ public class XMLParser extends DefaultHandler {
 	private Audio currentAudio;
 	private Interactable currentInteractable;
 	private Shading currentShading;
-	private boolean isInteractable;
+	private boolean isInteractable = false;
 	private DocumentInfo currentDocInfo;
 	private Defaults currentDefaults;
 	private Slide currentSlide;
@@ -111,6 +110,86 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
 		}
+		
+		else if (qName.equalsIgnoreCase("text"))
+		{
+			currentText = new Text();
+			currentText.setStartTime(attributes.getValue("starttime"));
+			currentText.setDuration(attributes.getValue("duration"));
+			currentText.setxStart(attributes.getValue("xstart"));
+			currentText.setyStart(attributes.getValue("ystart"));
+			currentText.setFont(attributes.getValue("font"));
+			currentText.setFontSize(attributes.getValue("fontSize"));
+			currentText.setFontColour(attributes.getValue("fontColour"));
+		}
+		
+		else if (qName.equalsIgnoreCase("Shape"))
+		{
+			currentShape = new Shape();
+			currentShape.setStartTime(attributes.getValue("starttime"));
+			currentShape.setDuration(attributes.getValue("duration"));
+			currentShape.setxStart(attributes.getValue("xstart"));
+			currentShape.setyStart(attributes.getValue("ystart"));
+			currentShape.setType(attributes.getValue("type"));
+			currentShape.setWidth(attributes.getValue("width"));
+			currentShape.setHeight(attributes.getValue("height"));
+			currentShape.setLineColour(attributes.getValue("lineColour"));
+			currentShape.setFillColour(attributes.getValue("fillColour"));
+		
+			ShapeOrPolyShade = true;
+		}
+		
+		else if (qName.equalsIgnoreCase("polygon"))
+		{
+			currentPolygon = new Polygon();
+			currentPolygon.setStartTime(attributes.getValue("starttime"));
+			currentPolygon.setSourceFile(attributes.getValue("sourceFile"));
+			currentPolygon.setDuration(attributes.getValue("duration"));
+			currentPolygon.setLineColour(attributes.getValue("lineColour"));
+			currentPolygon.setFillColour(attributes.getValue("fillColour"));
+			
+			ShapeOrPolyShade = false;
+		}
+		
+		else if (qName.equalsIgnoreCase("image"))
+		{
+			currentImage = new Image();
+			currentImage.setStartTime(attributes.getValue("starttime"));
+			currentImage.setDuration(attributes.getValue("duration"));
+			currentImage.setxStart(attributes.getValue("xstart"));
+			currentImage.setyStart(attributes.getValue("ystart"));
+			currentImage.setWidth(attributes.getValue("width"));
+			currentImage.setHeight(attributes.getValue("height"));
+		}
+		
+		else if (qName.equalsIgnoreCase("video"))
+		{
+			currentVideo = new Video();
+			currentVideo.setStartTime(attributes.getValue("starttime"));
+			currentVideo.setDuration(attributes.getValue("duration"));
+			currentVideo.setxStart(attributes.getValue("xstart"));
+			currentVideo.setyStart(attributes.getValue("ystart"));
+			currentVideo.setSourceFile(attributes.getValue("sourceFile"));
+			currentVideo.setLoop(attributes.getValue("loop"));
+		}
+		
+		else if (qName.equalsIgnoreCase("audio"))
+		{
+			currentAudio = new Audio();
+			currentAudio.setStartTime(attributes.getValue("starttime"));
+			currentAudio.setDuration(attributes.getValue("duration"));
+			currentAudio.setSourceFile(attributes.getValue("sourceFile"));
+			currentAudio.setLoop(attributes.getValue("loop"));
+		}
+		
+		else if (qName.equalsIgnoreCase("interactable"))
+		{
+			currentInteractable = new Interactable();
+			isInteractable = true;
+		}
+		
+		
+		
 	}
 	
 	@Override
@@ -199,7 +278,7 @@ public class XMLParser extends DefaultHandler {
 		{
 			currentDefaults.setFillColour(newContent);
 		}
-		//
+		
 		// Slides setting
 		
 		if (qName.equalsIgnoreCase("text"))
@@ -209,30 +288,80 @@ public class XMLParser extends DefaultHandler {
 				currentInteractable.getTextList().add(currentText);
 			}
 			currentText.setText(newContent);
+			currentSlide.getTextList().add(currentText);
 		}
 		
 		if (qName.equalsIgnoreCase("shape"))
 		{
-			if (isInteractable == true){
-				currentInteractable.setShape(currentShape);
+			if (isInteractable == true)
+			{
+				currentInteractable.getShapeList().add(currentShape);
 			}
+			
+			currentSlide.getShapeList().add(currentShape);
+			
 		}
 		
-		if (qName.equalsIgnoreCase("text"))
+		if (qName.equalsIgnoreCase("polygon"))
 		{
-			if (isInteractable == true){
-				currentText.setText(newContent);
-				currentInteractable.setText(currentText);
+			if (isInteractable == true)
+			{
+				currentInteractable.getPolygonList().add(currentPolygon);
 			}
-			currentText.setText(newContent);
+			currentSlide.getPolygonList().add(currentPolygon);
 		}
 		
-		//TODO finish from here
+		if (qName.equalsIgnoreCase("shading"))
+		{
+			if (ShapeOrPolyShade == true) // if current shading is for a shape
+			{
+				currentShape.setShading(currentShading);
+			}
+			else
+			{
+				currentPolygon.setShading(currentShading);
+			}
+		}
 		
+		if (qName.equalsIgnoreCase("image"))
+		{
+			if (isInteractable == true)
+			{
+				currentInteractable.getImageList().add(currentImage);
+			}
+			currentSlide.getImageList().add(currentImage);
+		}
 		
+		if (qName.equalsIgnoreCase("Audio"))
+		{
+			if (isInteractable == true)
+			{
+				currentInteractable.getAudioList().add(currentAudio);
+			}
+			currentSlide.getAudioList().add(currentAudio);
+		}
 		
+		if (qName.equalsIgnoreCase("Video"))
+		{
+			if (isInteractable == true)
+			{
+				currentInteractable.getVideoList().add(currentVideo);
+			}
+			currentSlide.getVideoList().add(currentVideo);
+		}
 		
+		if (qName.equalsIgnoreCase("Interactable"))
+		{
+			currentSlide.getInteractableList().add(currentInteractable);
+			isInteractable = false;
+		}
 		
+		if (qName.equalsIgnoreCase("Slide"))
+		{
+			currentPres.getSlides().add(currentSlide);
+			
+		}
+			
 			
 		
 	}
