@@ -22,17 +22,17 @@ public class Text {
 	private Color fontColour;
 	private String text;
  
-	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, Font myFont, Color myFontColour, String myText)
-	 {
-			 startTime = myStartTime;
-			 duration = myDuration;
-			 fontSize =  myFontSize;
-			 xStart = myXStart;
-			 yStart = myYStart;
-			 font = myFont;
-			 fontColour = myFontColour;
-			 text = myText;
-	}
+//	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, Font myFont, Color myFontColour, String myText)
+//	 {
+//			 startTime = myStartTime;
+//			 duration = myDuration;
+//			 fontSize =  myFontSize;
+//			 xStart = myXStart;
+//			 yStart = myYStart;
+//			 font = myFont;
+//			 fontColour = myFontColour;
+//			 text = myText;
+//	}
 	 
 	
 
@@ -146,18 +146,19 @@ public class Text {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
+			if(colour.startsWith("#")){
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			}
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
 			fontColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nAn error occured when setting font colour");
 		}
 	}
 	

@@ -1,7 +1,15 @@
 package server;
 
+import Parsers.*;
+import Objects.*;
+
+
 public class Main {
+	
+
 	public static void main(String[] args){
-		System.out.println("Eat shit github.");
+		XMLPrint print = new XMLPrint();
+		print.Print();
+		
 	}
 }

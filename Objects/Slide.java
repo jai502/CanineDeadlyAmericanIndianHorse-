@@ -28,7 +28,7 @@ public class Slide {
 	private ArrayList<Interactable> interactableList;
 	
 	public Slide(){
-		super();
+		imageList = new ArrayList<Image>();
 	}
 	
 	public Slide(int slideId, int nextSlide, int duration,
@@ -70,7 +70,15 @@ public class Slide {
 	}
 
 	public void setDuration(String string) {
+		try
+		{
 		this.duration = Integer.parseInt(string);
+		}
+		catch(Exception e)
+		{
+				System.out.println("\nAn error occured when setting slide duration");
+				this.duration = 0;
+		}
 	}
 
 	public Color getBackgroundColour() {
@@ -86,9 +94,9 @@ public class Slide {
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
@@ -126,9 +134,10 @@ public class Slide {
 	public ArrayList<Image> getImageList() {
 		return imageList;
 	}
-
-	public void setImageList(ArrayList<Image> imageList) {
-		this.imageList = imageList;
+	
+	public void addImage (Image image)
+	{
+		imageList.add(image);
 	}
 
 	public ArrayList<Video> getVideoList() {

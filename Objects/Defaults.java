@@ -45,9 +45,9 @@ public class Defaults {
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
