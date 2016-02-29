@@ -18,10 +18,10 @@ import java.awt.Font;
 
 public class Defaults {
 	private Color background, fontColour, lineColour, fillColour;
-	private Font font;
+	private String font;
 	private int	fontSize;
 	
-	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, Font myFont, int myFontSize){
+	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, String myFont, int myFontSize){
 		background = myBackground;
 		fontColour = myFontColour;
 		lineColour = myLineColour;
@@ -145,23 +145,13 @@ public class Defaults {
 			System.out.println("\nNo colour set for default fill colour");
 		}
 	}
-	public Font getFont() 
+	public String getFont() 
 	{
 		return font;
 	}
-	public void setFont(Font font) 
+	public void setFont(String font) 
 	{
 		this.font = font;
-	}
-	
-	public void setFont(String myFont)
-	{
-		try{
-			font = Font.getFont(myFont);	
-		}
-		catch(Exception e){
-			System.out.println("\nAn error occured when setting the font");
-		}
 	}
 	
 	public int getFontSize() 
