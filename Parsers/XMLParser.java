@@ -201,8 +201,6 @@ public class XMLParser extends DefaultHandler {
 			currentVideo.setxStart(attributes.getValue("xstart"));
 			currentVideo.setyStart(attributes.getValue("ystart"));
 			currentVideo.setSourceFile(attributes.getValue("sourceFile"));
-			System.out.println(attributes.getValue("loop"));
-			currentVideo.setLoop(attributes.getValue("loop"));
 			System.out.println(currentVideo.isLoop());
 		}
 		

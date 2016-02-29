@@ -18,11 +18,11 @@ import java.awt.Font;
 public class Text {
 	private int startTime, duration, fontSize;
 	private double xStart, yStart;
-	private Font font;
+	private String font;
 	private Color fontColour;
 	private String text;
  
-	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, Font myFont, Color myFontColour, String myText)
+	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
 	 {
 			 startTime = myStartTime;
 			 duration = myDuration;
@@ -125,23 +125,13 @@ public class Text {
 		this.yStart = Double.parseDouble(yStart);
 	}
 	
-	public Font getFont() 
+	public String getFont() 
 	{
 		return font;
 	}
-	public void setFont(Font font) 
+	public void setFont(String font) 
 	{
 		this.font = font;
-	}
-	
-	public void setFont(String myFont)
-	{
-		try{
-			font = Font.getFont(myFont);	
-		}
-		catch(Exception e){
-			System.out.println("\nNo font set for text");
-		}
 	}
 	
 	public Color getFontColour() 
