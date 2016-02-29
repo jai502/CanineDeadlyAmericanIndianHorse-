@@ -107,7 +107,7 @@ public class Shape
 	
 	public void setyStart(String yStart)
 	{
-		this.xStart = Double.parseDouble(yStart);
+		this.yStart = Double.parseDouble(yStart);
 	}
 	
 	public double getWidth() 

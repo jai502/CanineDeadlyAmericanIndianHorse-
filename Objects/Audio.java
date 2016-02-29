@@ -88,10 +88,23 @@ public class Audio {
 		this.loop = loop;
 	}
 	
-	public void setLoop(String loop) 
-	{
-		this.loop = Boolean.parseBoolean("loop");
-	}
+	// issues caused when parsing string to boolean, resolved with this
+		public void setLoop(String loop) 
+		{
+			if (loop.equalsIgnoreCase("true"))
+			{
+				this.loop = true;
+			}
+			else if (loop.equalsIgnoreCase("false"))
+			{
+				this.loop = false;
+			}
+			else
+			{
+				this.loop = false;
+			}
+			
+		}
 	
 	
 }

@@ -96,7 +96,7 @@ public class Video
 	
 	public void setyStart(String yStart)
 	{
-		this.xStart = Double.parseDouble(yStart);
+		this.yStart = Double.parseDouble(yStart);
 	}
 
 	public String getSourceFile() 
@@ -118,9 +118,23 @@ public class Video
 	{
 		this.loop = loop;
 	}
-
+	
+	
+	// issues caused when parsing string to boolean, resolved with this
 	public void setLoop(String loop) 
 	{
-		this.loop = Boolean.parseBoolean("loop");
+		if (loop.equalsIgnoreCase("true"))
+		{
+			this.loop = true;
+		}
+		else if (loop.equalsIgnoreCase("false"))
+		{
+			this.loop = false;
+		}
+		else
+		{
+			this.loop = false;
+		}
+		
 	}
 }

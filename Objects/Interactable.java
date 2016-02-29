@@ -59,15 +59,9 @@ public class Interactable
 	
 	public void setTargetSlide(String targetSlide)
 	{
-		try
-		{
-			this.targetSlide = Integer.parseInt("targetSlide");
-		}
-		catch(Exception e)
-		{
-			this.targetSlide = 0;
-		}
-		
+
+		this.targetSlide = Integer.parseInt(targetSlide);
+
 	}
 	
 	public ArrayList<Text> getTextList()
