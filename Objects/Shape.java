@@ -13,7 +13,7 @@
 
 package Objects;
 
-import java.awt.Color;
+import java.awt.Color;;
 
 public class Shape
 {
@@ -69,7 +69,14 @@ public class Shape
 	
 	public void setDuration(String duration)
 	{
-		this.duration = Integer.parseInt(duration);
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
 	}
 	
 
@@ -159,16 +166,16 @@ public class Shape
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			this.lineColour = new Color(rInt,gInt,bInt);
+			int bInt = Integer.parseInt(b, 16);
+			lineColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for shape line colour");
 		}
 	}
 
@@ -188,16 +195,16 @@ public class Shape
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
-			this.fillColour = new Color(rInt,gInt,bInt);
+			fillColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for shape fill colour");
 		}
 	}
 

@@ -58,11 +58,16 @@ public class Video
 		this.duration = duration;
 	}
 	
-	public void setDuration(String duration)
-	{
-		this.duration = Integer.parseInt(duration);
+	public void setDuration(String duration) {
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
 	}
-	
 
 	public double getxStart() 
 	{

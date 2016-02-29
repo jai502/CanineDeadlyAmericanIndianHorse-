@@ -28,7 +28,14 @@ public class Slide {
 	private ArrayList<Interactable> interactableList;
 	
 	public Slide(){
+		
+		textList = new ArrayList<Text>();
+		shapeList = new ArrayList<Shape>();
+		polygonList = new ArrayList<Polygon>();
 		imageList = new ArrayList<Image>();
+		videoList = new ArrayList<Video>();
+		audioList = new ArrayList<Audio>();
+		interactableList = new ArrayList<Interactable>();
 	}
 	
 	public Slide(int slideId, int nextSlide, int duration,
@@ -61,23 +68,30 @@ public class Slide {
 		return nextSlide;
 	}
 
-	public void setNextSlide(String string) {
-		this.nextSlide = Integer.parseInt(string);
+	public void setNextSlide(String nextSlide) {
+		try
+		{
+			this.nextSlide = Integer.parseInt(nextSlide);
+		}
+		catch(Exception e)
+		{
+			this.nextSlide = 0;
+		}
+		
 	}
 
 	public int getDuration() {
 		return duration;
 	}
 
-	public void setDuration(String string) {
+	public void setDuration(String duration) {
 		try
 		{
-		this.duration = Integer.parseInt(string);
+			this.duration = Integer.parseInt(duration);
 		}
 		catch(Exception e)
 		{
-				System.out.println("\nAn error occured when setting slide duration");
-				this.duration = 0;
+			this.duration = 0;
 		}
 	}
 
@@ -103,7 +117,7 @@ public class Slide {
 			backgroundColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for slide background colour");
 		}
 	}
 
@@ -111,24 +125,26 @@ public class Slide {
 		return textList;
 	}
 
-	public void setTextList(ArrayList<Text> textList) {
-		this.textList = textList;
+	public void addText (Text text)
+	{
+		textList.add(text);
 	}
 
 	public ArrayList<Shape> getShapeList() {
 		return shapeList;
 	}
 
-	public void setShapeList(ArrayList<Shape> shapeList) {
-		this.shapeList = shapeList;
+	public void addShape (Shape shape)
+	{
+		shapeList.add(shape);
 	}
 
 	public ArrayList<Polygon> getPolygonList() {
 		return polygonList;
 	}
 
-	public void setPolygonList(ArrayList<Polygon> polygonList) {
-		this.polygonList = polygonList;
+	public void addPolygon(Polygon polygon) {
+		polygonList.add(polygon);
 	}
 
 	public ArrayList<Image> getImageList() {
@@ -144,24 +160,27 @@ public class Slide {
 		return videoList;
 	}
 
-	public void setVideoList(ArrayList<Video> videoList) {
-		this.videoList = videoList;
+	public void addVideo (Video video)
+	{
+		videoList.add(video);
 	}
 
 	public ArrayList<Audio> getAudioList() {
 		return audioList;
 	}
-
-	public void setAudioList(ArrayList<Audio> audioList) {
-		this.audioList = audioList;
+	
+	public void addAudio (Audio audio)
+	{
+		audioList.add(audio);
 	}
 
 	public ArrayList<Interactable> getInteractableList() {
 		return interactableList;
 	}
 
-	public void setInteractableList(ArrayList<Interactable> interactableList) {
-		this.interactableList = interactableList;
+	public void addInteractable (Interactable interactable)
+	{
+		interactableList.add(interactable);
 	}
 
 	public void setSlideId(String string) {

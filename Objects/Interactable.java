@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 public class Interactable 
 {
+	private int targetSlide;
 	private ArrayList<Text> textList;
 	private ArrayList<Shape> shapeList;
 	private ArrayList<Polygon> polygonList;
@@ -38,19 +39,45 @@ public class Interactable
 
 
 	public Interactable() {
-		super();
-		// TODO Auto-generated constructor stub
+		textList = new ArrayList<Text>();
+		shapeList = new ArrayList<Shape>();
+		polygonList = new ArrayList<Polygon>();
+		imageList = new ArrayList<Image>();
+		videoList = new ArrayList<Video>();
+		audioList = new ArrayList<Audio>();
 	}
 	
+	
+	public int getTargetSlide() {
+		return targetSlide;
+	}
+
+
+	public void setTargetSlide(int targetSlide) {
+		this.targetSlide = targetSlide;
+	}
+	
+	public void setTargetSlide(String targetSlide)
+	{
+		try
+		{
+			this.targetSlide = Integer.parseInt("targetSlide");
+		}
+		catch(Exception e)
+		{
+			this.targetSlide = 0;
+		}
+		
+	}
 	
 	public ArrayList<Text> getTextList()
 	{
 		return textList;
 	}
 	
-	public void setTextList(ArrayList<Text> textList) 
+	public void addText (Text text)
 	{
-		this.textList = textList;
+		textList.add(text);
 	}
 	
 	public ArrayList<Shape> getShapeList() 
@@ -58,9 +85,9 @@ public class Interactable
 		return shapeList;
 	}
 	
-	public void setShapeList(ArrayList<Shape> shapeList)
+	public void addShape (Shape shape)
 	{
-		this.shapeList = shapeList;
+		shapeList.add(shape);
 	}
 	
 	public ArrayList<Polygon> getPolygonList() 
@@ -68,9 +95,8 @@ public class Interactable
 		return polygonList;
 	}
 	
-	public void setPolygonList(ArrayList<Polygon> polygonList)
-	{
-		this.polygonList = polygonList;
+	public void addPolygon(Polygon polygon) {
+		polygonList.add(polygon);
 	}
 	
 	public ArrayList<Image> getImageList() 
@@ -78,9 +104,9 @@ public class Interactable
 		return imageList;
 	}
 	
-	public void setImageList(ArrayList<Image> imageList)
+	public void addImage (Image image)
 	{
-		this.imageList = imageList;
+		imageList.add(image);
 	}
 	
 	public ArrayList<Video> getVideoList()
@@ -88,9 +114,9 @@ public class Interactable
 		return videoList;
 	}
 	
-	public void setVideoList(ArrayList<Video> videoList) 
+	public void addVideo (Video video)
 	{
-		this.videoList = videoList;
+		videoList.add(video);
 	}
 	
 	public ArrayList<Audio> getAudioList() 
@@ -98,9 +124,9 @@ public class Interactable
 		return audioList;
 	}
 	
-	public void setAudioList(ArrayList<Audio> audioList)
+	public void addAudio (Audio audio)
 	{
-		this.audioList = audioList;
+		audioList.add(audio);
 	}
 	
 

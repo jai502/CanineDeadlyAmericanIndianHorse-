@@ -22,19 +22,18 @@ public class Text {
 	private Color fontColour;
 	private String text;
  
-//	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, Font myFont, Color myFontColour, String myText)
-//	 {
-//			 startTime = myStartTime;
-//			 duration = myDuration;
-//			 fontSize =  myFontSize;
-//			 xStart = myXStart;
-//			 yStart = myYStart;
-//			 font = myFont;
-//			 fontColour = myFontColour;
-//			 text = myText;
-//	}
+	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, Font myFont, Color myFontColour, String myText)
+	 {
+			 startTime = myStartTime;
+			 duration = myDuration;
+			 fontSize =  myFontSize;
+			 xStart = myXStart;
+			 yStart = myYStart;
+			 font = myFont;
+			 fontColour = myFontColour;
+			 text = myText;
+	}
 	 
-	
 
 	public Text() {
 		super();
@@ -60,9 +59,15 @@ public class Text {
 		return duration;
 	}
 	
-	public void setDuration(String duration)
-	{
-		this.duration = Integer.parseInt(duration);
+	public void setDuration(String duration) {
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
 	}
 	
 	public void setDuration(int duration) 
@@ -82,7 +87,14 @@ public class Text {
 	
 	public void setFontSize(String fontSize)
 	{
-		this.fontSize = Integer.parseInt(fontSize);
+		try
+		{
+			this.fontSize = Integer.parseInt(fontSize);
+		}
+		catch(Exception e)
+		{
+			this.fontSize = 0;
+		}
 	}
 	
 	public double getxStart() 
@@ -128,7 +140,7 @@ public class Text {
 			font = Font.getFont(myFont);	
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting the font");
+			System.out.println("\nNo font set for text");
 		}
 	}
 	
@@ -158,7 +170,7 @@ public class Text {
 			fontColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting font colour");
+			System.out.println("\nNo colour set for font colour");
 		}
 	}
 	

@@ -4,10 +4,10 @@
  * Date of first version: 22nd February 2016
  * 
  * Last version by: Joseph Ingleby & Callum Silver
- * Date of last update: 22nd February 2016
+ * Date of last update: 28th February 2016
  * Version number: 0.1
  * 
- * Commit date: 22nd February 2016
+ * Commit date: 28th February 2016
  * Description: This class parses an xml file
  */
 
@@ -28,10 +28,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class XMLParser extends DefaultHandler {
 
-	private String inputFile = "PWS/PWSTest.xml";
-	private String fileLocation;
+	private String readingFile;
 	private String newContent;
-	private boolean ShapeOrPolyShade = false; // true for shape, false for poly
+	private String text = "";
+	private boolean ShapeOrPolyShade = false; // true for shape, false for polygon
 	private Text currentText;
 	private Shape currentShape;
 	private Polygon currentPolygon;
@@ -46,20 +46,24 @@ public class XMLParser extends DefaultHandler {
 	private Slide currentSlide;
 	private Presentation currentPres;
 	private ArrayList<Slide> slideList;
-	private int defaultsSet = 0;
-	
-	private ArrayList<Text> textList;
-
+	private boolean defaultsSet = false;
 	
 	
 
 	public XMLParser() {
+		
+		super();
+	}
+	
+	public void parseXML(String inputFile){
+		
+		readingFile = inputFile;
 
 		try 
 		{
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
-			saxParser.parse(inputFile, this);
+			saxParser.parse(inputFile , this);
 		} 
 		catch (ParserConfigurationException pce)
 		{
@@ -75,26 +79,7 @@ public class XMLParser extends DefaultHandler {
 		}
 	}
 
-	public String getInputFile() {
-		return inputFile;
-	}
 
-	public void setInputFile(String inputFile) {
-		this.inputFile = inputFile;
-	}
-
-	public String getFileLocation() {
-		return fileLocation;
-	}
-
-	public void setFileLocation(String fileLocation) {
-		this.fileLocation = fileLocation;
-	}
-
-	public void startFile() throws SAXException 
-	{
-		System.out.println("Started parsing: " + getInputFile());
-	}
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException 
@@ -106,15 +91,11 @@ public class XMLParser extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName,Attributes attributes) throws SAXException 
 	{
-		String elementName = localName;
-		if ("".equals(elementName))
-		{
-			elementName = qName;
-		}
 		
 		
-		if (elementName.equalsIgnoreCase("presentation"))
+		if (qName.equalsIgnoreCase("presentation"))
 		{
+			System.out.println("Started parsing: " + readingFile);
 			currentPres = new Presentation();
 			slideList = new ArrayList<Slide>();
 		}
@@ -122,22 +103,20 @@ public class XMLParser extends DefaultHandler {
 		if (qName.equalsIgnoreCase("documentInfo"))
 		{
 			currentDocInfo = new DocumentInfo();
-			System.out.println("hey");
 		}
 		if (qName.equalsIgnoreCase("defaults"))
 		{
 			currentDefaults = new Defaults();
-			System.out.println("hey again");
-			defaultsSet = 0;
+			defaultsSet = false;
 		}
 		if (qName.equalsIgnoreCase("slide"))
 		{
 			currentSlide = new Slide();
-			System.out.println("New slide");
+			System.out.println("New slide...");
+			System.out.println("Current Slide: " + (slideList.size() + 1));
 			currentSlide.setSlideId(attributes.getValue("slideID"));
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
-			System.out.println("Next slide:" + currentSlide.getNextSlide());
 		}
 		
 		if (qName.equalsIgnoreCase("text"))
@@ -150,6 +129,16 @@ public class XMLParser extends DefaultHandler {
 			currentText.setFont(attributes.getValue("font"));
 			currentText.setFontSize(attributes.getValue("fontsize"));
 			currentText.setFontColour(attributes.getValue("fontcolour"));
+		}
+		
+		if (qName.equalsIgnoreCase("b"))
+		{
+			text = (text + newContent);
+		}
+		
+		if (qName.equalsIgnoreCase("i"))
+		{
+			text = (text + newContent);
 		}
 		
 		if (qName.equalsIgnoreCase("Shape"))
@@ -178,6 +167,18 @@ public class XMLParser extends DefaultHandler {
 			currentPolygon.setFillColour(attributes.getValue("fillColour"));
 			
 			ShapeOrPolyShade = false;
+		}
+		
+		if (qName.equalsIgnoreCase("Shading"))
+		{
+			currentShading = new Shading();
+			currentShading.setxOne(attributes.getValue("x1"));
+			currentShading.setxTwo(attributes.getValue("x2"));
+			currentShading.setyOne(attributes.getValue("y1"));
+			currentShading.setyTwo(attributes.getValue("y2"));
+			currentShading.setColourOne(attributes.getValue("colour1"));
+			currentShading.setColourTwo(attributes.getValue("colour2"));
+			
 		}
 		
 		if (qName.equalsIgnoreCase("image"))
@@ -215,6 +216,7 @@ public class XMLParser extends DefaultHandler {
 		if (qName.equalsIgnoreCase("interactable"))
 		{
 			currentInteractable = new Interactable();
+			currentInteractable.setTargetSlide(attributes.getValue("targetSlide"));
 			isInteractable = true;
 		}
 		
@@ -241,13 +243,12 @@ public class XMLParser extends DefaultHandler {
 		{
 			currentPres.setDefaults(currentDefaults);
 			currentDefaults = null;
-			defaultsSet = 1;
+			defaultsSet = true;
 			System.out.println("defaults set");
 		}
 		
 		if (qName.equalsIgnoreCase("slide"))
 		{
-			currentSlide.setTextList(textList);
 			slideList.add(currentSlide);
 			currentSlide = null;
 		}
@@ -278,14 +279,12 @@ public class XMLParser extends DefaultHandler {
 		
 		if (qName.equalsIgnoreCase("backgroundColour"))
 		{
-			if (defaultsSet == 0)
+			if (defaultsSet == false)
 			{
 				currentDefaults.setBackground(newContent);
 			}
 			else
-			{
-				System.out.println("new content: " + newContent + "Qname" + qName + currentSlide.getNextSlide());
-				
+			{				
 				currentSlide.setBackgroundColour(newContent);
 				
 			}
@@ -321,29 +320,38 @@ public class XMLParser extends DefaultHandler {
 		if (qName.equalsIgnoreCase("text"))
 		{
 			if (isInteractable == true){
-				currentText.setText(newContent);
-				currentInteractable.getTextList().add(currentText);
+				text = (text + newContent);
+				currentText.setText(text);
+				currentInteractable.addText(currentText);
 				currentText = null;
 			}
 			else
 			{
-				currentText.setText(newContent);
-				System.out.println("new content contains: " + newContent + currentText.getText());
-				System.out.println("duration :" + currentText.getDuration()+ "Font:"+ currentText.getFontSize());
-				textList.add(currentText);
-				
+				text = (text + newContent);
+				currentText.setText(text);
+				currentSlide.addText(currentText);
 				currentText = null;
 			}
+		}
+		
+		if (qName.equalsIgnoreCase("b"))
+		{
+			text = (text + "<b>" + newContent + "</b>");
+		}
+		
+		if (qName.equalsIgnoreCase("i"))
+		{
+			text = (text + "<i>" + newContent + "</i>");
 		}
 		
 		if (qName.equalsIgnoreCase("shape"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.getShapeList().add(currentShape);
+				currentInteractable.addShape(currentShape);
 			}
 			
-			currentSlide.getShapeList().add(currentShape);
+			currentSlide.addShape(currentShape);
 			
 		}
 		
@@ -351,9 +359,9 @@ public class XMLParser extends DefaultHandler {
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.getPolygonList().add(currentPolygon);
+				currentInteractable.addPolygon(currentPolygon);
 			}
-			currentSlide.getPolygonList().add(currentPolygon);
+			currentSlide.addPolygon(currentPolygon);
 		}
 		
 		if (qName.equalsIgnoreCase("shading"))
@@ -372,9 +380,8 @@ public class XMLParser extends DefaultHandler {
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.getImageList().add(currentImage);
+				currentInteractable.addImage(currentImage);
 			}
-			System.out.println(currentSlide.getNextSlide() + "hello:" + currentImage.getSourceFile());
 			
 			currentSlide.addImage(currentImage);
 		}
@@ -383,49 +390,44 @@ public class XMLParser extends DefaultHandler {
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.getAudioList().add(currentAudio);
+				currentInteractable.addAudio(currentAudio);
 			}
-			currentSlide.getAudioList().add(currentAudio);
+			currentSlide.addAudio(currentAudio);
 		}
 		
 		if (qName.equalsIgnoreCase("Video"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.getVideoList().add(currentVideo);
+				currentInteractable.addVideo(currentVideo);
 			}
-			currentSlide.getVideoList().add(currentVideo);
+			currentSlide.addVideo(currentVideo);
 		}
 		
 		if (qName.equalsIgnoreCase("Interactable"))
 		{
-			currentSlide.getInteractableList().add(currentInteractable);
+			currentSlide.addInteractable(currentInteractable);
 			isInteractable = false;
 		}
 		
 		if (qName.equalsIgnoreCase("Presentation"))
 		{
 			currentPres.setSlides(slideList);
-			
 		}
 			
-			
-		
 	}
-	
 	
 	public void endDocument() throws SAXException 
 	{
         System.out.println("Finished parsing, stored presentation with " + slideList.size() + " slides.");
 	}
-	public Presentation getPresentation(String fileLocation, String fileName)
+	
+	public Presentation getPresentation()
 	{
-		setInputFile(fileName);
-		setFileLocation(fileLocation);
-		
 		return currentPres;
-		
 	}
+	
+	
 
 
 }

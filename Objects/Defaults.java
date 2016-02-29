@@ -21,15 +21,19 @@ public class Defaults {
 	private Font font;
 	private int	fontSize;
 	
-	//public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, Font myFont, int myFontSize){
-	//	background = myBackground;
-	//	fontColour = myFontColour;
-	//	lineColour = myLineColour;
-	//	fillColour = myFillColour;
-	//	font = myFont;
-	//	fontSize = myFontSize;
-	//}/
+	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, Font myFont, int myFontSize){
+		background = myBackground;
+		fontColour = myFontColour;
+		lineColour = myLineColour;
+		fillColour = myFillColour;
+		font = myFont;
+		fontSize = myFontSize;
+	}
 	
+	public Defaults() {
+		super();
+	}
+
 	public Color getBackground() 
 	{
 		return background;
@@ -54,7 +58,7 @@ public class Defaults {
 			background = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for default background colour");
 		}
 	}
 	
@@ -73,16 +77,16 @@ public class Defaults {
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
+			int bInt = Integer.parseInt(b, 16);
 			fontColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for default font colour");
 		}
 	}
 	
@@ -101,16 +105,16 @@ public class Defaults {
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
 			lineColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for default line colour");
 		}
 	}
 	
@@ -129,16 +133,16 @@ public class Defaults {
 		{
 			if(colour.startsWith("#"))
 				colour.equals(colour.substring(1));
-			String r = colour.substring(0,1);
-			String g = colour.substring(2,3);
-			String b = colour.substring(4,5);
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
 			int rInt = Integer.parseInt(r, 16);
 			int gInt = Integer.parseInt(g, 16);
 			int bInt = Integer.parseInt(b,  16);
 			fillColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nAn error occured when setting colour");
+			System.out.println("\nNo colour set for default fill colour");
 		}
 	}
 	public Font getFont() 
