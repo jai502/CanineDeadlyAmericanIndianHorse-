@@ -14,6 +14,8 @@ package Parsers;
 
 import static org.junit.Assert.*;
 
+import java.awt.Color;
+
 import org.junit.*;
 
 import Objects.*;
@@ -129,6 +131,16 @@ public class XMLParserTest {
 	}
 	
 	@Test
+	public void ShadingReadsIntoList() {
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getColourOne());
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getColourTwo());
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getxOne());
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getxTwo());
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getyOne());
+		assertNotNull(presentation.getSlides().get(1).getPolygonList().get(0).getShading().getyTwo());
+	}
+	
+	@Test
 	public void ImageReadsIntoList() 
 	{
 		assertNotNull(presentation.getSlides().get(0).getImageList().get(0).getDuration());
@@ -168,19 +180,44 @@ public class XMLParserTest {
 		assertNotNull(presentation.getSlides().get(5).getInteractableList().get(0).getTextList().get(0).getDuration());
 		assertNotNull(presentation.getSlides().get(5).getInteractableList().get(0).getTextList().get(0).getStartTime());
 	}
-	// TODO Add in Shading test
-	// TODO Add in more random values
+	// TODO Add in values for the assertEquals
 	//Test some random values, as testing all aspects of the pres file would be too extensive
 	@Test
 	public void randomValueTests() {
+		// Doc info
 		assertEquals("Callum Silver", presentation.getDocInfo().getAuthor());
 		assertEquals("1.0", presentation.getDocInfo().getVersion());
+		// Defaults
 		assertEquals(12, presentation.getDefaults().getFontSize());
 		assertEquals("serif", presentation.getDefaults().getFont());
+		// Slide
 		assertEquals(2, presentation.getSlides().get(0).getSlideId());
 		assertEquals(3, presentation.getSlides().get(0).getNextSlide());
-		assertEquals("Callum Silver", presentation.getDocInfo().getAuthor());
-		assertEquals("Callum Silver", presentation.getDocInfo().getAuthor());
+		// Text
+		assertEquals("This is <b>bold</b> a <i>italics</i> test for testing.", presentation.getSlides().get(4).getTextList().get(0).getText());
+		assertEquals(0.5, presentation.getSlides().get(4).getTextList().get(0).getxStart(), 0); // extra term is for asserting equals double and is the discrepancy
+		// Images
+		assertEquals("InsertPicture.jpg", presentation.getSlides().get(0).getImageList().get(0).getSourceFile());
+		assertEquals(0.2, presentation.getSlides().get(0).getImageList().get(0).getHeight(), 0);
+		// Shape
+		// TODO find way of testing colour
+		//assertEquals(,presentation.getSlides().get(1).getShapeList().get(1).getLineColour());
+		assertEquals("rectangle", presentation.getSlides().get(1).getShapeList().get(1).getType());
+		// Polygon
+		//assertEquals(2, presentation.getSlides().get(1).getPolygonList().get(0).getFillColour());
+		assertEquals(1 , presentation.getSlides().get(1).getPolygonList().get(0).getStartTime());
+		// Audio
+		assertEquals(true, presentation.getSlides().get(2).getAudioList().get(0).isLoop());
+		assertEquals("Audio.aac", presentation.getSlides().get(2).getAudioList().get(0).getSourceFile());
+		// Video
+		assertEquals(0.1, presentation.getSlides().get(3).getVideoList().get(0).getyStart(), 0);
+		assertEquals("Video.mp4", presentation.getSlides().get(3).getVideoList().get(0).getSourceFile());
+		// Interactable
+		assertEquals(3, presentation.getSlides().get(5).getInteractableList().get(0).getTargetSlide());
+		assertEquals(0, presentation.getSlides().get(5).getInteractableList().get(0).getTextList().get(0).getDuration());
+		// Shading
+		//assertEquals(2, presentation.getSlides().get(1).getPolygonList().get(0).getShading().getColourOne());
+		assertEquals(0.1 ,presentation.getSlides().get(1).getPolygonList().get(0).getShading().getxTwo(), 0);
 	}
 	
 	@Test
