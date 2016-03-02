@@ -89,6 +89,9 @@ public class MainGUI extends Application
 	private ImageView image;
 	private boolean x = false;
 
+	/* variables for presentation scene */
+	Pagination pagination;
+
 	// Constructor
 	public MainGUI(){
 
@@ -185,7 +188,7 @@ public class MainGUI extends Application
 		BorderPane presentationLayout = new BorderPane();
 		presentationLayout.setId("presentationLayout"); // rootNode id for presentation Scene in CSS
 		// Add the root node to the scene
-		presentationMenu = new Scene(presentationLayout, 900, 600);
+		presentationMenu = new Scene(presentationLayout, 900, 630);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
 		presentationLayout.getStylesheets().add(MainGUI.class.getResource("style.css").toExternalForm());
@@ -196,7 +199,7 @@ public class MainGUI extends Application
 
 		/* Pagination part */
 
-		final Pagination pagination;
+		//final Pagination pagination;
 		final int numOfPage = images.length;
 		// Create pagination with desired number of pages
 		pagination = new Pagination(numOfPage);
@@ -230,19 +233,6 @@ public class MainGUI extends Application
 				else if (ke.getCode().equals(KeyCode.ESCAPE))
 				{	
 					x = false;
-				}
-			}
-		});
-
-		// Change slide with mouse events
-		presentationLayout.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				if (mouseEvent.isPrimaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
-				}
-				if (mouseEvent.isSecondaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
 				}
 			}
 		});
@@ -428,6 +418,22 @@ public class MainGUI extends Application
 			image.fitHeightProperty().bind(pageBox.heightProperty());
 		}
 
+		image.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+			// Add mouse event handler to the images part of the pagination
+			@Override
+			public void handle(MouseEvent mouseEvent) {
+				if (mouseEvent.isPrimaryButtonDown()) {
+					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
+				}
+				if (mouseEvent.isSecondaryButtonDown()) {
+					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
+				}
+
+				mouseEvent.consume();
+			}
+		});
+
 		pageBox.getChildren().add(image);
 
 		return pageBox;
@@ -441,6 +447,7 @@ public class MainGUI extends Application
 		for (int i = 0; i < 3; i++) {
 			images[i] = new Image(MainGUI.class.getResource("animal" + (i + 1) + ".jpg").toExternalForm(), false);
 		}
+
 		return images;
 	}
 	/* Method for GridPane for Main Menu */
