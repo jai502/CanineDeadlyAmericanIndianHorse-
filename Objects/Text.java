@@ -13,7 +13,9 @@
 package Objects;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.io.IOException;
+
+import Parsers.ReadTextFile;
 
 public class Text {
 	private int startTime, duration, fontSize;
@@ -21,6 +23,7 @@ public class Text {
 	private String font;
 	private Color fontColour;
 	private String text;
+	private String sourceText;
  
 	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
 	 {
@@ -172,6 +175,35 @@ public class Text {
 	public void setText(String text) 
 	{
 		this.text = text;
+	}
+
+
+	public String getSourceText() {
+		return sourceText;
+	}
+
+
+	public void setSourceText(String sourceFile)
+	{
+		if (sourceFile != null){
+			try
+			{
+				ReadTextFile reader = new ReadTextFile();
+				this.sourceText = reader.ReadFile(sourceFile);
+				
+				
+			}
+			catch (IOException e)
+			{
+				
+				System.out.println("Error source file for text");
+			}
+		}
+		else
+		{
+			System.out.println("No source file for text");
+		}
+		
 	} 
  
 }

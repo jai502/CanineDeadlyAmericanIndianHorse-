@@ -129,6 +129,7 @@ public class XMLParser extends DefaultHandler {
 			currentText.setFont(attributes.getValue("font"));
 			currentText.setFontSize(attributes.getValue("fontsize"));
 			currentText.setFontColour(attributes.getValue("fontcolour"));
+			currentText.setSourceText(attributes.getValue("sourceFile"));
 		}
 		
 		if (qName.equalsIgnoreCase("b"))
@@ -324,6 +325,7 @@ public class XMLParser extends DefaultHandler {
 				currentText.setText(text);
 				currentInteractable.addText(currentText);
 				currentText = null;
+				text = "";
 			}
 			else
 			{
@@ -331,6 +333,7 @@ public class XMLParser extends DefaultHandler {
 				currentText.setText(text);
 				currentSlide.addText(currentText);
 				currentText = null;
+				text = "";
 			}
 		}
 		
