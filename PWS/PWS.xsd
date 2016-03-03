@@ -268,6 +268,12 @@
 										<attribute name="sourceFile"
 											type="string">
 										</attribute>
+										<attribute name="width"
+											type="string">
+										</attribute>
+										<attribute name="height"
+											type="string">
+										</attribute>
 									</complexType>
 								</element>
 								<element name="shape" minOccurs="0">
@@ -956,6 +962,12 @@
 													</attribute>
 													<attribute
 														name="sourceFile" type="string">
+													</attribute>
+													<attribute
+														name="width" type="string">
+													</attribute>
+													<attribute
+														name="height" type="string">
 													</attribute>
 												</complexType>
 											</element>

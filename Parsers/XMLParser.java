@@ -130,6 +130,8 @@ public class XMLParser extends DefaultHandler {
 			currentText.setFontSize(attributes.getValue("fontsize"));
 			currentText.setFontColour(attributes.getValue("fontcolour"));
 			currentText.setSourceText(attributes.getValue("sourceFile"));
+			currentText.setWidth(attributes.getValue("width"));
+			currentText.setHeight(attributes.getValue("height"));
 		}
 		
 		if (qName.equalsIgnoreCase("b"))

@@ -38,11 +38,11 @@
   	<video ystart="0.1" loop="false" xstart="0.2" sourceFile="Video.mp4" starttime="50" duration="100" />
   </slide>
   <slide slideID="1" nextSlide="2">
-  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0" font="SansSerif" fontcolour="FFFFFF" fontsize="12" sourceFile="Parsers/test.txt">This is <b>bold</b> a <i>italics</i> test for testing.</text>
-  	<text ystart="0.6" xstart="0.6" starttime="500" duration="100" font="Serif" fontcolour="FF0FF1" fontsize="8">This is a <i>italics</i> test for testing the second text.</text>
+  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0" font="SansSerif" fontcolour="FFFFFF" fontsize="12" sourceFile="Parsers/test.txt" width="0.3" height="0.2">This is <b>bold</b> a <i>italics</i> test for testing.</text>
+  	<text ystart="0.6" xstart="0.6" starttime="500" duration="100" font="Serif" fontcolour="FF0FF1" fontsize="8" width="0.4" height="0.3">This is a <i>italics</i> test for testing the second text.</text>
   </slide>
   <slide slideID="7">
   	<interactable targetSlide="3">
-  		<text ystart="0.0" xstart="0.0" starttime="0" duration="0"></text>
+  		<text ystart="0.0" xstart="0.0" starttime="0" duration="0" width="0.2" height="0.3"></text>
   	</interactable></slide>
 </Presentation>

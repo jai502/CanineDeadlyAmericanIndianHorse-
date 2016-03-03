@@ -19,7 +19,7 @@ import Parsers.ReadTextFile;
 
 public class Text {
 	private int startTime, duration, fontSize;
-	private double xStart, yStart;
+	private double xStart, yStart, height, width;
 	private String font;
 	private Color fontColour;
 	private String text;
@@ -205,5 +205,42 @@ public class Text {
 		}
 		
 	} 
+	public double getHeight() {
+		return height;
+	}
+	public void setHeight(double height) {
+		this.height = height;
+	}
+	
+	public void setHeight(String height)
+	{
+		if (height.equals(null))
+		{
+			System.out.println("no height for text set");
+		}
+		else
+		{
+			this.width = Double.parseDouble(height);
+		}
+	}
+	
+	public double getWidth() {
+		return width;
+	}
+	public void setWidth(double width) {
+		this.width = width;
+	}
+	public void setWidth(String width)
+	{
+		if (width.equals(null))
+		{
+			System.out.println("no width for text set");
+		}
+		else
+		{
+			this.width = Double.parseDouble(width);
+		}
+		
+	}
  
 }
