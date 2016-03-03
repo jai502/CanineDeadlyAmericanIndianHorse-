@@ -13,14 +13,17 @@
 package Objects;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.io.IOException;
+
+import Parsers.ReadTextFile;
 
 public class Text {
 	private int startTime, duration, fontSize;
-	private double xStart, yStart;
+	private double xStart, yStart, height, width;
 	private String font;
 	private Color fontColour;
 	private String text;
+	private String sourceText;
  
 	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
 	 {
@@ -172,6 +175,72 @@ public class Text {
 	public void setText(String text) 
 	{
 		this.text = text;
+	}
+
+
+	public String getSourceText() {
+		return sourceText;
+	}
+
+
+	public void setSourceText(String sourceFile)
+	{
+		if (sourceFile != null){
+			try
+			{
+				ReadTextFile reader = new ReadTextFile();
+				this.sourceText = reader.ReadFile(sourceFile);
+				
+				
+			}
+			catch (IOException e)
+			{
+				
+				System.out.println("Error source file for text");
+			}
+		}
+		else
+		{
+			System.out.println("No source file for text");
+		}
+		
 	} 
+	public double getHeight() {
+		return height;
+	}
+	public void setHeight(double height) {
+		this.height = height;
+	}
+	
+	public void setHeight(String height)
+	{
+		if (height.equals(null))
+		{
+			System.out.println("no height for text set");
+		}
+		else
+		{
+			this.width = Double.parseDouble(height);
+		}
+	}
+	
+	public double getWidth() {
+		return width;
+	}
+	public void setWidth(double width) {
+		this.width = width;
+	}
+	public void setWidth(String width)
+	{
+		if (width.equals(null))
+		{
+			System.out.println("no width for text set");
+		}
+		else
+		{
+			this.width = Double.parseDouble(width);
+		}
+		
+	}
  
 }

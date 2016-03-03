@@ -61,6 +61,9 @@ public class XMLPrint {
 	            		System.out.println("Text " + (x+1) + " Font: " + presentation.getSlides().get(i).getTextList().get(x).getFont());
 	            		System.out.println("Text " + (x+1) + " Font Colour: " + presentation.getSlides().get(i).getTextList().get(x).getFontColour());
 	            		System.out.println("Text " + (x+1) + " Reads: " + presentation.getSlides().get(i).getTextList().get(x).getText());
+	            		System.out.println("Text " + (x+1) + " Source Reads: " + presentation.getSlides().get(i).getTextList().get(x).getSourceText());
+	            		System.out.println("Text " + (x+1) + " Width: " + presentation.getSlides().get(i).getTextList().get(x).getWidth());
+	            		System.out.println("Text " + (x+1) + " Height: " + presentation.getSlides().get(i).getTextList().get(x).getHeight());
 	            		System.out.println("--------Text-------");
 	            	}
 	            	for (int x = 0; x < presentation.getSlides().get(i).getShapeList().size(); x++)
