@@ -44,23 +44,14 @@ public class ImageHandler  extends Application
 		Canvas imageCanvas = new Canvas(x, y);
 		GraphicsContext gContext = imageCanvas.getGraphicsContext2D();
 		Image image = generateImage();
-//		image = resizedImage(image,getCanvasXSize(x),getCanvasYSize(y));
-		gContext.drawImage(resizedImage(image,getCanvasXSize(x),getCanvasYSize(y)), 0, 0);
+		gContext.scale(0.1,0.1);
+		gContext.drawImage(image, 0, 0);
+
 		
 		return imageCanvas;
 	}
 	
-	//method to resize the image before it goes on the canvas
-	public Image resizedImage(Image image, int canvasX, int canvasY)
-	{
-		ImageView iView = new ImageView(image);
-		iView.setPreserveRatio(true);
-		iView.setFitHeight(canvasY);
-		iView.fitHeightProperty();
-		Image resizedImage = iView.getImage();
-		return resizedImage;
 
-	}
 
 	//this method will take the return the desired canvas position when given the size of the scene
 	public int getCanvasXPosition(int sizeOfSceneX)
