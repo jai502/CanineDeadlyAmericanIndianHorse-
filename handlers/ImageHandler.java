@@ -1,134 +1,78 @@
+/*
+* (C) Stammtisch
+* First version created by: Joseph Ingleby & Callum Silver
+* Date of first version: 2nd March 2016
+* 
+* Last version by: Joseph Ingleby & Callum Silver
+* Date of last update: 3rd March 2016
+* Version number: 2.0
+* 
+* Commit date: 3rd March 2016
+* Description: This class holds takes an Images Object and returns a canvas containing the image in 
+* the correct position.
+*/
 package handlers;
 
-
-import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-
-import javafx.application.Application;
-import javafx.scene.Scene;
+// Imports
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+
 import Objects.Images;
-import javax.imageio.*;
 
-import com.sun.prism.Graphics;
-
-public class ImageHandler  extends Application
+public class ImageHandler
 {
-	
-	private Images imageToHandle = new	Images("handlers/house.jpg", 0, 0, 0, 0, 0.1 , 0.1);
+	private Images imageToHandle;
 	
 	//constructors
-	public ImageHandler(Images imageToHandle) 
-	{
-		super();
-		this.imageToHandle = imageToHandle;
-	}
-	
 	public ImageHandler()
 	{
 		super();
 	}
 	
 	//returns a canvas that contains the image
-	public Canvas establishCanvas(int x, int y) 
+	public Canvas drawCanvas(Images imageToHandle , int sceneSizeX, int sceneSizeY) 
 	{
-		Canvas imageCanvas = new Canvas(x, y);
+		this.imageToHandle = imageToHandle;
+		
+		// set up a new canvas
+		Canvas imageCanvas = new Canvas(sceneSizeX, sceneSizeY);
 		GraphicsContext gContext = imageCanvas.getGraphicsContext2D();
 		Image image = generateImage();
-		gContext.scale(0.1,0.1);
-		gContext.drawImage(image, 0, 0);
-
+		// draw image (image, x start, y start, width, height)
+		gContext.drawImage(image, getXPosition(sceneSizeX), getYPosition(sceneSizeY), getWidth(sceneSizeX), getHeight(sceneSizeY));
 		
 		return imageCanvas;
 	}
 	
-
-
-	//this method will take the return the desired canvas position when given the size of the scene
-	public int getCanvasXPosition(int sizeOfSceneX)
+	//this method gets the starting X position of the image for use in the canvas
+	public double getXPosition(int sizeOfSceneX)
 	{
-		return (int) (sizeOfSceneX*getImageToHandle().getxStart());
+		return (sizeOfSceneX*imageToHandle.getxStart());
+	}
+
+	//this method gets the starting Y position of the image for use in the canvas
+	public double getYPosition(int sizeOfSceneY)
+	{
+		return (sizeOfSceneY*imageToHandle.getyStart());
 	}
 	
-
-	//this method will take the return the desired canvas position when given the size of the scene
-	public int getCanvasYPosition(int sizeOfSceneY)
+	//this method gets the width of the image for use in the canvas
+	public double getWidth(int sizeOfSceneX)
 	{
-		return (int)(sizeOfSceneY*getImageToHandle().getyStart());
+		return ((sizeOfSceneX*imageToHandle.getWidth()));
+	}
+
+	//this method gets the height of the image for use in the canvas
+	public double getHeight(int sizeOfSceneY)
+	{
+		return ((sizeOfSceneY*imageToHandle.getHeight()));
 	}
 	
 	//this method will read the source file and create the image
 	private Image generateImage() 
 	{
-		return new Image(this.imageToHandle.getSourceFile());
-
-	}
-	
-	
-	//this method will take the return the desired canvas height when given the size of the scene
-	public int getCanvasYSize(int sizeOfSceneY)
-	{
-		return (int)(sizeOfSceneY*getImageToHandle().getHeight());
+		return new Image(imageToHandle.getSourceFile());
 	}
 
-	//this method will take the return the desired canvas width when given the size of the scene
-	public int getCanvasXSize(int sizeOfSceneX)
-	{
-		return (int)(sizeOfSceneX*getImageToHandle().getWidth());
-	}
-	
-	
-	//returns the time the canvas will be displayed for
-	public int getCanvasDuration()
-	{
-		return getImageToHandle().getDuration();
-	}
-
-	//returns the time the canvas will be start to be displayed for
-	public int getCanvasStartTime()
-	{
-		return getImageToHandle().getStartTime();
-	}
-
-	//getter and setters
-	public Images getImageToHandle() 
-	{
-		return imageToHandle;
-	}
-
-	public void setImageToHandle(Images imageToHandle) 
-	{
-		this.imageToHandle = imageToHandle;
-	}
-
-
-	@Override
-	public void start(Stage primary) throws Exception 
-	{
-	
-		StackPane root = new StackPane();
-		Scene scene = new Scene(root, 700, 700);
-		Canvas imageCanvas = establishCanvas(500, 500);
-		
-		root.getChildren().addAll(imageCanvas);
-		primary.setScene(scene);
-		primary.show();
-		
-	}
-
-
-	
-	public static void main(String[] args)
-	{
-		launch(args);
-	}
 }
