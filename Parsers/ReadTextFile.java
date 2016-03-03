@@ -1,3 +1,16 @@
+/*
+ * (C) Stammtisch
+ * First version created by: Callum Silver
+ * Date of first version: 03rd March 2016
+ * 
+ * Last version by: Callum Silver
+ * Date of last update: 03rd March 2016
+ * Version number: 0.1
+ * 
+ * Commit date: 03rd March 2016
+ * Description: This class takes a source file for .txt and returns it as one long string.
+ * For use in the text Object.
+ */
 package Parsers;
 
 import java.io.IOException;
@@ -41,7 +54,7 @@ public class ReadTextFile {
 		FileReader fileToRead = new FileReader(sourceFile);
 		BufferedReader reader = new BufferedReader(fileToRead);
 		
-		String currentLine;
+		String currentLine = new String();
 		int lines = 0;
 		
 		while ((currentLine = reader.readLine()) != null) 

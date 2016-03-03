@@ -14,15 +14,12 @@ package Parsers;
 
 import static org.junit.Assert.*;
 
-import java.awt.Color;
-
 import org.junit.*;
 
 import Objects.*;
 
 public class XMLParserTest {
 	
-	private XMLParser parser;
 	private Presentation presentation;
 
 	@Before
