@@ -22,7 +22,7 @@ public class Slide {
 	private ArrayList<Text> textList;
 	private ArrayList<Shape> shapeList;
 	private ArrayList<Polygon> polygonList;
-	private ArrayList<Image> imageList;
+	private ArrayList<Images> imageList;
 	private ArrayList<Video> videoList;
 	private ArrayList<Audio> audioList;
 	private ArrayList<Interactable> interactableList;
@@ -32,7 +32,7 @@ public class Slide {
 		textList = new ArrayList<Text>();
 		shapeList = new ArrayList<Shape>();
 		polygonList = new ArrayList<Polygon>();
-		imageList = new ArrayList<Image>();
+		imageList = new ArrayList<Images>();
 		videoList = new ArrayList<Video>();
 		audioList = new ArrayList<Audio>();
 		interactableList = new ArrayList<Interactable>();
@@ -41,7 +41,7 @@ public class Slide {
 	public Slide(int slideId, int nextSlide, int duration,
 			Color backgroundColour, ArrayList<Text> textList,
 			ArrayList<Shape> shapeList, ArrayList<Polygon> polygonList,
-			ArrayList<Image> imageList, ArrayList<Video> videoList,
+			ArrayList<Images> imageList, ArrayList<Video> videoList,
 			ArrayList<Audio> audioList, ArrayList<Interactable> interactableList) {
 		super();
 		this.slideId = slideId;
@@ -147,11 +147,11 @@ public class Slide {
 		polygonList.add(polygon);
 	}
 
-	public ArrayList<Image> getImageList() {
+	public ArrayList<Images> getImageList() {
 		return imageList;
 	}
 	
-	public void addImage (Image image)
+	public void addImage (Images image)
 	{
 		imageList.add(image);
 	}

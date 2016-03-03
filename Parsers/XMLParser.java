@@ -35,7 +35,7 @@ public class XMLParser extends DefaultHandler {
 	private Text currentText;
 	private Shape currentShape;
 	private Polygon currentPolygon;
-	private Image currentImage;
+	private Images currentImage;
 	private Video currentVideo;
 	private Audio currentAudio;
 	private Interactable currentInteractable;
@@ -183,7 +183,7 @@ public class XMLParser extends DefaultHandler {
 		
 		if (qName.equalsIgnoreCase("image"))
 		{
-			currentImage = new Image();
+			currentImage = new Images();
 			currentImage.setStartTime(attributes.getValue("starttime"));
 			currentImage.setDuration(attributes.getValue("duration"));
 			currentImage.setSourceFile(attributes.getValue("sourceFile"));
