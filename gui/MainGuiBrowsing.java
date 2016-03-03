@@ -360,7 +360,7 @@ public class MainGuiBrowsing extends Application
 
 
 	/* Method to create testing page for pagination in presentation viewer */
-		public VBox createPage(int pageIndex) 
+	public VBox createPage(int pageIndex) 
 	{
 		VBox pageBox = new VBox();
 		Label pageLabel = new Label("HERE WILL BE SLIDE " + (pageIndex+1));
@@ -368,7 +368,7 @@ public class MainGuiBrowsing extends Application
 		return pageBox;
 	}
 
-/*	// Method for opening a file in the browser with normal OS procedure
+	/*	// Method for opening a file in the browser with normal OS procedure
 	private void openFile(File file) {
 		try {
 			desktop.open(file);
@@ -376,7 +376,7 @@ public class MainGuiBrowsing extends Application
 			Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	*/
+	 */
 
 	/* Method for GridPane for Main Menu */
 	public GridPane addMainGridItems()
