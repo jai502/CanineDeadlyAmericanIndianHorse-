@@ -31,42 +31,42 @@ public class ImageHandler
 	}
 	
 	//returns a canvas that contains the image
-	public Canvas drawCanvas(Images imageToHandle , int sceneSizeX, int sceneSizeY) 
+	public Canvas drawCanvas(Images imageToHandle , int canvasSizeX, int canvasSizeY) 
 	{
 		this.imageToHandle = imageToHandle;
 		
 		// set up a new canvas
-		Canvas imageCanvas = new Canvas(sceneSizeX, sceneSizeY);
+		Canvas imageCanvas = new Canvas(canvasSizeX, canvasSizeY);
 		GraphicsContext gContext = imageCanvas.getGraphicsContext2D();
 		Image image = generateImage();
 		// draw image (image, x start, y start, width, height)
-		gContext.drawImage(image, getXPosition(sceneSizeX), getYPosition(sceneSizeY), getWidth(sceneSizeX), getHeight(sceneSizeY));
+		gContext.drawImage(image, getXPosition(canvasSizeX), getYPosition(canvasSizeY), getWidth(canvasSizeX), getHeight(canvasSizeY));
 		
 		return imageCanvas;
 	}
 	
 	//this method gets the starting X position of the image for use in the canvas
-	public double getXPosition(int sizeOfSceneX)
+	public double getXPosition(int sizeOfCanvasX)
 	{
-		return (sizeOfSceneX*imageToHandle.getxStart());
+		return (sizeOfCanvasX*imageToHandle.getxStart());
 	}
 
 	//this method gets the starting Y position of the image for use in the canvas
-	public double getYPosition(int sizeOfSceneY)
+	public double getYPosition(int sizeOfCanvasY)
 	{
-		return (sizeOfSceneY*imageToHandle.getyStart());
+		return (sizeOfCanvasY*imageToHandle.getyStart());
 	}
 	
 	//this method gets the width of the image for use in the canvas
-	public double getWidth(int sizeOfSceneX)
+	public double getWidth(int sizeOfCanvasX)
 	{
-		return ((sizeOfSceneX*imageToHandle.getWidth()));
+		return ((sizeOfCanvasX*imageToHandle.getWidth()));
 	}
 
 	//this method gets the height of the image for use in the canvas
-	public double getHeight(int sizeOfSceneY)
+	public double getHeight(int sizeOfCanvasY)
 	{
-		return ((sizeOfSceneY*imageToHandle.getHeight()));
+		return ((sizeOfCanvasY*imageToHandle.getHeight()));
 	}
 	
 	//this method will read the source file and create the image
