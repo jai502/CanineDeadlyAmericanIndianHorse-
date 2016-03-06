@@ -1,179 +1,170 @@
 /**
 * (C) Stammtisch
 * First version created by: J.Bones
-* Date of first version: 25.02.2016
+* Date of first version: 06.03.2016
 * 
 * Last version by: J.Bones
 * Date of last update: 
-* Version number: 1.0
+* Version number: 1.1
 * 
-* Commit date:
-* Description: Simple text handler to allow for dispaly of text from PWS
+* Commit date: 06.03.2016
+* Description: Simple text handler to allow for display of text according to the PWS
  */
 package handlers;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
 
-public class TextHandler extends Application{
-	Stage window;
-	
-	public static void main(String[] args) {
-		launch(args);
-	}
-	
-	@Override
-  public void start(Stage primaryStage) throws Exception
-  {
-      window = primaryStage;
-      window.setTitle("Text viewer");
-      window.setHeight(300);
-      window.setWidth(400);
+public class TextHandler
+{
 
-      //Add some text to the screen
-      String message = "I am some <b>bold</b> and <i>italic</i> text and " +
-              "some more <b>of that bold</b> and <i>of that italic</i> text. "+
-              "This is a test for <b>PWS</b> testing <i>Good job</i>.";
+	public TextFlow setText(String text, int xStart, int yStart, String fontFamily, int fontSize, Color fontColour)
+	{
+		//Declare an empty text flow object to be returned
+		TextFlow textFlow = null;
 
-      System.out.println("Length of string is: "+message.length()+" characters");
+		//Notify the user if the string is empty
+		if(text.isEmpty())
+		{
+			System.out.println("Nothing to handle!");
+			System.exit(0);
+		}
+		else
+		{
+			//Declare a TextFlow object to append the text objects
+			textFlow = new TextFlow();
+			
+			//Set the starting co-ordinates of the textFlow object
+			textFlow.setLayoutX(xStart);
+			textFlow.setLayoutY(yStart);
 
-      FlowPane flow = new FlowPane();
-      flow.setVgap(5);
-      flow.setHgap(0);
-      flow.setPrefWrapLength(300);
+			//Declare counter to keep track of HTML tag indexes
+			int endOfLastTag = 0;
 
-      int boldCount = 0;
-      int italCount = 0;
-      int endOfLastTag = 0;
-      int numberOfTextElements = 0;
+      //cycle through each character of the message to be displayed
+      for(int i=0;i<text.length();i++)
+      {
+      	//If
+          if(text.charAt(i)=='<')
+          {
+          	//Declare an ArrayList to store characters which are not bold or italic
+          	ArrayList<Character> normalChars = new ArrayList<Character>(text.length());
 
-      //cycle through each character of the string
-      for(int i=0;i<message.length();i++){
+          	//Store the characters from the end of the last tag to the start of the current tag
+          	for(int j=endOfLastTag;j<i;j++)
+          	{
+          		normalChars.add(text.charAt(j));
+          	}
+          	//Build a string from the characters stored in the character array list
+          	StringBuilder normal = new StringBuilder();
+          	for (Object index : normalChars)
+          	{
+          		normal.append(index);
+          	}
+          	normalChars.clear(); //Clear the array list ready for the next characters
+          	
+          	//Store the string of non-formatted characters
+          	String normalText = null;
+          	normalText = normal.toString();
 
-          if(message.charAt(i)=='<'){
-              numberOfTextElements +=1;
-              ArrayList normalChars = new ArrayList(message.length());
-              String normalText = null;
+          	//Add the string of non-formatted characters to the text flow object
+          	Text defaultText = new Text(normalText);
+          	defaultText.setFont(Font.font(fontFamily, fontSize)); //Set the font of the non-formatted string
+          	defaultText.setFill(fontColour); //Set the font colour of the non-formatted string
+          	textFlow.getChildren().add(defaultText);
+          	
+          	//Apply font formatting based on the respective HTML tag
+          	switch (text.charAt(i+1))
+          	{
+          	case'b':
+          		//Create an array list of characters to store bold characters
+          		ArrayList<Character> boldChars = new ArrayList<Character>(text.length()-i);
+          		String boldString = null;
 
-              //Print out the text from the end of the last tag to the start of the current tag
-              for(int j=endOfLastTag;j<i;j++){
-                  normalChars.add(message.charAt(j));
-              }
-              StringBuilder normal = new StringBuilder();
-              for (Object index : normalChars){
-                  normal.append(index);
-              }
-              normalChars.clear();
-              normalText = normal.toString();
-              System.out.println("default format string: "+normalText);
+          		for(int j=i+3;j<text.length();j++){
+          			//append characters to the bold array list
+          			boldChars.add(text.charAt(j));
+          			//break out of for loop if end tag identifier found
+          			if(text.charAt(j)=='/'){
+          				//Remove the final two characters in order to remove the closing tags
+          				boldChars.remove(j-i-3);
+          				boldChars.remove(j-i-4);
 
-              //Append bold text to screen
-              Text defaultText = new Text(normalText);
-              defaultText.getStyleClass().add("text-default");
-              flow.getChildren().add(defaultText);
+          				//Update the end of tag counter with end of tag index
+          				endOfLastTag = j+3;
+          				
+          				//Build a string from the characters stored in the character array list
+          				StringBuilder output = new StringBuilder();
+          				for(Object character : boldChars)
+          				{
+          					output.append(character);
+          				}
+          				boldChars.clear(); //Clear the array list ready for the next bold characters
+          				boldString = output.toString();
+          				break;
+          			}
+          		}
+          		//Add the bold text to the textflow object
+          		Text bold = new Text(boldString);
+          		bold.setFont(Font.font(fontFamily, FontWeight.BOLD, fontSize));
+          		bold.setFill(fontColour);
+          		textFlow.getChildren().add(bold);
+          		break;
 
-              switch (message.charAt(i+1)){
-                  case'b':
-                      numberOfTextElements +=1;
-                      boldCount +=1;
-                      //Create an array list of characters to store bold content
-                      ArrayList boldChars = new ArrayList(message.length()-i);
-                      String boldString = null;
+          	case 'i':
+          		//Create an array list of characters to store italic content
+          		ArrayList<Character> italChars = new ArrayList<Character>(text.length()-i);
+          		String italicString = null;
 
-                      for(int j=i+3;j<message.length();j++){
-                          //append characters to an arraylist
-                          boldChars.add(message.charAt(j));
-                          //break out of for loop if end tag identifier found
-                          if(message.charAt(j)=='/'){
-                              //Remove the final two characters in order to remove the closing tags
-                              //Remove the final two characters in order to remove the closing tags
-                              boldChars.remove(j-i-3);
-                              boldChars.remove(j-i-4);
+          		for(int j=i+3;j<text.length();j++)
+          		{
+          			//append characters to an arraylist
+          			italChars.add(text.charAt(j));
 
-                              //Update the end of tag counter
-                              endOfLastTag = j+3;
+          			//break out of for loop if an end tag identifier is found
+          			if(text.charAt(j)=='/')
+          			{
+          				//Remove the final two characters in order to remove the tag
+          				italChars.remove(j-i-3);
+          				italChars.remove(j-i-4);
 
-                              //Iterate through list and format to a string
-                              StringBuilder output = new StringBuilder();
-                              for(Object character : boldChars){
-                                  output.append(character);
-                              }
-                              //flush out the array list
-                              boldChars.clear();
-                              boldString = output.toString();
-                              System.out.println("String to be bold: "+output);
-                              break;
-                          }
+          				//Update the end of tag counter
+          				endOfLastTag = j+3;
 
-                      }
+          				//Iterate through array list and build a string from the characters
+          				StringBuilder output = new StringBuilder();
+          				for(Object character : italChars)
+          				{
+          					output.append(character);
+          				}
+          				italicString = output.toString();
+          				italChars.clear();
+          				break;
+          			}
+          		}
 
-                      //Append bold text to screen
-                      Text bold = new Text(boldString);
-                      bold.getStyleClass().add("text-bold");
-                      flow.getChildren().add(bold);
-                      break;
-
-                  case 'i':
-                      numberOfTextElements +=1;
-                      italCount +=1;
-                      //Create an array list of characters to store bold content
-                      ArrayList italChars = new ArrayList(message.length()-i);
-                      String italicString = null;
-
-                      for(int j=i+3;j<message.length();j++){
-
-                          //append characters to an arraylist
-                          italChars.add(message.charAt(j));
-
-                          //break out of for loop if end tag identifier found
-                          if(message.charAt(j)=='/'){
-                              //Remove the final two characters in order to remove the tag
-                              italChars.remove(j-i-3);
-                              italChars.remove(j-i-4);
-
-                              //Update the end of tag counter
-                              endOfLastTag = j+3;
-
-                              //Iterate through list and format to a string
-                              StringBuilder output = new StringBuilder();
-                              for(Object character : italChars){
-                                  output.append(character);
-                              }
-                              italicString = output.toString();
-                              System.out.println("String to be italic: "+italicString);
-                              italChars.clear();
-                              break;
-                          }
-                      }
-
-                      //Append italic text to screen
-                      Text italic = new Text(italicString);
-                      italic.getStyleClass().add("text-italic");
-                      flow.getChildren().add(italic);
-                      break;
-
-                  default:
-                      break;
-
-              }
-
+          		//Append italic text to screen
+          		Text italic = new Text(italicString);
+          		italic.setFont(Font.font(fontFamily, FontPosture.ITALIC, fontSize));
+          		italic.setFill(fontColour);
+          		textFlow.getChildren().add(italic);
+          		break;
+          		
+          	//default case statement
+          	default:
+          		break;
+          	}
           }
       }
-      System.out.println("Number of bold tag pair occurrences: "+boldCount);
-      System.out.println("Number of italic tag pair occurences: "+italCount);
-      System.out.println("Number of text elements is: "+numberOfTextElements);
+		}
+		//Return the text flow object to the superclass
+		return textFlow;
+	}
 
-
-
-      Scene scene = new Scene(flow);
-      scene.getStylesheets().add("handlers/Style.css");
-      window.setScene(scene);
-      window.show();
-
-  }
 }
 
