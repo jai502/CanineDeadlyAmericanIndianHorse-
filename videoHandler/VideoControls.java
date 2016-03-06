@@ -77,17 +77,18 @@ public class VideoControls extends GridPane {
                 playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON))); //load next image
             }
         });
-		if (loop) {
-			mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); //repeat as often as required
-		} else {
-			mediaPlayer.setCycleCount(1); //play once
-		}
-        
+		mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); //repeat as often as required
 		mediaPlayer.setOnEndOfMedia(new Runnable() {
 			public void run() {
 				//when media has finished, set replay button
 				mediaPlayer.stop();
+				if (!loop) {
 				imageState[PLAY_BUTTON] = REPLAY;
+				}
+				else {
+					imageState[PLAY_BUTTON] = PAUSE;
+					mediaPlayer.play();
+				}
 				playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
 			}
 		});
@@ -139,7 +140,7 @@ public class VideoControls extends GridPane {
                 if (mediaSlider.isValueChanging()) {
                 	//if slider is dragged while media is finished, switch button graphic to play
                 	Status status = mediaPlayer.getStatus();
-                    if (status == Status.STOPPED) {
+                    if (status == Status.STOPPED && !loop) {
                     	mediaPlayer.pause();
                     	imageState[PLAY_BUTTON] = PLAY;
                     	playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
@@ -155,6 +156,10 @@ public class VideoControls extends GridPane {
 		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
 			public void invalidated(Observable ov) {
 				Duration currentTime = mediaPlayer.getCurrentTime();
+				if (currentTime.toSeconds() == 0.0 && loop)
+				{
+					mediaPlayer.play();
+				}
 				mediaSlider.setValue(currentTime.toMillis()/mediaLength.toMillis()*100);
 				mediaTime.setText(createTimeLabel(currentTime) + "/" + createTimeLabel(mediaLength));
 			}

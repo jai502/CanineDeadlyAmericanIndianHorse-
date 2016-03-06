@@ -24,7 +24,7 @@ public class VideoHandlerTest extends Application{
 	@Override
 	public void start(Stage primary) throws Exception {
 		// Creates Image of Images type (Sourcefile, start time, duration, x start, y start, width, height);
-				Video player = new Video(0,0,0,0,"test.mp4", false);
+				Video player = new Video(0,0,0,0,"test.mp4", true);
 	
 			
 				// Create a Stack pane
