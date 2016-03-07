@@ -11,21 +11,19 @@ import java.sql.*;
 *	Commit date:	
 *	Description: 	SQL server handling classes
 */
+
 public class SQLServer 
 {
 	private static String username = "root";
-	private static String password = "canine_horse";
-	
-	
+	private static String password = "canine_horse";	
 	private static String connectionString = "jdbc:mysql://localhost:3306/userdetails";
 	
-	private static Connection connection;
-	private static Statement command;
-	private static ResultSet data;
-	
 	// Connect  to the server defined by
-	public static void connect(String server, int port, String database)
+	public static Connection connect(String server, int port, String database)
 	{	
+		Connection connection = null;
+		Statement command = null;
+		
 		// Construct connection command string
 		connectionString = "jdbc:mysql://" + server + ":" + port + "/" + database;
 		
@@ -38,14 +36,29 @@ public class SQLServer
 		} catch (SQLException e) {
 			System.out.println("Unable to connect to SQL server");
 			e.printStackTrace();
-		}
+		} finally {
+	        if (command != null) { 
+	        	try {
+	        		command.close();
+	        	} catch (SQLException e) {
+	        	// Failed to close command
+				e.printStackTrace();
+	        	} 
+	        }
+	    }
+		
+		return connection;
 	
 	}
 	
 	// Add a user using function argument values
-	public static void addUser(String table, String username, String password, String email, String dob) 
+	public static void addUser(Connection con, String table, String username, String password, String email, String dob) 
 	{
+		Statement command = null;
+		
 		try {
+			// Create new JDBC statement
+			command = con.createStatement();
 			// Execute SQL INSERT command
 			command.executeUpdate("INSERT INTO " + table  
 									+ " (username, password, email, dob) "
@@ -59,13 +72,26 @@ public class SQLServer
 		} catch (SQLException e) {
 			System.out.println("Unable to add user");
 			e.printStackTrace();
-		}
+		} finally {
+	        if (command != null) { 
+	        	try {
+	        		command.close();
+	        	} catch (SQLException e) {
+	        	// Failed to close command
+				e.printStackTrace();
+	        	} 
+	        }
+	    }
 	}
 	
 	// Delete the user with username and password matching function argument values
-	public static void deleteUser(String table, String username, String password)
+	public static void deleteUser(Connection con, String table, String username, String password)
 	{
+		Statement command = null;
+
 		try {
+			// Create new JDBC statement
+			command = con.createStatement();
 			// Execute SQL DELETE FROM command
 			command.executeUpdate("DELETE FROM " + table 
 									+ " WHERE username = "
@@ -76,25 +102,81 @@ public class SQLServer
 		} catch (SQLException e) {
 			System.out.println("Unable to delete user");
 			e.printStackTrace();
-		}
+		} finally {
+	        if (command != null) { 
+	        	try {
+	        		command.close();
+	        	} catch (SQLException e) {
+	        	// Failed to close command
+				e.printStackTrace();
+	        	} 
+	        }
+	    }
 		
+	}
+	
+	// Check if a user exists in a database
+	public static boolean checkUser(Connection con, String table, String username)
+	{
+		Statement command = null;
+		
+		Boolean result = false;
+		ResultSet data;
+		String query = null;
+		
+		try {
+			// Create new JDBC statement
+			command = con.createStatement();
+			// Execute SQL SELECT FROM command
+			data = command.executeQuery("SELECT id, username FROM " + table
+											+ " WHERE username = "
+											+ "('" + username + "')"
+										);
+			// Extract data from results set
+			 while(data.next())
+			 {
+				 // Check if fetched username is equal to expected username
+				 if (username.equals(data.getString("username")))
+				 {
+					 result = true;
+				 }
+			 }
+		} catch (SQLException e) {
+			System.out.println("Unable to find user");
+			e.printStackTrace();
+		} finally {
+	        if (command != null) { 
+	        	try {
+	        		command.close();
+	        	} catch (SQLException e) {
+	        	// Failed to close command
+				e.printStackTrace();
+	        	} 
+	        }
+	    }
+		
+		return result;
 	}
 	
 	public static void main(String[] args) 
 	{
+		Connection con = null;
+		
 		// SQL 
 		String server = "localhost";
 		int port = 3306;
 		String database = "userdetails";
-		String table = "test";
+		String table = "user";
 		Date test;
 		
 		
-		connect(server, port, database);
+		con = connect(server, port, database);
 		
-		//addUser("user", "test123", "pass", "email@gmail.com", "1990-01-01");
-		//deleteUser("user", "test123", "pass");
+		//addUser(con, "user", "test123", "pass", "email@gmail.com", "1990-01-01");
+		//deleteUser(con, "user", "test123", "pass");
 		
+		//boolean result = checkUser(con, table, "test123");
+		//System.out.println("User found? " + result);
 	}
 
 }
