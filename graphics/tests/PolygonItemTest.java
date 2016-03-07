@@ -36,7 +36,7 @@ public class PolygonItemTest {
 		//set polygon item variables
 		item.setStartTime(32);
 		item.setDuration(43);
-		item.setSourceFile("Test.csv");
+		item.setSourceFile("Example.csv");
 		item.setShading(shading);
 		item.setFillColour("00F0F0");
 		item.setLineColour("FFFFFF");
@@ -56,7 +56,7 @@ public class PolygonItemTest {
 		assertEquals(duration, 43, 0); 
 		assertEquals(targetSlide, 1, 0);
 		assertEquals(interactable, true);
-		assertEquals(sourceFile, "Test.csv");
+		assertEquals(sourceFile, "Example.csv");
 		assertEquals(gradient, shading);
 		assertEquals(fillColour, Color.web("00F0F0"));
 		assertEquals(lineColour, Color.web("FFFFFF"));
