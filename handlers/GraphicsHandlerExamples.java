@@ -1,11 +1,11 @@
-package graphics.examples;
+package handlers;
 
 //Imports
 import java.io.IOException;
-import graphics.Gradient;
-import graphics.GraphicsHandler;
-import graphics.PolygonItem;
-import graphics.ShapeItem;
+import Objects.ShadingItem;
+import Objects.PolygonItem;
+import Objects.ShadingItem;
+import Objects.ShapeItem;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -35,10 +35,10 @@ import javafx.stage.Stage;
 public class GraphicsHandlerExamples extends Application {
 	
 	// New shading for defining gradient fills for shapes 
-	private Gradient rectangleShading = new Gradient();	
-	private Gradient circleShading = new Gradient();	
-	private Gradient roundedRectangleShading = new Gradient();	
-	private Gradient polygonShading = new Gradient();		
+	private ShadingItem rectangleShading = new ShadingItem();	
+	private ShadingItem circleShading = new ShadingItem();	
+	private ShadingItem roundedRectangleShading = new ShadingItem();	
+	private ShadingItem polygonShading = new ShadingItem();		
 	
 	// Main JavaFX method
     public static void main(String[] args) {
@@ -93,21 +93,20 @@ public class GraphicsHandlerExamples extends Application {
     	ShapeItem rectangle = new ShapeItem();  
     	
     	// Set the gradient parameters (see documentation on setting Gradients)
-		rectangleShading.setX1(0);
-		rectangleShading.setX2(1); 
-		rectangleShading.setY1(0);
-		rectangleShading.setY2(1);
-		rectangleShading.setColour1("393092");
-		rectangleShading.setColour2("4500FF");   
+		rectangleShading.setxOne(0);
+		rectangleShading.setxTwo(1); 
+		rectangleShading.setyOne(0);
+		rectangleShading.setyTwo(1);
+		rectangleShading.setColourOne("393092");
+		System.out.println(rectangleShading.getColourOne());
+		rectangleShading.setColourTwo("4500FF");   
 		
 		// Set Item parameters
 		rectangle.setStartTime(0);
 		rectangle.setDuration(0);
-		rectangle.setTargetSlide(0);
-		rectangle.setX(0.15f);
-		rectangle.setY(0.15f);
-		rectangle.setInteractable(false);
-		rectangle.setShapeType("rectangle");
+		rectangle.setxStart(0.15f);
+		rectangle.setyStart(0.15f);
+		rectangle.setType("rectangle");
 		rectangle.setWidth(0.6f);
 		rectangle.setHeight(0.6f);
 		rectangle.setFillColour("000000");
@@ -128,21 +127,19 @@ public class GraphicsHandlerExamples extends Application {
     	ShapeItem circle1 = new ShapeItem();  
     	
     	// Set the gradient parameters (see documentation on setting Gradients)
-		circleShading.setX1(0);
-		circleShading.setX2(1); 
-		circleShading.setY1(0);
-		circleShading.setY2(1);
-		circleShading.setColour1("FFCC00");
-		circleShading.setColour2("ED8B03"); 
+		circleShading.setxOne(0);
+		circleShading.setxTwo(1); 
+		circleShading.setyOne(0);
+		circleShading.setyTwo(1);
+		circleShading.setColourOne("FFCC00");
+		circleShading.setColourTwo("ED8B03"); 
 		
 		// Set Item parameters
 		circle1.setStartTime(0);
 		circle1.setDuration(0);
-		circle1.setTargetSlide(0);
-		circle1.setX(0.2f);
-		circle1.setY(0.2f);
-		circle1.setInteractable(false);
-		circle1.setShapeType("circle");
+		circle1.setxStart(0.2f);
+		circle1.setyStart(0.2f);
+		circle1.setType("circle");
 		circle1.setWidth(0.4f);
 		circle1.setHeight(0.4f);
 		circle1.setFillColour("000000");
@@ -165,11 +162,9 @@ public class GraphicsHandlerExamples extends Application {
 		// Set Item parameters
 		circle2.setStartTime(0);
 		circle2.setDuration(0);
-		circle2.setTargetSlide(0);
-		circle2.setX(0.47f);
-		circle2.setY(0.47f);
-		circle2.setInteractable(false);
-		circle2.setShapeType("circle");
+		circle2.setxStart(0.47f);
+		circle2.setyStart(0.47f);
+		circle2.setType("circle");
 		circle2.setWidth(0.2f);
 		circle2.setHeight(0.2f);
 		circle2.setFillColour("000000");
@@ -192,21 +187,19 @@ public class GraphicsHandlerExamples extends Application {
     	ShapeItem roundRect = new ShapeItem();   
     	
     	// Set the gradient parameters (see documentation on setting Gradients)
-		roundedRectangleShading.setX1(0);
-		roundedRectangleShading.setX2(1); 
-		roundedRectangleShading.setY1(0);
-		roundedRectangleShading.setY2(1);
-		roundedRectangleShading.setColour1("A63286");
-		roundedRectangleShading.setColour2("FF00FF");  
+		roundedRectangleShading.setxOne(0);
+		roundedRectangleShading.setxTwo(1); 
+		roundedRectangleShading.setyOne(0);
+		roundedRectangleShading.setyTwo(1);
+		roundedRectangleShading.setColourOne("A63286");
+		roundedRectangleShading.setColourTwo("FF00FF");  
 		
 		// Set Item parameters
 		roundRect.setStartTime(0);
 		roundRect.setDuration(0);
-		roundRect.setTargetSlide(0);
-		roundRect.setX(0.7f);
-		roundRect.setY(0.7f);
-		roundRect.setInteractable(false);
-		roundRect.setShapeType("rounded rectangle");
+		roundRect.setxStart(0.7f);
+		roundRect.setyStart(0.7f);
+		roundRect.setType("rounded rectangle");
 		roundRect.setWidth(0.2f);
 		roundRect.setHeight(0.2f);
 		roundRect.setFillColour("000000");
@@ -227,22 +220,20 @@ public class GraphicsHandlerExamples extends Application {
     	PolygonItem polygon = new PolygonItem();    	
     	
     	// Set the gradient parameters (see documentation on setting Gradients)
-		polygonShading.setX1(0);
-		polygonShading.setX2(1); 
-		polygonShading.setY1(0);
-		polygonShading.setY2(1);
-		polygonShading.setColour1("47B475");
-		polygonShading.setColour2("00FFF0");  
+		polygonShading.setxOne(0);
+		polygonShading.setxTwo(1); 
+		polygonShading.setyOne(0);
+		polygonShading.setyTwo(1);
+		polygonShading.setColourOne("47B475");
+		polygonShading.setColourTwo("00FFF0");  
 		
 		// Set Item parameters
 		polygon.setStartTime(0);
-		polygon.setDuration(0);
-		polygon.setTargetSlide(0);        
-		polygon.setInteractable(true);   
+		polygon.setDuration(0);  
 		
         // For Polygon items, as per the spec and PWS, the list of points are defined in a CSV file. 
         // Check the documentation for an example source file. 
-		polygon.setSourceFile("graphics/examples/Pentagon.csv"); 
+		polygon.setSourceFile("files/Pentagon.csv"); 
 		polygon.setFillColour("02B8BE");
 		polygon.setLineColour("000000");
 		polygon.setShading(polygonShading); 

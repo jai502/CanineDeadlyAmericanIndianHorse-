@@ -1,9 +1,11 @@
-package graphics;
+package handlers;
 
 import javafx.scene.canvas.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.*;
+import Objects.ShapeItem;
+import Objects.ShadingItem;
 
 /** 
  * <tt>ShapeHandler</tt> class handles shapeItem information.
@@ -36,7 +38,7 @@ public class ShapeHandler {
 	private float height;
 	private Color lineColour;	
 	private Color fillColour;
-	private Gradient shading;
+	private ShadingItem shading;
 	private float x1;
 	private float y1;
 	private Color colour1;
@@ -63,9 +65,9 @@ public class ShapeHandler {
 		// Get shape parameters from item		
 		canvasWidth = canvas.getWidth();
 		canvasHeight = canvas.getHeight();	
-		positionX = item.getX();
-		positionY = item.getY();
-		shapeType = item.getShapeType();
+		positionX = item.getxStart();
+		positionY = item.getyStart();
+		shapeType = item.getType();
 		width = item.getWidth();
 		height = item.getHeight();
 		
@@ -141,12 +143,12 @@ public class ShapeHandler {
 		
 		// Check to see if gradient has been set
 		if (shading != null) {
-			x1 = shading.getX1();
-			y1 = shading.getY1();
-			x2 = shading.getX2();
-			y2 = shading.getY2();
-			colour1 = shading.getColour1();
-			colour2 = shading.getColour2();	
+			x1 = shading.getxOne();
+			y1 = shading.getyOne();
+			x2 = shading.getxTwo();
+			y2 = shading.getyTwo();
+			colour1 = shading.getColourOne();
+			colour2 = shading.getColourTwo();	
 			
 			// Error shown when gradient colours are undefined
 			if (colour1 == null && colour2 == null) {

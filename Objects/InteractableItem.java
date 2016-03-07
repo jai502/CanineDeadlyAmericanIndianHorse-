@@ -15,7 +15,7 @@ package Objects;
 
 import java.util.ArrayList;
 
-public class InteractableItem 
+public class InteractableItem extends Item 
 {
 	private int targetSlide;
 	private ArrayList<TextItem> textList;

@@ -13,20 +13,17 @@
 
 package Objects;
 
-import java.awt.Color;;
+import javafx.scene.paint.Color;
 
-public class ShapeItem
+public class ShapeItem extends Item
 {
-	private int startTime, duration;
-	private double xStart, yStart, width, height;
+	private float xStart, yStart, width, height;
 	private String type;
 	private Color lineColour, fillColour;
 	private ShadingItem shading;
 	
-	public ShapeItem(int myStartTime, int myDuration, double myXStart, double myYStart, double myWidth, double myHeight, String myType, Color myLineColour, Color myFillColour, ShadingItem myShading)
+	public ShapeItem(int myStartTime, int myDuration, float myXStart, float myYStart, float myWidth, float myHeight, String myType, Color myLineColour, Color myFillColour, ShadingItem myShading)
 	{
-		startTime = myStartTime;
-		duration = myDuration;
 		xStart = myXStart;
 		yStart = myYStart;
 		width = myWidth;
@@ -41,103 +38,66 @@ public class ShapeItem
 	public ShapeItem() {
 		super();
 	}
-
-	public int getStartTime()
-	{
-		return startTime;
-	}
-
-	public void setStartTime(int startTime) 
-	{
-		this.startTime = startTime;
-	}
-	
-	public void setStartTime (String startTime)
-	{
-		this.startTime = Integer.parseInt(startTime);
-	}
-
-	public int getDuration() 
-	{
-		return duration;
-	}
-
-	public void setDuration(int duration)
-	{
-		this.duration = duration;
-	}
-	
-	public void setDuration(String duration)
-	{
-		try
-		{
-			this.duration = Integer.parseInt(duration);
-		}
-		catch(Exception e)
-		{
-			this.duration = 0;
-		}
-	}
 	
 
-	public double getxStart() 
+	public float getxStart() 
 	{
 		return xStart;
 	}
 
-	public void setxStart(double xStart)
+	public void setxStart(float xStart)
 	{
 		this.xStart = xStart;
 	}
 	
 	public void setxStart(String xStart)
 	{
-		this.xStart = Double.parseDouble(xStart);
+		this.xStart = Float.parseFloat(xStart);
 	}
 	
-	public double getyStart() 
+	public float getyStart() 
 	{
 		return yStart;
 	}
 
-	public void setyStart(double yStart) 
+	public void setyStart(float yStart) 
 	{
 		this.yStart = yStart;
 	}
 	
 	public void setyStart(String yStart)
 	{
-		this.yStart = Double.parseDouble(yStart);
+		this.yStart = Float.parseFloat(yStart);
 	}
 	
-	public double getWidth() 
+	public float getWidth() 
 	{
 		return width;
 	}
 
-	public void setWidth(double width) 
+	public void setWidth(float width) 
 	{
 		this.width = width;
 	}
 	
 	public void setWidth(String width)
 	{
-		this.width = Double.parseDouble(width);
+		this.width = Float.parseFloat(width);
 	}
 	
-	public double getHeight()
+	public float getHeight()
 	{
 		return height;
 	}
 
-	public void setHeight(double height) 
+	public void setHeight(float height) 
 	{
 		this.height = height;
 	}
 	
 	public void setHeight(String height)
 	{
-		this.height = Double.parseDouble(height);
+		this.height = Float.parseFloat(height);
 	}
 
 	public String getType() 
@@ -164,15 +124,7 @@ public class ShapeItem
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b, 16);
-			lineColour = new Color(rInt,gInt,bInt);
+			this.lineColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for ShapeItem line colour");
@@ -193,15 +145,7 @@ public class ShapeItem
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			fillColour = new Color(rInt,gInt,bInt);
+			this.fillColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for ShapeItem fill colour");

@@ -13,17 +13,14 @@
 
 package Objects;
 
-public class ImageItem
+public class ImageItem extends Item
 {
 	private String sourceFile;
-	private int startTime, duration;
-	private double xStart, yStart, height, width;
+	private float xStart, yStart, height, width;
 	
-	public ImageItem(String mySourceFile, int myStartTime, int myDuration, double myXStart, double myYStart, double myHeight, double myWidth)
+	public ImageItem(String mySourceFile, int myStartTime, int myDuration, float myXStart, float myYStart, float myHeight, float myWidth)
 	{
-		sourceFile = mySourceFile;
-		startTime = myStartTime;
-		duration = myDuration; 
+		sourceFile = mySourceFile; 
 		xStart = myXStart; 
 		yStart = myYStart; 
 		height = myHeight; 
@@ -40,82 +37,52 @@ public class ImageItem
 	public void setSourceFile(String sourceFile) {
 		this.sourceFile = sourceFile;
 	}
-	public int getStartTime() {
-		return startTime;
-	}
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
-	}
 	
-	public void setStartTime(String startTime) 
-	{
-		this.startTime = Integer.parseInt(startTime);
-	}
-	
-	public int getDuration() {
-		return duration;
-	}
-	
-	public void setDuration(int duration) {
-		this.duration = duration;
-	}
-	
-	public void setDuration(String duration) {
-		try
-		{
-			this.duration = Integer.parseInt(duration);
-		}
-		catch(Exception e)
-		{
-			this.duration = 0;
-		}
-	}
-	
-	public double getxStart() {
+	public float getxStart() {
 		return xStart;
 	}
 	
 	public void setxStart(String xStart)
 	{
-		this.xStart = Double.parseDouble(xStart);
+		this.xStart = Float.parseFloat(xStart);
 	}
 	
-	public void setxStart(double xStart) {
+	public void setxStart(float xStart) {
 		this.xStart = xStart;
 	}
-	public double getyStart() {
+	public float getyStart() {
 		return yStart;
 	}
-	public void setyStart(double yStart) {
+	public void setyStart(float yStart) {
 		this.yStart = yStart;
 	}
 	
 	public void setyStart(String yStart)
 	{
-		this.yStart = Double.parseDouble(yStart);
+		this.yStart = Float.parseFloat(yStart);
 	}
 	
-	public double getHeight() {
+	public float getHeight() {
 		return height;
 	}
-	public void setHeight(double height) {
+	public void setHeight(float height) {
 		this.height = height;
 	}
 	
 	public void setHeight(String height)
 	{
-		this.height = Double.parseDouble(height);
+		this.height = Float.parseFloat(height);
 	}
 	
-	public double getWidth() {
+	public float getWidth() {
 		return width;
 	}
-	public void setWidth(double width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 	public void setWidth(String width)
 	{
-		this.width = Double.parseDouble(width);
+		this.width = Float.parseFloat(width);
 	}
 }
 

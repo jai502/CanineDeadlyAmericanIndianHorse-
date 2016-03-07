@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import graphics.Gradient;
+import Objects.ShadingItem;
 import javafx.scene.paint.Color;
 
 
@@ -21,21 +21,21 @@ public class GradientTest {
 	
 	@Before
 	public void setUp() {
-		Gradient gradient = new Gradient();
+		ShadingItem gradient = new ShadingItem();
 		//set item variables
-		gradient.setX1(12);
-		gradient.setX2(15); 
-		gradient.setY1(18);
-		gradient.setY2(21);
-		gradient.setColour1("00FF00");
-		gradient.setColour2("FF00FF");
+		gradient.setxOne(12);
+		gradient.setxTwo(15); 
+		gradient.setyOne(18);
+		gradient.setyTwo(21);
+		gradient.setColourOne("00FF00");
+		gradient.setColourTwo("FF00FF");
 		//get item variables
-		X1 = gradient.getX1();
-		X2 = gradient.getX2();
-		Y1 = gradient.getY1();
-		Y2 = gradient.getY2();
-		colour1 = gradient.getColour1();
-		colour2 = gradient.getColour2();
+		X1 = gradient.getxOne();
+		X2 = gradient.getxTwo();
+		Y1 = gradient.getyOne();
+		Y2 = gradient.getyTwo();
+		colour1 = gradient.getColourOne();
+		colour2 = gradient.getColourTwo();
 	} 
 
 	@Test

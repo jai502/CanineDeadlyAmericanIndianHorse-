@@ -2,8 +2,8 @@ package graphics.tests;
 
 import static org.junit.Assert.*;
 
-import graphics.Gradient;
-import graphics.PolygonItem;
+import Objects.ShadingItem;
+import Objects.PolygonItem;
 import javafx.scene.paint.Color;
 
 import org.junit.Before;
@@ -15,8 +15,8 @@ public class PolygonItemTest {
 	private int duration;
 	private int targetSlide;
 	private boolean interactable;
-	private Gradient gradient = new Gradient();
-	private Gradient shading = new Gradient();
+	private ShadingItem gradient = new ShadingItem();
+	private ShadingItem shading = new ShadingItem();
 	private String sourceFile;
 	private Color fillColour;
 	private Color lineColour;
@@ -26,18 +26,16 @@ public class PolygonItemTest {
 		PolygonItem item = new PolygonItem();
 		 
 		//set gradient item
-		shading.setX1(12);
-		shading.setX2(15);
-		shading.setY1(18);
-		shading.setY2(21);
-		shading.setColour1("00FF00");
-		shading.setColour2("FF00FF");
+		shading.setxOne(12);
+		shading.setxTwo(15);
+		shading.setyOne(18);
+		shading.setyTwo(21);
+		shading.setColourOne("00FF00");
+		shading.setColourTwo("FF00FF");
 		
 		//set polygon item variables
 		item.setStartTime(32);
 		item.setDuration(43);
-		item.setTargetSlide(1);
-		item.setInteractable(true);
 		item.setSourceFile("Test.csv");
 		item.setShading(shading);
 		item.setFillColour("00F0F0");
@@ -46,8 +44,6 @@ public class PolygonItemTest {
 		//get variables from item
 		startTime = item.getStartTime();
 		duration = item.getDuration();
-		targetSlide = item.getTargetSlide();
-		interactable = item.isInteractable();
 		sourceFile = item.getSourceFile();
 		gradient = item.getShading();
 		fillColour = item.getFillColour();

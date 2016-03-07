@@ -12,23 +12,22 @@
 */
 package Objects;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 import java.io.IOException;
 
 import Parsers.ReadTextFile;
 
-public class TextItem {
-	private int startTime, duration, fontSize;
-	private double xStart, yStart, height, width;
+public class TextItem extends Item
+{
+	private int fontSize;
+	private float xStart, yStart, height, width;
 	private String font;
 	private Color fontColour;
 	private String text;
 	private String sourceText;
  
-	 public TextItem(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
+	 public TextItem(int myStartTime, int myDuration, int myFontSize, float myXStart, float myYStart, String myFont, Color myFontColour, String myText)
 	 {
-			 startTime = myStartTime;
-			 duration = myDuration;
 			 fontSize =  myFontSize;
 			 xStart = myXStart;
 			 yStart = myYStart;
@@ -40,42 +39,6 @@ public class TextItem {
 
 	public TextItem() {
 		super();
-	}
-
-	public int getStartTime()
-	{
-		return startTime;
-	}
-	
-	public void setStartTime(String startTime) 
-	{
-		this.startTime = Integer.parseInt(startTime);
-	}
-	
-	public void setStartTime(int startTime) 
-	{
-		this.startTime = startTime;
-	}
-	
-	public int getDuration()
-	{
-		return duration;
-	}
-	
-	public void setDuration(String duration) {
-		try
-		{
-			this.duration = Integer.parseInt(duration);
-		}
-		catch(Exception e)
-		{
-			this.duration = 0;
-		}
-	}
-	
-	public void setDuration(int duration) 
-	{
-		this.duration = duration;
 	}
 	
 	public int getFontSize() 
@@ -100,32 +63,32 @@ public class TextItem {
 		}
 	}
 	
-	public double getxStart() 
+	public float getxStart() 
 	{
 		return xStart;
 	}
 	
-	public void setxStart(double xStart) 
+	public void setxStart(float xStart) 
 	{
 		this.xStart = xStart;
 	}
 	
 	public void setxStart(String xStart)
 	{
-		this.xStart = Double.parseDouble(xStart);
+		this.xStart = Float.parseFloat(xStart);
 	}
-	public double getyStart() 
+	public float getyStart() 
 	{
 		return yStart;
 	}
-	public void setyStart(double yStart) 
+	public void setyStart(float yStart) 
 	{
 		this.yStart = yStart;
 	}
 	
 	public void setyStart(String yStart)
 	{
-		this.yStart = Double.parseDouble(yStart);
+		this.yStart = Float.parseFloat(yStart);
 	}
 	
 	public String getFont() 
@@ -151,16 +114,7 @@ public class TextItem {
 	{
 		try
 		{
-			if(colour.startsWith("#")){
-				colour.equals(colour.substring(1));
-			}
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			fontColour = new Color(rInt,gInt,bInt);
+			this.fontColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for font colour");
@@ -205,10 +159,10 @@ public class TextItem {
 		}
 		
 	} 
-	public double getHeight() {
+	public float getHeight() {
 		return height;
 	}
-	public void setHeight(double height) {
+	public void setHeight(float height) {
 		this.height = height;
 	}
 	
@@ -220,14 +174,14 @@ public class TextItem {
 		}
 		else
 		{
-			this.width = Double.parseDouble(height);
+			this.height = Float.parseFloat(height);
 		}
 	}
 	
-	public double getWidth() {
+	public float getWidth() {
 		return width;
 	}
-	public void setWidth(double width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 	public void setWidth(String width)
@@ -238,7 +192,7 @@ public class TextItem {
 		}
 		else
 		{
-			this.width = Double.parseDouble(width);
+			this.width = Float.parseFloat(width);
 		}
 		
 	}

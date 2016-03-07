@@ -1,12 +1,12 @@
-package graphics;
+package handlers;
 
 import java.io.IOException;
 
-import graphics.Item;
-import graphics.PolygonItem;
-import graphics.ShapeItem;
-
-import javafx.scene.canvas.*;
+import Objects.Item;
+import Objects.PolygonItem;
+import Objects.ShapeItem;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 
 /** 
  * <tt>GraphicsHandler</tt> class handles graphics information to output graphics on a canvas.
@@ -104,18 +104,18 @@ public class GraphicsHandler {
 	 * 
 	 * @return targetSlide
 	 */
-	public int getTargetSlide(){
-		int targetSlide =  returnItem.getTargetSlide();
-		return targetSlide;
-	}
+//	public int getTargetSlide(){
+//		int targetSlide =  returnItem.getTargetSlide();
+//		return targetSlide;
+//	}
 	
 	/** 
 	 * Return method to return if graphics are interactable
 	 * 
 	 * @return interactable
 	 */
-	public boolean isInteractable(){
-		boolean interactable = returnItem.isInteractable();
-		return interactable;
-	}
+//	public boolean isInteractable(){
+//		boolean interactable = returnItem.isInteractable();
+//		return interactable;
+//	}
 }

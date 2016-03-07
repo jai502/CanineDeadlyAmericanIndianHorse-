@@ -13,13 +13,14 @@
 
 package Objects;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 
 public class ShadingItem {
-	private double xOne, xTwo, yOne, yTwo;
+	private float xOne, xTwo, yOne, yTwo;
 	private Color colourOne, colourTwo;
 	
-	public ShadingItem(double myXOne, double myXTwo, double myYOne, double myYTwo, Color myColourOne, Color myColourTwo)
+	
+	public ShadingItem (float myXOne, float myXTwo, float myYOne, float myYTwo, Color myColourOne, Color myColourTwo)
 	{
 		xOne = myXOne;
 		xTwo = myXTwo; 
@@ -34,53 +35,53 @@ public class ShadingItem {
 		super();
 	}
 
-	public double getxOne()
+	public float getxOne()
 	{
 		return xOne;
 	}
-	public void setxOne(double xOne) {
+	public void setxOne(float xOne) {
 		this.xOne = xOne;
 	}
 	
 	public void setxOne(String xOne)
 	{
-		this.xOne = Double.parseDouble(xOne);
+		this.xOne = Float.parseFloat(xOne);
 	}
 	
-	public double getxTwo() 
+	public float getxTwo() 
 	{
 		return xTwo;
 	}
-	public void setxTwo(double xTwo)
+	public void setxTwo(float xTwo)
 	{
 		this.xTwo = xTwo;
 	}
 	
 	public void setxTwo(String xTwo)
 	{
-		this.xTwo = Double.parseDouble(xTwo);
+		this.xTwo = Float.parseFloat(xTwo);
 	}
-	public double getyOne() 
+	public float getyOne() 
 	{
 		return yOne;
 	}
-	public void setyOne(double yOne)
+	public void setyOne(float yOne)
 	{
 		this.yOne = yOne;
 	}
 	public void setyOne(String yOne)
 	{
-		this.yOne = Double.parseDouble(yOne);
+		this.yOne = Float.parseFloat(yOne);
 	}
-	public double getyTwo() {
+	public float getyTwo() {
 		return yTwo;
 	}
-	public void setyTwo(double yTwo) {
+	public void setyTwo(float yTwo) {
 		this.yTwo = yTwo;
 	}
 	public void setyTwo(String yTwo)
 	{
-		this.yTwo = Double.parseDouble(yTwo);
+		this.yTwo = Float.parseFloat(yTwo);
 	}
 	public Color getColourOne() {
 		return colourOne;
@@ -93,15 +94,7 @@ public class ShadingItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			this.colourOne = new Color(rInt,gInt,bInt);
+			this.colourOne = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for ShadingItem colour one");
@@ -119,15 +112,7 @@ public class ShadingItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			this.colourTwo = new Color(rInt,gInt,bInt);
+			this.colourTwo = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for ShadingItem colour two");

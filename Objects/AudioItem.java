@@ -13,7 +13,8 @@
 
 package Objects;
 
-public class AudioItem {
+public class AudioItem extends Item
+{
 	private int startTime, duration;
 	private String sourceFile;
 	private boolean loop;
@@ -21,50 +22,12 @@ public class AudioItem {
 	public AudioItem(int startTime, int duration, String sourceFile, boolean loop) 
 	{
 		super();
-		this.startTime = startTime;
-		this.duration = duration;
 		this.sourceFile = sourceFile;
 		this.loop = loop;
 	}
 
 	public AudioItem() {
 		super();
-	}
-
-	public int getStartTime()
-	{
-		return startTime;
-	}
-
-	public void setStartTime(int startTime)
-	{
-		this.startTime = startTime;
-	}
-	
-	public void setStartTime(String startTime) 
-	{
-		this.startTime = Integer.parseInt(startTime);
-	}
-
-	public int getDuration() 
-	{
-		return duration;
-	}
-
-	public void setDuration(int duration)
-	{
-		this.duration = duration;
-	}
-	
-	public void setDuration(String duration) {
-		try
-		{
-			this.duration = Integer.parseInt(duration);
-		}
-		catch(Exception e)
-		{
-			this.duration = 0;
-		}
 	}
 	
 
@@ -108,3 +71,4 @@ public class AudioItem {
 	
 	
 }
+

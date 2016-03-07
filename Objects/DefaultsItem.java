@@ -13,8 +13,7 @@
 
 package Objects;
 
-import java.awt.Color;
-import java.awt.Font;
+import javafx.scene.paint.Color;
 
 public class DefaultsItem {
 	private Color background, fontColour, lineColour, fillColour;
@@ -47,15 +46,7 @@ public class DefaultsItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			background = new Color(rInt,gInt,bInt);
+			this.background = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for default background colour");
@@ -75,15 +66,7 @@ public class DefaultsItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b, 16);
-			fontColour = new Color(rInt,gInt,bInt);
+			this.fontColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for default font colour");
@@ -103,15 +86,7 @@ public class DefaultsItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			lineColour = new Color(rInt,gInt,bInt);
+			this.lineColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for default line colour");
@@ -131,15 +106,7 @@ public class DefaultsItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			fillColour = new Color(rInt,gInt,bInt);
+			this.fillColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for default fill colour");

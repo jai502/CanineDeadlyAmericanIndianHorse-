@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import graphics.Gradient;
-import graphics.ShapeItem;
+import Objects.ShadingItem;
+import Objects.ShapeItem;
 import javafx.scene.paint.Color;
 
 public class ShapeItemTest {
@@ -18,8 +18,8 @@ public class ShapeItemTest {
 	private float x;
 	private float y;
 	private boolean interactable;
-	private Gradient gradient = new Gradient();
-	private Gradient shading = new Gradient();
+	private ShadingItem gradient = new ShadingItem();
+	private ShadingItem shading = new ShadingItem();
 	private String shapeType;
 	private float width;
 	private float height;
@@ -32,21 +32,19 @@ public class ShapeItemTest {
 		ShapeItem item = new ShapeItem();
 		
 		//set gradient item
-		shading.setX1(12);
-		shading.setX2(15); 
-		shading.setY1(18);
-		shading.setY2(21);
-		shading.setColour1("00FF00");
-		shading.setColour2("FF00FF");
+		shading.setxOne(12);
+		shading.setxTwo(15); 
+		shading.setyOne(18);
+		shading.setyTwo(21);
+		shading.setColourOne("00FF00");
+		shading.setColourTwo("FF00FF");
 		
 		//set polygon item variables
 		item.setStartTime(32);
 		item.setDuration(43);
-		item.setTargetSlide(2);
-		item.setX(25);
-		item.setY(10);
-		item.setInteractable(false);
-		item.setShapeType("circle");
+		item.setxStart(25);
+		item.setyStart(10);
+		item.setType("circle");
 		item.setWidth(14);
 		item.setHeight(17);
 		item.setFillColour("00FF00");
@@ -56,11 +54,9 @@ public class ShapeItemTest {
 		//get polygon variables
 		startTime = item.getStartTime();
 		duration = item.getDuration();
-		targetSlide = item.getTargetSlide();
-		x = item.getX();
-		y = item.getY();
-		interactable = item.isInteractable();
-		shapeType = item.getShapeType();
+		x = item.getxStart();
+		y = item.getyStart();
+		shapeType = item.getType();
 		width = item.getWidth();
 		height = item.getHeight();
 		fillColour = item.getFillColour();

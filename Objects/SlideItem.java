@@ -13,7 +13,7 @@
 
 package Objects;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 import java.util.ArrayList;
 
 public class SlideItem {
@@ -106,15 +106,7 @@ public class SlideItem {
 	public void setBackgroundColour(String colour) {
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			backgroundColour = new Color(rInt,gInt,bInt);
+			this.backgroundColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for slide background colour");

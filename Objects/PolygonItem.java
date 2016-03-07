@@ -13,19 +13,17 @@
 
 package Objects;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 
-public class PolygonItem {
+public class PolygonItem extends Item
+{
 	
-	private int startTime , duration;
 	private Color lineColour, fillColour;
 	private String sourceFile;
 	private ShadingItem shading;
 	
 	public PolygonItem(int myStartTime, int myDuration, Color myLineColour, Color myFillColour, String mySourceFile, ShadingItem myShading)
 	{
-		startTime = myStartTime;
-		duration = myDuration;
 		lineColour = myLineColour;
 		fillColour = myFillColour;
 		sourceFile = mySourceFile;
@@ -34,36 +32,6 @@ public class PolygonItem {
 	
 	public PolygonItem() {
 		super();
-	}
-
-	public int getStartTime() {
-		return startTime;
-	}
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
-	}
-	
-	public void setStartTime(String startTime) 
-	{
-		this.startTime = Integer.parseInt(startTime);
-	}
-	
-	public int getDuration() {
-		return duration;
-	}
-	public void setDuration(int duration) {
-		this.duration = duration;
-	}
-	
-	public void setDuration(String duration) {
-		try
-		{
-			this.duration = Integer.parseInt(duration);
-		}
-		catch(Exception e)
-		{
-			this.duration = 0;
-		}
 	}
 	
 	public Color getLineColour() {
@@ -77,15 +45,7 @@ public class PolygonItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			this.lineColour = new Color(rInt,gInt,bInt);
+			this.lineColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for PolygonItem line colour");
@@ -103,15 +63,7 @@ public class PolygonItem {
 	{
 		try
 		{
-			if(colour.startsWith("#"))
-				colour.equals(colour.substring(1));
-			String r = colour.substring(0,2);
-			String g = colour.substring(2,4);
-			String b = colour.substring(4,6);
-			int rInt = Integer.parseInt(r, 16);
-			int gInt = Integer.parseInt(g, 16);
-			int bInt = Integer.parseInt(b,  16);
-			this.fillColour = new Color(rInt,gInt,bInt);
+			this.fillColour = Color.web(colour);
 		}
 		catch(Exception e){
 			System.out.println("\nNo colour set for PolygonItem fill colour");

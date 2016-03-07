@@ -1,4 +1,4 @@
-package graphics;
+package handlers;
 
 import java.io.FileNotFoundException;
 

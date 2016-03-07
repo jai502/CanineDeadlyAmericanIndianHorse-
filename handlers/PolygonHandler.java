@@ -1,6 +1,9 @@
-package graphics;
+package handlers;
 
 import java.io.IOException;
+
+import Objects.PolygonItem;
+import Objects.ShadingItem;
 import javafx.scene.canvas.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -33,7 +36,7 @@ public class PolygonHandler {
 	private int nPoints;
 	private Color lineColour;
 	private Color fillColour;
-	private Gradient shading;
+	private ShadingItem shading;
 	private float x1;
 	private float y1;
 	private Color colour1;
@@ -114,12 +117,12 @@ public class PolygonHandler {
 		
 		// Check to see if gradient has been set
 		if (shading != null) {
-			x1 = shading.getX1();
-			y1 = shading.getY1();
-			x2 = shading.getX2();
-			y2 = shading.getY2();
-			colour1 = shading.getColour1();
-			colour2 = shading.getColour2();	
+			x1 = shading.getxOne();
+			y1 = shading.getyOne();
+			x2 = shading.getxTwo();
+			y2 = shading.getyTwo();
+			colour1 = shading.getColourOne();
+			colour2 = shading.getColourTwo();	
 			
 			// Error shown when gradient colours are undefined
 			if (colour1 == null && colour2 == null) {
