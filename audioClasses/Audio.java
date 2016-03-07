@@ -1,5 +1,15 @@
-
-
+/*
+* (C) Stammtisch
+* First version created by: Dan Dreyfus
+* Date of first version: 1st March 2016
+* 
+* Last version by: Dan Dreyfus
+* Date of last update: 7rd March 2016
+* Version number: 1.0
+* 
+* Commit date: 7rd March 2016
+* Description: This class is a visual test for the image handler which draws two test images on a scene
+*/
 
 package audioClasses;
 
