@@ -8,18 +8,18 @@
 * Version number: 1.0
 * 
 * Commit date: 22nd February 2016
-* Description: This class holds the information for shading received from the xml document.
+* Description: This class holds the information for ShadingItem received from the xml document.
 */
 
 package Objects;
 
 import java.awt.Color;
 
-public class Shading {
+public class ShadingItem {
 	private double xOne, xTwo, yOne, yTwo;
 	private Color colourOne, colourTwo;
 	
-	public Shading(double myXOne, double myXTwo, double myYOne, double myYTwo, Color myColourOne, Color myColourTwo)
+	public ShadingItem(double myXOne, double myXTwo, double myYOne, double myYTwo, Color myColourOne, Color myColourTwo)
 	{
 		xOne = myXOne;
 		xTwo = myXTwo; 
@@ -29,7 +29,7 @@ public class Shading {
 		colourTwo = myColourTwo;
 	}
 	
-	public Shading() 
+	public ShadingItem() 
 	{
 		super();
 	}
@@ -104,7 +104,7 @@ public class Shading {
 			this.colourOne = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for shading colour one");
+			System.out.println("\nNo colour set for ShadingItem colour one");
 		}
 	}
 	
@@ -130,7 +130,7 @@ public class Shading {
 			this.colourTwo = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for shading colour two");
+			System.out.println("\nNo colour set for ShadingItem colour two");
 		}
 	}
 }

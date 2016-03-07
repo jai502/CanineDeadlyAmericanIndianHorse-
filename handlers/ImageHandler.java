@@ -18,11 +18,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-import Objects.Images;
+import Objects.*;
 
 public class ImageHandler
 {
-	private Images imageToHandle;
+	private ImageItem imageToHandle;
 	
 	//constructors
 	public ImageHandler()
@@ -31,7 +31,7 @@ public class ImageHandler
 	}
 	
 	//returns a canvas that contains the image
-	public Canvas drawCanvas(Images imageToHandle , int canvasSizeX, int canvasSizeY) 
+	public Canvas drawCanvas(ImageItem imageToHandle , int canvasSizeX, int canvasSizeY) 
 	{
 		this.imageToHandle = imageToHandle;
 		

@@ -34,8 +34,8 @@ public class ImageHandlerTest extends Application{
 	{
 		
 		// Creates Image of Images type (Sourcefile, start time, duration, x start, y start, width, height);
-		Images imageToHandleHouse = new Images("handlers/house.jpg",0 ,0, 0, 0, 1, 1);
-		Images imageToHandleDog = new Images("handlers/dog.png",0 ,0, 0.7, 0.6, 0.4, 0.3);
+		ImageItem imageToHandleHouse = new ImageItem("files/house.jpg",0 ,0, 0, 0, 1, 1);
+		ImageItem imageToHandleDog = new ImageItem("files/dog.png",0 ,0, 0.7, 0.6, 0.4, 0.3);
 	
 		// Create a Stack pane
 		StackPane root = new StackPane();

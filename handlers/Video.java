@@ -1,4 +1,4 @@
-package videoHandler;
+package handlers;
 
 /*
  * Author: Oliver Rushton
@@ -47,12 +47,12 @@ public class Video extends Pane{
 		this.sourceFile = sourceFile;
 		this.loop = loop;
 		//retrieves video file from source folder
-	    final File f = new File("videos/"+ sourceFile);
+	    final File f = new File(sourceFile);
 	    try {
 	    	Media media = new Media(f.toURI().toString()); //writes file as URI string to pass to media
 	    	mediaPlayer = new MediaPlayer(media);
 	    } catch (MediaException m) {
-	    	System.out.println("The source File '" + sourceFile + "' does not exist in the relative path: src/videos/" + sourceFile);
+	    	System.out.println("The source File '" + f + "' does not exist in the relative path: src/videos/" + sourceFile);
 	    }
 		setupPlayer();
 	}
@@ -170,6 +170,7 @@ public class Video extends Pane{
 	
 	public int getStartTime() {
 		return startTime;
+		// TODO Auto-generated constructor
 	}
 	
 	public int getEndTime() {

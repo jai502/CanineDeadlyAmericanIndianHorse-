@@ -31,21 +31,21 @@ public class XMLParser extends DefaultHandler {
 	private String readingFile;
 	private String newContent;
 	private String text = "";
-	private boolean ShapeOrPolyShade = false; // true for shape, false for polygon
-	private Text currentText;
-	private Shape currentShape;
-	private Polygon currentPolygon;
-	private Images currentImage;
-	private Video currentVideo;
-	private Audio currentAudio;
-	private Interactable currentInteractable;
-	private Shading currentShading;
+	private boolean ShapeOrPolyShade = false; // true for ShapeItem, false for PolygonItem
+	private TextItem currentText;
+	private ShapeItem currentShape;
+	private PolygonItem currentPolygon;
+	private ImageItem currentImage;
+	private VideoItem currentVideo;
+	private AudioItem currentAudio;
+	private InteractableItem currentInteractable;
+	private ShadingItem currentShading;
 	private boolean isInteractable = false;
 	private DocumentInfo currentDocInfo;
-	private Defaults currentDefaults;
-	private Slide currentSlide;
+	private DefaultsItem currentDefaults;
+	private SlideItem currentSlide;
 	private Presentation currentPres;
-	private ArrayList<Slide> slideList;
+	private ArrayList<SlideItem> slideList;
 	private boolean defaultsSet = false;
 	
 	
@@ -97,31 +97,31 @@ public class XMLParser extends DefaultHandler {
 		{
 			System.out.println("Started parsing: " + readingFile);
 			currentPres = new Presentation();
-			slideList = new ArrayList<Slide>();
+			slideList = new ArrayList<SlideItem>();
 		}
 		
 		if (qName.equalsIgnoreCase("documentInfo"))
 		{
 			currentDocInfo = new DocumentInfo();
 		}
-		if (qName.equalsIgnoreCase("defaults"))
+		if (qName.equalsIgnoreCase("Defaults"))
 		{
-			currentDefaults = new Defaults();
+			currentDefaults = new DefaultsItem();
 			defaultsSet = false;
 		}
-		if (qName.equalsIgnoreCase("slide"))
+		if (qName.equalsIgnoreCase("Slide"))
 		{
-			currentSlide = new Slide();
-			System.out.println("New slide...");
+			currentSlide = new SlideItem();
+			System.out.println("New Slide...");
 			System.out.println("Current Slide: " + (slideList.size() + 1));
 			currentSlide.setSlideId(attributes.getValue("slideID"));
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
 		}
 		
-		if (qName.equalsIgnoreCase("text"))
+		if (qName.equalsIgnoreCase("Text"))
 		{
-			currentText = new Text();
+			currentText = new TextItem();
 			currentText.setStartTime(attributes.getValue("starttime"));
 			currentText.setDuration(attributes.getValue("duration"));
 			currentText.setxStart(attributes.getValue("xstart"));
@@ -146,7 +146,7 @@ public class XMLParser extends DefaultHandler {
 		
 		if (qName.equalsIgnoreCase("Shape"))
 		{
-			currentShape = new Shape();
+			currentShape = new ShapeItem();
 			currentShape.setStartTime(attributes.getValue("starttime"));
 			currentShape.setDuration(attributes.getValue("duration"));
 			currentShape.setxStart(attributes.getValue("xstart"));
@@ -160,9 +160,9 @@ public class XMLParser extends DefaultHandler {
 			ShapeOrPolyShade = true;
 		}
 		
-		if (qName.equalsIgnoreCase("polygon"))
+		if (qName.equalsIgnoreCase("Polygon"))
 		{
-			currentPolygon = new Polygon();
+			currentPolygon = new PolygonItem();
 			currentPolygon.setStartTime(attributes.getValue("starttime"));
 			currentPolygon.setSourceFile(attributes.getValue("sourceFile"));
 			currentPolygon.setDuration(attributes.getValue("duration"));
@@ -174,7 +174,7 @@ public class XMLParser extends DefaultHandler {
 		
 		if (qName.equalsIgnoreCase("Shading"))
 		{
-			currentShading = new Shading();
+			currentShading = new ShadingItem();
 			currentShading.setxOne(attributes.getValue("x1"));
 			currentShading.setxTwo(attributes.getValue("x2"));
 			currentShading.setyOne(attributes.getValue("y1"));
@@ -186,7 +186,7 @@ public class XMLParser extends DefaultHandler {
 		
 		if (qName.equalsIgnoreCase("image"))
 		{
-			currentImage = new Images();
+			currentImage = new ImageItem();
 			currentImage.setStartTime(attributes.getValue("starttime"));
 			currentImage.setDuration(attributes.getValue("duration"));
 			currentImage.setSourceFile(attributes.getValue("sourceFile"));
@@ -196,9 +196,9 @@ public class XMLParser extends DefaultHandler {
 			currentImage.setHeight(attributes.getValue("height"));
 		}
 		
-		if (qName.equalsIgnoreCase("video"))
+		if (qName.equalsIgnoreCase("Video"))
 		{
-			currentVideo = new Video();
+			currentVideo = new VideoItem();
 			currentVideo.setStartTime(attributes.getValue("starttime"));
 			currentVideo.setDuration(attributes.getValue("duration"));
 			currentVideo.setxStart(attributes.getValue("xstart"));
@@ -207,18 +207,18 @@ public class XMLParser extends DefaultHandler {
 			currentVideo.setLoop(attributes.getValue("loop"));
 		}
 		
-		if (qName.equalsIgnoreCase("audio"))
+		if (qName.equalsIgnoreCase("Audio"))
 		{
-			currentAudio = new Audio();
+			currentAudio = new AudioItem();
 			currentAudio.setStartTime(attributes.getValue("starttime"));
 			currentAudio.setDuration(attributes.getValue("duration"));
 			currentAudio.setSourceFile(attributes.getValue("sourceFile"));
 			currentAudio.setLoop(attributes.getValue("loop"));
 		}
 		
-		if (qName.equalsIgnoreCase("interactable"))
+		if (qName.equalsIgnoreCase("Interactable"))
 		{
-			currentInteractable = new Interactable();
+			currentInteractable = new InteractableItem();
 			currentInteractable.setTargetSlide(attributes.getValue("targetSlide"));
 			isInteractable = true;
 		}
@@ -242,15 +242,15 @@ public class XMLParser extends DefaultHandler {
 			System.out.println("doc info set");
 		}
 		
-		if (qName.equalsIgnoreCase("defaults"))
+		if (qName.equalsIgnoreCase("Defaults"))
 		{
 			currentPres.setDefaults(currentDefaults);
 			currentDefaults = null;
 			defaultsSet = true;
-			System.out.println("defaults set");
+			System.out.println("DefaultsItem set");
 		}
 		
-		if (qName.equalsIgnoreCase("slide"))
+		if (qName.equalsIgnoreCase("Slide"))
 		{
 			slideList.add(currentSlide);
 			currentSlide = null;
@@ -278,7 +278,7 @@ public class XMLParser extends DefaultHandler {
 			currentDocInfo.setComment(newContent);
 		}
 		
-		// Defaults setting
+		// DefaultsItem setting
 		
 		if (qName.equalsIgnoreCase("backgroundColour"))
 		{
@@ -320,7 +320,7 @@ public class XMLParser extends DefaultHandler {
 		
 		// Slides setting
 		
-		if (qName.equalsIgnoreCase("text"))
+		if (qName.equalsIgnoreCase("Text"))
 		{
 			if (isInteractable == true){
 				text = (text + newContent);
@@ -349,7 +349,7 @@ public class XMLParser extends DefaultHandler {
 			text = (text + "<i>" + newContent + "</i>");
 		}
 		
-		if (qName.equalsIgnoreCase("shape"))
+		if (qName.equalsIgnoreCase("Shape"))
 		{
 			if (isInteractable == true)
 			{
@@ -360,7 +360,7 @@ public class XMLParser extends DefaultHandler {
 			
 		}
 		
-		if (qName.equalsIgnoreCase("polygon"))
+		if (qName.equalsIgnoreCase("Polygon"))
 		{
 			if (isInteractable == true)
 			{
@@ -369,9 +369,9 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.addPolygon(currentPolygon);
 		}
 		
-		if (qName.equalsIgnoreCase("shading"))
+		if (qName.equalsIgnoreCase("Shading"))
 		{
-			if (ShapeOrPolyShade == true) // if current shading is for a shape
+			if (ShapeOrPolyShade == true) // if current ShadingItem is for a ShapeItem
 			{
 				currentShape.setShading(currentShading);
 			}

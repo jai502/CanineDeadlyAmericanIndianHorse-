@@ -45,13 +45,13 @@ public class XMLParserTest {
 	@Test
 	public void presContainsDefaults() 
 	{
-		assertTrue(presentation.getDefaults() instanceof Defaults);
+		assertTrue(presentation.getDefaults() instanceof DefaultsItem);
 	}
 	
 	@Test
 	public void presContainsSlides() 
 	{
-		assertTrue(presentation.getSlides().get(0) instanceof Slide);
+		assertTrue(presentation.getSlides().get(0) instanceof SlideItem);
 	}
 	
 	@Test

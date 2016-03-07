@@ -1,4 +1,4 @@
-package videoHandler;
+package handlers;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;

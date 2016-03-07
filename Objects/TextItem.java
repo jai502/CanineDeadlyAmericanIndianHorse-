@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import Parsers.ReadTextFile;
 
-public class Text {
+public class TextItem {
 	private int startTime, duration, fontSize;
 	private double xStart, yStart, height, width;
 	private String font;
@@ -25,7 +25,7 @@ public class Text {
 	private String text;
 	private String sourceText;
  
-	 public Text(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
+	 public TextItem(int myStartTime, int myDuration, int myFontSize, double myXStart, double myYStart, String myFont, Color myFontColour, String myText)
 	 {
 			 startTime = myStartTime;
 			 duration = myDuration;
@@ -38,7 +38,7 @@ public class Text {
 	}
 	 
 
-	public Text() {
+	public TextItem() {
 		super();
 	}
 

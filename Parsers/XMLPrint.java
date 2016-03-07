@@ -18,15 +18,19 @@ public class XMLPrint {
 
 	public Presentation presentation;
 	
+	public static void main (String args[]){
+		XMLPrint xPrint = new XMLPrint();
+		xPrint.print();
+	}
 
 	public XMLPrint() {
 		super();
 	}
 	
-	public void Print()
+	public void print()
 	{
 		XMLParser parser = new XMLParser();
-		parser.parseXML("PWS/PWSTest.xml");
+		parser.parseXML("PWS/pwsTest.xml");
 		presentation = parser.getPresentation();
 			System.out.println("------------------------");
 			System.out.println("Presentation Document Info:");

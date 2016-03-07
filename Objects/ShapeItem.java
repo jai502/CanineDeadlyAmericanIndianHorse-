@@ -15,15 +15,15 @@ package Objects;
 
 import java.awt.Color;;
 
-public class Shape
+public class ShapeItem
 {
 	private int startTime, duration;
 	private double xStart, yStart, width, height;
 	private String type;
 	private Color lineColour, fillColour;
-	private Shading shading;
+	private ShadingItem shading;
 	
-	public Shape(int myStartTime, int myDuration, double myXStart, double myYStart, double myWidth, double myHeight, String myType, Color myLineColour, Color myFillColour, Shading myShading)
+	public ShapeItem(int myStartTime, int myDuration, double myXStart, double myYStart, double myWidth, double myHeight, String myType, Color myLineColour, Color myFillColour, ShadingItem myShading)
 	{
 		startTime = myStartTime;
 		duration = myDuration;
@@ -38,7 +38,7 @@ public class Shape
 		
 	}
 
-	public Shape() {
+	public ShapeItem() {
 		super();
 	}
 
@@ -175,7 +175,7 @@ public class Shape
 			lineColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for shape line colour");
+			System.out.println("\nNo colour set for ShapeItem line colour");
 		}
 	}
 
@@ -204,15 +204,15 @@ public class Shape
 			fillColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for shape fill colour");
+			System.out.println("\nNo colour set for ShapeItem fill colour");
 		}
 	}
 
-	public Shading getShading() {
+	public ShadingItem getShading() {
 		return shading;
 	}
 
-	public void setShading(Shading shading) {
+	public void setShading(ShadingItem shading) {
 		this.shading = shading;
 	}
 

@@ -1,14 +1,11 @@
 package handlers;
 
-import Objects.Images;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import videoHandler.Video;
+import handlers.Video;
 
 public class VideoHandlerTest extends Application{
 
@@ -24,7 +21,7 @@ public class VideoHandlerTest extends Application{
 	@Override
 	public void start(Stage primary) throws Exception {
 		// Creates Image of Images type (Sourcefile, start time, duration, x start, y start, width, height);
-				Video player = new Video(0,0,0,0,"test.mp4", true);
+				Video player = new Video(0,0,0,0,"files/test.mp4", true);
 	
 			
 				// Create a Stack pane

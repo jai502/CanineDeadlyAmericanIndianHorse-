@@ -15,14 +15,14 @@ package Objects;
 
 import java.awt.Color;
 
-public class Polygon {
+public class PolygonItem {
 	
 	private int startTime , duration;
 	private Color lineColour, fillColour;
 	private String sourceFile;
-	private Shading shading;
+	private ShadingItem shading;
 	
-	public Polygon(int myStartTime, int myDuration, Color myLineColour, Color myFillColour, String mySourceFile, Shading myShading)
+	public PolygonItem(int myStartTime, int myDuration, Color myLineColour, Color myFillColour, String mySourceFile, ShadingItem myShading)
 	{
 		startTime = myStartTime;
 		duration = myDuration;
@@ -32,7 +32,7 @@ public class Polygon {
 		shading = myShading;
 	}
 	
-	public Polygon() {
+	public PolygonItem() {
 		super();
 	}
 
@@ -88,7 +88,7 @@ public class Polygon {
 			this.lineColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for polygon line colour");
+			System.out.println("\nNo colour set for PolygonItem line colour");
 		}
 	}
 	
@@ -114,7 +114,7 @@ public class Polygon {
 			this.fillColour = new Color(rInt,gInt,bInt);
 		}
 		catch(Exception e){
-			System.out.println("\nNo colour set for polygon fill colour");
+			System.out.println("\nNo colour set for PolygonItem fill colour");
 		}
 	}
 	
@@ -124,10 +124,10 @@ public class Polygon {
 	public void setSourceFile(String sourceFile) {
 		this.sourceFile = sourceFile;
 	}
-	public Shading getShading() {
+	public ShadingItem getShading() {
 		return shading;
 	}
-	public void setShading(Shading shading) {
+	public void setShading(ShadingItem shading) {
 		this.shading = shading;
 	}
 	

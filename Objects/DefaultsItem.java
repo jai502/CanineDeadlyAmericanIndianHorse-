@@ -16,12 +16,12 @@ package Objects;
 import java.awt.Color;
 import java.awt.Font;
 
-public class Defaults {
+public class DefaultsItem {
 	private Color background, fontColour, lineColour, fillColour;
 	private String font;
 	private int	fontSize;
 	
-	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, String myFont, int myFontSize){
+	public DefaultsItem(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, String myFont, int myFontSize){
 		background = myBackground;
 		fontColour = myFontColour;
 		lineColour = myLineColour;
@@ -30,7 +30,7 @@ public class Defaults {
 		fontSize = myFontSize;
 	}
 	
-	public Defaults() {
+	public DefaultsItem() {
 		super();
 	}
 

@@ -1,4 +1,4 @@
-/*
+/*/
 * (C) Stammtisch
 * First version created by: Joseph Ingleby & Callum Silver
 * Date of first version: 22nd February 2016
@@ -8,29 +8,26 @@
 * Version number: 1.0
 * 
 * Commit date: 22nd February 2016
-* Description: This class holds the information for video files received from the xml document.
+* Description: This class holds the information for audio files received from the xml document.
 */
 
 package Objects;
 
-public class Video
-{
+public class AudioItem {
 	private int startTime, duration;
-	private double xStart, yStart;
 	private String sourceFile;
 	private boolean loop;
 	
-	public Video(int myStartTime, int myDuration, double myXStart, double myYStart, String mySourceFile, boolean myLoop)
+	public AudioItem(int startTime, int duration, String sourceFile, boolean loop) 
 	{
-		startTime = myStartTime;
-		duration = myDuration;
-		xStart = myXStart;
-		yStart = myYStart;
-		sourceFile = mySourceFile;
-		loop = myLoop;
+		super();
+		this.startTime = startTime;
+		this.duration = duration;
+		this.sourceFile = sourceFile;
+		this.loop = loop;
 	}
 
-	public Video() {
+	public AudioItem() {
 		super();
 	}
 
@@ -39,7 +36,7 @@ public class Video
 		return startTime;
 	}
 
-	public void setStartTime(int startTime) 
+	public void setStartTime(int startTime)
 	{
 		this.startTime = startTime;
 	}
@@ -54,7 +51,8 @@ public class Video
 		return duration;
 	}
 
-	public void setDuration(int duration) {	
+	public void setDuration(int duration)
+	{
 		this.duration = duration;
 	}
 	
@@ -68,36 +66,7 @@ public class Video
 			this.duration = 0;
 		}
 	}
-
-	public double getxStart() 
-	{
-		return xStart;
-	}
-
-	public void setxStart(double xStart) 
-	{
-		this.xStart = xStart;
-	}
 	
-	public void setxStart(String xStart)
-	{
-		this.xStart = Double.parseDouble(xStart);
-	}
-
-	public double getyStart() 
-	{
-		return yStart;
-	}
-
-	public void setyStart(double yStart) 
-	{
-		this.yStart = yStart;
-	}
-	
-	public void setyStart(String yStart)
-	{
-		this.yStart = Double.parseDouble(yStart);
-	}
 
 	public String getSourceFile() 
 	{
@@ -119,22 +88,23 @@ public class Video
 		this.loop = loop;
 	}
 	
-	
 	// issues caused when parsing string to boolean, resolved with this
-	public void setLoop(String loop) 
-	{
-		if (loop.equalsIgnoreCase("true"))
+		public void setLoop(String loop) 
 		{
-			this.loop = true;
+			if (loop.equalsIgnoreCase("true"))
+			{
+				this.loop = true;
+			}
+			else if (loop.equalsIgnoreCase("false"))
+			{
+				this.loop = false;
+			}
+			else
+			{
+				this.loop = false;
+			}
+			
 		}
-		else if (loop.equalsIgnoreCase("false"))
-		{
-			this.loop = false;
-		}
-		else
-		{
-			this.loop = false;
-		}
-		
-	}
+	
+	
 }

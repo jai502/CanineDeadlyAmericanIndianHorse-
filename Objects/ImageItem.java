@@ -13,13 +13,13 @@
 
 package Objects;
 
-public class Images
+public class ImageItem
 {
 	private String sourceFile;
 	private int startTime, duration;
 	private double xStart, yStart, height, width;
 	
-	public Images(String mySourceFile, int myStartTime, int myDuration, double myXStart, double myYStart, double myHeight, double myWidth)
+	public ImageItem(String mySourceFile, int myStartTime, int myDuration, double myXStart, double myYStart, double myHeight, double myWidth)
 	{
 		sourceFile = mySourceFile;
 		startTime = myStartTime;
@@ -30,7 +30,7 @@ public class Images
 		width = myWidth;
 	}
 	
-	public Images() {
+	public ImageItem() {
 		super();
 	}
 

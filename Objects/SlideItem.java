@@ -16,33 +16,33 @@ package Objects;
 import java.awt.Color;
 import java.util.ArrayList;
 
-public class Slide {
+public class SlideItem {
 	private int slideId, nextSlide, duration;
 	private Color backgroundColour;
-	private ArrayList<Text> textList;
-	private ArrayList<Shape> shapeList;
-	private ArrayList<Polygon> polygonList;
-	private ArrayList<Images> imageList;
-	private ArrayList<Video> videoList;
-	private ArrayList<Audio> audioList;
-	private ArrayList<Interactable> interactableList;
+	private ArrayList<TextItem> textList;
+	private ArrayList<ShapeItem> shapeList;
+	private ArrayList<PolygonItem> polygonList;
+	private ArrayList<ImageItem> imageList;
+	private ArrayList<VideoItem> videoList;
+	private ArrayList<AudioItem> audioList;
+	private ArrayList<InteractableItem> interactableList;
 	
-	public Slide(){
+	public SlideItem(){
 		
-		textList = new ArrayList<Text>();
-		shapeList = new ArrayList<Shape>();
-		polygonList = new ArrayList<Polygon>();
-		imageList = new ArrayList<Images>();
-		videoList = new ArrayList<Video>();
-		audioList = new ArrayList<Audio>();
-		interactableList = new ArrayList<Interactable>();
+		textList = new ArrayList<TextItem>();
+		shapeList = new ArrayList<ShapeItem>();
+		polygonList = new ArrayList<PolygonItem>();
+		imageList = new ArrayList<ImageItem>();
+		videoList = new ArrayList<VideoItem>();
+		audioList = new ArrayList<AudioItem>();
+		interactableList = new ArrayList<InteractableItem>();
 	}
 	
-	public Slide(int slideId, int nextSlide, int duration,
-			Color backgroundColour, ArrayList<Text> textList,
-			ArrayList<Shape> shapeList, ArrayList<Polygon> polygonList,
-			ArrayList<Images> imageList, ArrayList<Video> videoList,
-			ArrayList<Audio> audioList, ArrayList<Interactable> interactableList) {
+	public SlideItem(int slideId, int nextSlide, int duration,
+			Color backgroundColour, ArrayList<TextItem> textList,
+			ArrayList<ShapeItem> shapeList, ArrayList<PolygonItem> polygonList,
+			ArrayList<ImageItem> imageList, ArrayList<VideoItem> videoList,
+			ArrayList<AudioItem> audioList, ArrayList<InteractableItem> interactableList) {
 		super();
 		this.slideId = slideId;
 		this.nextSlide = nextSlide;
@@ -121,64 +121,64 @@ public class Slide {
 		}
 	}
 
-	public ArrayList<Text> getTextList() {
+	public ArrayList<TextItem> getTextList() {
 		return textList;
 	}
 
-	public void addText (Text text)
+	public void addText (TextItem text)
 	{
 		textList.add(text);
 	}
 
-	public ArrayList<Shape> getShapeList() {
+	public ArrayList<ShapeItem> getShapeList() {
 		return shapeList;
 	}
 
-	public void addShape (Shape shape)
+	public void addShape (ShapeItem shape)
 	{
 		shapeList.add(shape);
 	}
 
-	public ArrayList<Polygon> getPolygonList() {
+	public ArrayList<PolygonItem> getPolygonList() {
 		return polygonList;
 	}
 
-	public void addPolygon(Polygon polygon) {
+	public void addPolygon(PolygonItem polygon) {
 		polygonList.add(polygon);
 	}
 
-	public ArrayList<Images> getImageList() {
+	public ArrayList<ImageItem> getImageList() {
 		return imageList;
 	}
 	
-	public void addImage (Images image)
+	public void addImage (ImageItem image)
 	{
 		imageList.add(image);
 	}
 
-	public ArrayList<Video> getVideoList() {
+	public ArrayList<VideoItem> getVideoList() {
 		return videoList;
 	}
 
-	public void addVideo (Video video)
+	public void addVideo (VideoItem video)
 	{
 		videoList.add(video);
 	}
 
-	public ArrayList<Audio> getAudioList() {
+	public ArrayList<AudioItem> getAudioList() {
 		return audioList;
 	}
 	
-	public void addAudio (Audio audio)
+	public void addAudio (AudioItem audio)
 	{
 		audioList.add(audio);
 	}
 
-	public ArrayList<Interactable> getInteractableList() {
+	public ArrayList<InteractableItem> getInteractableList() {
 		return interactableList;
 	}
 
-	public void addInteractable (Interactable interactable)
+	public void addInteractable (InteractableItem interactable)
 	{
 		interactableList.add(interactable);
 	}
