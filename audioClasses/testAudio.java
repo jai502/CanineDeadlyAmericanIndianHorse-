@@ -12,7 +12,7 @@ public class testAudio extends Application {
 		launch(args);
 		
 	}
-	
+	//build and test the control panel
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub

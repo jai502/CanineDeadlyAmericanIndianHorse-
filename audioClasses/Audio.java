@@ -1,7 +1,9 @@
+
+
+
 package audioClasses;
 
 import java.io.File;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -19,9 +21,10 @@ import javafx.scene.media.*;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.util.Duration;
 
+//main class for creating the audio controls
 public class Audio extends HBox {
 	
-	private MediaPlayer mp;
+	private MediaPlayer mp; //
 	private final boolean repeat = false;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
@@ -44,12 +47,8 @@ public class Audio extends HBox {
 		mediaControls();
 		
 	}
-
+	//building the control panel
 	public void mediaControls(){
-		
-		this.setAlignment(Pos.CENTER);
-		this.setPadding(new Insets(5, 10, 5, 10));
-		//BorderPane.setAlignment(mediaBar, Pos.CENTER);
 		
 	    playButton = new Button(">");
 		
@@ -123,13 +122,13 @@ public class Audio extends HBox {
        });
 		
 		this.getChildren().add(playButton);	
-
+		
 		Label spacer = new Label("      ");
 		this.getChildren().add(spacer);
 		
 		Label timeLabel = new Label("Time:  ");
 		this.getChildren().add(timeLabel);
-		
+		//set up the time slider
 		timeSlider = new Slider();
 		HBox.setHgrow(timeSlider, Priority.ALWAYS);
 		timeSlider.setMinWidth(50);
@@ -145,9 +144,8 @@ public class Audio extends HBox {
 		    }
 		});
 		
-		
 		this.getChildren().add(timeSlider);
-		
+		//Add Timer
 		playTime = new Label();
 		playTime.setPrefWidth(130);
 		playTime.setMinWidth(50);
@@ -197,7 +195,7 @@ public class Audio extends HBox {
 		     });
 		  }
 		}
-	
+	// function for the control timer, to determine where it is
 	private static String formatTime(Duration elapsed, Duration duration) {
 		
 		   int intElapsed = (int)Math.floor(elapsed.toSeconds());
@@ -239,12 +237,5 @@ public class Audio extends HBox {
 		            }
 		        }
 		    }
-	
-
-
-	
-	
-	
-	
 	
 }
