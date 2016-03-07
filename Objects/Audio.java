@@ -1,4 +1,4 @@
-/*
+/*/
 * (C) Stammtisch
 * First version created by: Joseph Ingleby & Callum Silver
 * Date of first version: 22nd February 2016
@@ -27,6 +27,10 @@ public class Audio {
 		this.loop = loop;
 	}
 
+	public Audio() {
+		super();
+	}
+
 	public int getStartTime()
 	{
 		return startTime;
@@ -35,6 +39,11 @@ public class Audio {
 	public void setStartTime(int startTime)
 	{
 		this.startTime = startTime;
+	}
+	
+	public void setStartTime(String startTime) 
+	{
+		this.startTime = Integer.parseInt(startTime);
 	}
 
 	public int getDuration() 
@@ -46,6 +55,18 @@ public class Audio {
 	{
 		this.duration = duration;
 	}
+	
+	public void setDuration(String duration) {
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
+	}
+	
 
 	public String getSourceFile() 
 	{
@@ -66,6 +87,24 @@ public class Audio {
 	{
 		this.loop = loop;
 	}
+	
+	// issues caused when parsing string to boolean, resolved with this
+		public void setLoop(String loop) 
+		{
+			if (loop.equalsIgnoreCase("true"))
+			{
+				this.loop = true;
+			}
+			else if (loop.equalsIgnoreCase("false"))
+			{
+				this.loop = false;
+			}
+			else
+			{
+				this.loop = false;
+			}
+			
+		}
 	
 	
 }

@@ -30,6 +30,10 @@ public class Video
 		loop = myLoop;
 	}
 
+	public Video() {
+		super();
+	}
+
 	public int getStartTime()
 	{
 		return startTime;
@@ -39,6 +43,11 @@ public class Video
 	{
 		this.startTime = startTime;
 	}
+	
+	public void setStartTime(String startTime) 
+	{
+		this.startTime = Integer.parseInt(startTime);
+	}
 
 	public int getDuration() 
 	{
@@ -47,6 +56,17 @@ public class Video
 
 	public void setDuration(int duration) {	
 		this.duration = duration;
+	}
+	
+	public void setDuration(String duration) {
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
 	}
 
 	public double getxStart() 
@@ -58,6 +78,11 @@ public class Video
 	{
 		this.xStart = xStart;
 	}
+	
+	public void setxStart(String xStart)
+	{
+		this.xStart = Double.parseDouble(xStart);
+	}
 
 	public double getyStart() 
 	{
@@ -67,6 +92,11 @@ public class Video
 	public void setyStart(double yStart) 
 	{
 		this.yStart = yStart;
+	}
+	
+	public void setyStart(String yStart)
+	{
+		this.yStart = Double.parseDouble(yStart);
 	}
 
 	public String getSourceFile() 
@@ -87,5 +117,24 @@ public class Video
 	public void setLoop(boolean loop) 
 	{
 		this.loop = loop;
+	}
+	
+	
+	// issues caused when parsing string to boolean, resolved with this
+	public void setLoop(String loop) 
+	{
+		if (loop.equalsIgnoreCase("true"))
+		{
+			this.loop = true;
+		}
+		else if (loop.equalsIgnoreCase("false"))
+		{
+			this.loop = false;
+		}
+		else
+		{
+			this.loop = false;
+		}
+		
 	}
 }

@@ -13,7 +13,7 @@
 
 package Objects;
 
-import java.awt.Color;
+import java.awt.Color;;
 
 public class Shape
 {
@@ -21,8 +21,9 @@ public class Shape
 	private double xStart, yStart, width, height;
 	private String type;
 	private Color lineColour, fillColour;
+	private Shading shading;
 	
-	public Shape(int myStartTime, int myDuration, double myXStart, double myYStart, double myWidth, double myHeight, String myType, Color myLineColour, Color myFillColour)
+	public Shape(int myStartTime, int myDuration, double myXStart, double myYStart, double myWidth, double myHeight, String myType, Color myLineColour, Color myFillColour, Shading myShading)
 	{
 		startTime = myStartTime;
 		duration = myDuration;
@@ -32,7 +33,13 @@ public class Shape
 		height = myHeight;
 		type = myType;
 		lineColour = myLineColour;
-		fillColour = myFillColour;	
+		fillColour = myFillColour;
+		shading = myShading;
+		
+	}
+
+	public Shape() {
+		super();
 	}
 
 	public int getStartTime()
@@ -44,6 +51,11 @@ public class Shape
 	{
 		this.startTime = startTime;
 	}
+	
+	public void setStartTime (String startTime)
+	{
+		this.startTime = Integer.parseInt(startTime);
+	}
 
 	public int getDuration() 
 	{
@@ -54,6 +66,19 @@ public class Shape
 	{
 		this.duration = duration;
 	}
+	
+	public void setDuration(String duration)
+	{
+		try
+		{
+			this.duration = Integer.parseInt(duration);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
+	}
+	
 
 	public double getxStart() 
 	{
@@ -64,7 +89,12 @@ public class Shape
 	{
 		this.xStart = xStart;
 	}
-
+	
+	public void setxStart(String xStart)
+	{
+		this.xStart = Double.parseDouble(xStart);
+	}
+	
 	public double getyStart() 
 	{
 		return yStart;
@@ -74,7 +104,12 @@ public class Shape
 	{
 		this.yStart = yStart;
 	}
-
+	
+	public void setyStart(String yStart)
+	{
+		this.yStart = Double.parseDouble(yStart);
+	}
+	
 	public double getWidth() 
 	{
 		return width;
@@ -84,7 +119,12 @@ public class Shape
 	{
 		this.width = width;
 	}
-
+	
+	public void setWidth(String width)
+	{
+		this.width = Double.parseDouble(width);
+	}
+	
 	public double getHeight()
 	{
 		return height;
@@ -93,6 +133,11 @@ public class Shape
 	public void setHeight(double height) 
 	{
 		this.height = height;
+	}
+	
+	public void setHeight(String height)
+	{
+		this.height = Double.parseDouble(height);
 	}
 
 	public String getType() 
@@ -114,6 +159,25 @@ public class Shape
 	{
 		this.lineColour = lineColour;
 	}
+	
+	public void setLineColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b, 16);
+			lineColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for shape line colour");
+		}
+	}
 
 	public Color getFillColour() 
 	{
@@ -124,6 +188,35 @@ public class Shape
 	{
 		this.fillColour = fillColour;
 	}
+	
+	public void setFillColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			fillColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for shape fill colour");
+		}
+	}
+
+	public Shading getShading() {
+		return shading;
+	}
+
+	public void setShading(Shading shading) {
+		this.shading = shading;
+	}
+
+
 	
 	
 }

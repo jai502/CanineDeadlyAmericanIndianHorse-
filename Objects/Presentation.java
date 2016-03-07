@@ -19,9 +19,13 @@ public class Presentation
 {
 	private	DocumentInfo docInfo;
 	private Defaults defaults;
-	private ArrayList slides = new ArrayList<Slide>() ;
+	private ArrayList<Slide> slides;
 	
-	public Presentation(DocumentInfo docInfo, Defaults defaults,ArrayList slides)
+	public Presentation() {
+		super();
+	}
+
+	public Presentation(DocumentInfo docInfo, Defaults defaults,ArrayList<Slide> slides)
 	{
 		super();
 		this.docInfo = docInfo;
@@ -49,12 +53,12 @@ public class Presentation
 		this.defaults = defaults;
 	}
 
-	public ArrayList getSlides()
+	public ArrayList<Slide> getSlides()
 	{
 		return slides;
 	}
 
-	public void setSlides(ArrayList slides)
+	public void setSlides(ArrayList<Slide> slides)
 	{
 		this.slides = slides;
 	}

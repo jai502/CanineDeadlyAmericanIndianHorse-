@@ -18,10 +18,10 @@ import java.awt.Font;
 
 public class Defaults {
 	private Color background, fontColour, lineColour, fillColour;
-	private Font font;
+	private String font;
 	private int	fontSize;
 	
-	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, Font myFont, int myFontSize){
+	public Defaults(Color myBackground, Color myFontColour, Color myLineColour, Color myFillColour, String myFont, int myFontSize){
 		background = myBackground;
 		fontColour = myFontColour;
 		lineColour = myLineColour;
@@ -30,6 +30,10 @@ public class Defaults {
 		fontSize = myFontSize;
 	}
 	
+	public Defaults() {
+		super();
+	}
+
 	public Color getBackground() 
 	{
 		return background;
@@ -38,6 +42,26 @@ public class Defaults {
 	{
 		this.background = background;
 	}
+	
+	public void setBackground(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			background = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for default background colour");
+		}
+	}
+	
 	public Color getFontColour() 
 	{
 		return fontColour;
@@ -46,6 +70,26 @@ public class Defaults {
 	{
 		this.fontColour = fontColour;
 	}
+	
+	public void setFontColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b, 16);
+			fontColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for default font colour");
+		}
+	}
+	
 	public Color getLineColour() 
 	{
 		return lineColour;
@@ -54,6 +98,26 @@ public class Defaults {
 	{
 		this.lineColour = lineColour;
 	}
+	
+	public void setLineColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			lineColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for default line colour");
+		}
+	}
+	
 	public Color getFillColour() 
 	{
 		return fillColour;
@@ -62,14 +126,34 @@ public class Defaults {
 	{
 		this.fillColour = fillColour;
 	}
-	public Font getFont() 
+	
+	public void setFillColour(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			fillColour = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for default fill colour");
+		}
+	}
+	public String getFont() 
 	{
 		return font;
 	}
-	public void setFont(Font font) 
+	public void setFont(String font) 
 	{
 		this.font = font;
 	}
+	
 	public int getFontSize() 
 	{
 		return fontSize;
@@ -77,6 +161,11 @@ public class Defaults {
 	public void setFontSize(int fontSize) 
 	{
 		this.fontSize = fontSize;
+	}
+	
+	public void setFontSize(String fontSize) 
+	{
+		this.fontSize = Integer.parseInt(fontSize);
 	}
 	
 }

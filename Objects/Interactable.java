@@ -1,4 +1,4 @@
-/*
+/*/
 * (C) Stammtisch
 * First version created by: Joseph Ingleby & Callum Silver
 * Date of first version: 22nd February 2016
@@ -13,73 +13,117 @@
 
 package Objects;
 
+import java.util.ArrayList;
+
 public class Interactable 
 {
-	private Text text;
-	private Shape shape;
-	private Polygon polygon;
-	private Image image;
-	private Video video;
-	
-	public Interactable(Text text, Shape shape, Polygon polygon, Image image, Video video)
-	{
+	private int targetSlide;
+	private ArrayList<Text> textList;
+	private ArrayList<Shape> shapeList;
+	private ArrayList<Polygon> polygonList;
+	private ArrayList<Images> imageList;
+	private ArrayList<Video> videoList;
+	private ArrayList<Audio> audioList;
+		
+	public Interactable(ArrayList<Text> textList, ArrayList<Shape> shapeList,
+			ArrayList<Polygon> polygonList, ArrayList<Images> imageList,
+			ArrayList<Video> videoList, ArrayList<Audio> audioList) {
 		super();
-		this.text = text;
-		this.shape = shape;
-		this.polygon = polygon;
-		this.image = image;
-		this.video = video;
+		this.textList = textList;
+		this.shapeList = shapeList;
+		this.polygonList = polygonList;
+		this.imageList = imageList;
+		this.videoList = videoList;
+		this.audioList = audioList;
 	}
 
-	public Text getText()
+
+	public Interactable() {
+		textList = new ArrayList<Text>();
+		shapeList = new ArrayList<Shape>();
+		polygonList = new ArrayList<Polygon>();
+		imageList = new ArrayList<Images>();
+		videoList = new ArrayList<Video>();
+		audioList = new ArrayList<Audio>();
+	}
+	
+	
+	public int getTargetSlide() {
+		return targetSlide;
+	}
+
+
+	public void setTargetSlide(int targetSlide) {
+		this.targetSlide = targetSlide;
+	}
+	
+	public void setTargetSlide(String targetSlide)
 	{
-		return text;
-	}
 
-	public void setText(Text text) 
+		this.targetSlide = Integer.parseInt(targetSlide);
+
+	}
+	
+	public ArrayList<Text> getTextList()
 	{
-		this.text = text;
+		return textList;
 	}
-
-	public Shape getShape() 
+	
+	public void addText (Text text)
 	{
-		return shape;
+		textList.add(text);
 	}
-
-	public void setShape(Shape shape)
+	
+	public ArrayList<Shape> getShapeList() 
 	{
-		this.shape = shape;
+		return shapeList;
 	}
-
-	public Polygon getPolygon()
-{
-		return polygon;
-	}
-
-	public void setPolygon(Polygon polygon)
+	
+	public void addShape (Shape shape)
 	{
-		this.polygon = polygon;
+		shapeList.add(shape);
 	}
-
-	public Image getImage() 
+	
+	public ArrayList<Polygon> getPolygonList() 
 	{
-		return image;
+		return polygonList;
 	}
-
-	public void setImage(Image image) 
+	
+	public void addPolygon(Polygon polygon) {
+		polygonList.add(polygon);
+	}
+	
+	public ArrayList<Images> getImageList() 
 	{
-		this.image = image;
+		return imageList;
 	}
-
-	public Video getVideo() 
+	
+	public void addImage (Images image)
 	{
-		return video;
+		imageList.add(image);
 	}
-
-	public void setVideo(Video video) 
+	
+	public ArrayList<Video> getVideoList()
 	{
-		this.video = video;
+		return videoList;
 	}
+	
+	public void addVideo (Video video)
+	{
+		videoList.add(video);
+	}
+	
+	public ArrayList<Audio> getAudioList() 
+	{
+		return audioList;
+	}
+	
+	public void addAudio (Audio audio)
+	{
+		audioList.add(audio);
+	}
+	
+
 	
 	
 	

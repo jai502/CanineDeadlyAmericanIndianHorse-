@@ -29,23 +29,48 @@ public class Shading {
 		colourTwo = myColourTwo;
 	}
 	
-	public double getxOne() {
+	public Shading() 
+	{
+		super();
+	}
+
+	public double getxOne()
+	{
 		return xOne;
 	}
 	public void setxOne(double xOne) {
 		this.xOne = xOne;
 	}
-	public double getxTwo() {
+	
+	public void setxOne(String xOne)
+	{
+		this.xOne = Double.parseDouble(xOne);
+	}
+	
+	public double getxTwo() 
+	{
 		return xTwo;
 	}
-	public void setxTwo(double xTwo) {
+	public void setxTwo(double xTwo)
+	{
 		this.xTwo = xTwo;
 	}
-	public double getyOne() {
+	
+	public void setxTwo(String xTwo)
+	{
+		this.xTwo = Double.parseDouble(xTwo);
+	}
+	public double getyOne() 
+	{
 		return yOne;
 	}
-	public void setyOne(double yOne) {
+	public void setyOne(double yOne)
+	{
 		this.yOne = yOne;
+	}
+	public void setyOne(String yOne)
+	{
+		this.yOne = Double.parseDouble(yOne);
 	}
 	public double getyTwo() {
 		return yTwo;
@@ -53,16 +78,59 @@ public class Shading {
 	public void setyTwo(double yTwo) {
 		this.yTwo = yTwo;
 	}
+	public void setyTwo(String yTwo)
+	{
+		this.yTwo = Double.parseDouble(yTwo);
+	}
 	public Color getColourOne() {
 		return colourOne;
 	}
 	public void setColourOne(Color colourOne) {
 		this.colourOne = colourOne;
 	}
+	
+	public void setColourOne(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			this.colourOne = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for shading colour one");
+		}
+	}
+	
 	public Color getColourTwo() {
 		return colourTwo;
 	}
 	public void setColourTwo(Color colourTwo) {
 		this.colourTwo = colourTwo;
+	}
+	
+	public void setColourTwo(String colour)
+	{
+		try
+		{
+			if(colour.startsWith("#"))
+				colour.equals(colour.substring(1));
+			String r = colour.substring(0,2);
+			String g = colour.substring(2,4);
+			String b = colour.substring(4,6);
+			int rInt = Integer.parseInt(r, 16);
+			int gInt = Integer.parseInt(g, 16);
+			int bInt = Integer.parseInt(b,  16);
+			this.colourTwo = new Color(rInt,gInt,bInt);
+		}
+		catch(Exception e){
+			System.out.println("\nNo colour set for shading colour two");
+		}
 	}
 }
