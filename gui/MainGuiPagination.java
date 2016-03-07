@@ -1,21 +1,17 @@
 package gui;
 
-import gui.MainGUI;
-
 /*
  * (C) Stammtisch
  * First version created by: Mathew Gould & Alexander Stassis (Design Team)
  * Date of first version: 21/02/16
  * 
  * Last version by: Mathew Gould & Alexander Stassis (Design Team)
- * Date of last update:  29/02/16
+ * Date of last update:  06/03/16
  * Version number: 1
  * 
- * Commit date: 29/02/16
+ * Commit date: 07/03/16
  * Description: Designing the Main GUI Class which will lead to other GUIs
- * This class currently is in implementation and the methods will be put into
- * another class?? 
- * 
+ * This class currently is still in implementation
  * NOTE: Comments still need to be improved!
  * 		 Menu Items need to be implemented more.
  */
@@ -28,6 +24,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,6 +36,8 @@ import javafx.geometry.Pos;
 import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.scene.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -49,11 +51,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
-public class MainGUI extends Application 
+public class MainGuiPagination extends Application 
 {	
 	/* variables for the primary stage */
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, presentationMenu;
+	private double width = 900;
+	private double height = 600;
 
 	/* variables for addMainGridItems() method */
 	private Button signUp, logIn;
@@ -73,6 +77,11 @@ public class MainGUI extends Application
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
 
+	/* variables for presentation scene */
+	private HBox buttonControls;
+	private BorderPane presentationLayout;
+	private Pagination pagination;
+
 	/* variables for menuItems() method */
 	private MenuBar menuBar;
 	private ImageView myImage = new ImageView();
@@ -80,20 +89,21 @@ public class MainGUI extends Application
 	private FileChooser browseFiles = new FileChooser(); // For browsing files
 
 	/* variables for openFile() method */
-	private Desktop desktop = Desktop.getDesktop();
+	//private Desktop desktop = Desktop.getDesktop();
 
 	/* variables for createPage() method */
-	private Image[] images = createContent();
+	//	private AnchorPane pageBox;
+	//	private Canvas canvas;
+	//	private Canvas canvasTest;
+	//	private GraphicsContext gc;
+	//	private Image[] images = createContent();
 
 	/* variables for createContent() method */
-	private ImageView image;
-	private boolean x = false;
-
-	/* variables for presentation scene */
-	Pagination pagination;
+	//	private ImageView image;
+	//	private boolean x = false;
 
 	// Constructor
-	public MainGUI(){
+	public MainGuiPagination(){
 
 	}
 
@@ -106,14 +116,27 @@ public class MainGUI extends Application
 	@Override
 	public void init()
 	{
-		System.out.println("Setting up/initialising windows now");
+		System.out.println("Setting up/initialising GUI now");
 	}
 
 	@Override
-	public void start(Stage primaryStage) 
+	public void start(Stage primaryStage) throws IOException 
 	{
+		initialiseGUI(primaryStage);
+	}
+
+	// Override the stop() method
+	@Override
+	public void stop()
+	{
+		System.out.println("Stopping GUI Now!");
+	}
+
+	/* Method which initialises and creates all the GUI */ 
+	private boolean initialiseGUI(Stage stage) throws IOException {
+
 		// Assign window variable as the primary stage
-		window = primaryStage;
+		window = stage;
 
 		// Create menu bar objects ready to add to the Scenes
 		MenuBar mainMenuBar = menuItems(); // Main Menu
@@ -121,15 +144,15 @@ public class MainGUI extends Application
 		MenuBar signupMenuBar = menuItems(); // Sign Up Menu
 		MenuBar presentationMenuBar = menuItems(); // Presentation Menu
 
-		/********** Main Menu Screen **************/
+		/******************** Main Menu Screen ************************/
 		// Create a root node called menuLayout which uses BorderPane
 		BorderPane menuLayout = new BorderPane();
 		menuLayout.setId("menuLayout"); // rootNode id for Main Menu Scene in CSS
 		// Add the root node to the scene
-		mainMenu = new Scene(menuLayout, 900, 600);
+		mainMenu = new Scene(menuLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		menuLayout.getStylesheets().add(MainGUI.class.getResource("style.css").toExternalForm());
+		menuLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
 
 		// Create the grid items
 		GridPane controls1 = addMainGridItems();
@@ -142,18 +165,18 @@ public class MainGUI extends Application
 		window.setTitle("Main Menu");
 		window.setScene(mainMenu);
 
-		/*******************************************/
+		/**************************************************************/
 
-		/************* Login Screen ****************/
+		/*********************** Login Screen *************************/
 
 		// Create a root node called loginLayout which uses BorderPane
 		BorderPane loginLayout = new BorderPane();
 		loginLayout.setId("loginLayout"); // rootNode id for LogIn Scene in CSS
 		// Add the root node to the scene
-		logInMenu = new Scene(loginLayout, 900, 600);
+		logInMenu = new Scene(loginLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		loginLayout.getStylesheets().add(MainGUI.class.getResource("style.css").toExternalForm());
+		loginLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls2 = addLoginGridItems();
@@ -162,17 +185,17 @@ public class MainGUI extends Application
 		loginLayout.setTop(loginMenuBar);
 		loginLayout.setCenter(controls2);
 
-		/****************************************/
+		/*************************************************************/
 
-		/********* Sign Up screen ***************/
+		/******************** Sign Up screen *************************/
 		// Create a root node called loginLayout which uses BorderPane
 		BorderPane signupLayout = new BorderPane();
 		signupLayout.setId("signupLayout"); // rootNode id for Sign Up Scene in CSS
 		// Add the root node to the scene
-		signUpMenu = new Scene(signupLayout, 900, 600);
+		signUpMenu = new Scene(signupLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		signupLayout.getStylesheets().add(MainGUI.class.getResource("style.css").toExternalForm());
+		signupLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls3 = addSignupGridItems();
@@ -181,81 +204,153 @@ public class MainGUI extends Application
 		signupLayout.setTop(signupMenuBar);
 		signupLayout.setCenter(controls3);
 
-		/****************************************/
+		/**************************************************************/
 
-		/********* Presentation screen **********/
+		/******************* Presentation screen **********************/
 		// Create a root node called loginLayout which uses BorderPane
-		BorderPane presentationLayout = new BorderPane();
-		presentationLayout.setId("presentationLayout"); // rootNode id for presentation Scene in CSS
+		presentationLayout = new BorderPane();
+		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in CSS
 		// Add the root node to the scene
-		presentationMenu = new Scene(presentationLayout, 900, 630);
+		presentationMenu = new Scene(presentationLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		presentationLayout.getStylesheets().add(MainGUI.class.getResource("style.css").toExternalForm());
+		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
 
-		// Auto adjust file to be displayed to the window size
-		//myImage.fitWidthProperty().bind(window.widthProperty()); 
-		//myImage.fitHeightProperty().bind(window.heightProperty()); 
-
-		/* Pagination part */
-
-		//final Pagination pagination;
-		final int numOfPage = images.length;
-		// Create pagination with desired number of pages
-		pagination = new Pagination(numOfPage);
-
+		// Create extra presentation controls
+		buttonControls = controls();
+		// Create a pagination layout. Currently 3 slides in implementation
+		pagination = new Pagination(3, 0);
 		// Set style of page controls
 		pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 
-		// Style pagination area
-		//pagination.getStylesheets().add(Main.class.getResource("pagination.css").toExternalForm());
 
-
-		// Create pagefactory controls
+		// Create the pagination page
 		pagination.setPageFactory(new Callback<Integer, Node>() {
 			@Override
 			public Node call(Integer pageIndex) {
-				return createPage(pageIndex);
-			}
-		});
+				try {
+					return presentationCanvas();
+				} catch (IOException e) {
+					return null;
+				}
+			}});
 
-		// FullScreen
-		presentationLayout.setOnKeyPressed(new EventHandler<KeyEvent>()
+		presentationLayout.setTop(presentationMenuBar);
+		BorderPane.setAlignment(buttonControls, Pos.CENTER);
+		presentationLayout.setBottom(buttonControls);
+		presentationLayout.setCenter(pagination);
+
+
+		/* FullScreen for presentation screen */
+		presentationMenu.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
 			@Override
 			public void handle(KeyEvent ke)
 			{
 				if (ke.getCode().equals(KeyCode.F))
 				{
-					x = true;
+					//x = true;
 					window.setFullScreen(true);
 				}
 				else if (ke.getCode().equals(KeyCode.ESCAPE))
 				{	
-					x = false;
+					//x = false;
+					window.setFullScreen(false);
 				}
 			}
 		});
-
-		//	BorderPane controls4 = paginationItems();
-
-		// Add the menu and file to the root node
-		presentationLayout.setTop(presentationMenuBar);
-		//presentationLayout.setCenter(myImage);
-		presentationLayout.setCenter(pagination);
-		//presentationLayout.setCenter(controls4);
 
 		/****************************************/
 
 		// Show all GUI Visibility to true
 		window.show();
+
+		return true;
 	}
 
-	// Override the stop() method
-	@Override
-	public void stop()
-	{
-		System.out.println("Closing Windows Now!");
+	/* Method which will add the panes (each slide) to the presentation screen */
+	private Pane presentationCanvas() throws IOException{
+
+		Image img = new Image(getClass().getResource("animal1.jpg").openStream());
+		Canvas canvas = new Canvas(presentationLayout.getWidth(), presentationLayout.getHeight());
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		// Draw the image to the canvas
+		gc.drawImage(img, 0, 0, presentationLayout.getWidth(), presentationLayout.getHeight());
+
+		/**** Binding and Resize attributes to the canvas ****/
+		canvas.widthProperty().bind(presentationLayout.widthProperty());
+		canvas.heightProperty().bind(presentationLayout.heightProperty());
+
+		final ResizeChangeListener resizeChangeListener = new ResizeChangeListener(presentationLayout, gc, img);
+
+		canvas.widthProperty().addListener(resizeChangeListener);
+		canvas.heightProperty().addListener(resizeChangeListener);
+
+		/******************************************************/
+
+		/* Mouse event handler for the canvas */
+		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+			// Add mouse event handler to the images part of the pagination
+			@Override
+			public void handle(MouseEvent mouseEvent) {
+				if (mouseEvent.isPrimaryButtonDown()) {
+					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
+				}
+				if (mouseEvent.isSecondaryButtonDown()) {
+					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
+				}
+
+				mouseEvent.consume();
+			}
+		});
+
+		// Make a new root node
+		Pane pane = new Pane();
+		// Add the canvas to the root node
+		pane.getChildren().add(canvas);
+
+		return pane;
+	}
+
+	/* Method which will create extra controls for the presentation screen */
+	private HBox controls(){
+		HBox controls = new HBox(8); // Spacing of 8
+
+		Button next = new Button("Next");
+		next.setPrefSize(100, 50);
+		next.setId("Next"); // String ID for css
+
+		Button previous = new Button("Previous");
+		previous.setPrefSize(100, 50);
+		previous.setId("Previous"); // String ID for css
+
+		// Add the buttons to the HBox
+		controls.getChildren().addAll(next, previous);
+
+		// Event handler for the Next Button
+		next.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				// Increase PageIndex by 1
+				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
+			}
+		});
+
+		// Event handler for the Previous Button
+		previous.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				// Decrease PageIndex by 1
+				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
+			}
+		});
+
+		return controls;
 	}
 
 	/* Method to add menu items and buttons for all GUIs */
@@ -306,7 +401,7 @@ public class MainGUI extends Application
 						WritableImage image = SwingFXUtils.toFXImage(bufferedImage, null);
 						myImage.setImage(image);
 					} catch (IOException ex) {
-						Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
+						Logger.getLogger(MainGuiPagination.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
 				else
@@ -373,16 +468,6 @@ public class MainGUI extends Application
 		return menuBar;
 	}
 
-
-	/* Method to create testing page for pagination in presentation viewer */
-	/*	public VBox createPage(int pageIndex) 
-	{
-		VBox pageBox = new VBox();
-		Label pageLabel = new Label("HERE WILL BE SLIDE " + (pageIndex+1));
-		pageBox.getChildren().add(myImage);
-		return pageBox;
-	}*/
-
 	/* Method for opening a file in the browser with normal OS procedure
 	private void openFile(File file) {
 		try {
@@ -393,63 +478,41 @@ public class MainGUI extends Application
 	}
 	 */
 
+	/* Inner Class for allowing the Resizing of Canvas objects */
+	private static class ResizeChangeListener implements ChangeListener<Number> {
 
-	// Method to create testing page for pagination in presentation viewer
-	public AnchorPane createPage(int pageIndex) {
+		private final Pane parent;
+		private final GraphicsContext context;
+		private final Image img;
 
-		//Image[] images = createContent();
-
-		AnchorPane pageBox;
-
-		pageBox = new AnchorPane();
-		//Label pageLabel = new Label("HERE WILL BE SLIDE " + (pageIndex+1));
-		//pageBox.getChildren().add(pageLabel);
-
-		image = new ImageView(images[pageIndex]);
-
-		if(x == true){
-
-			image.fitWidthProperty().bind(window.widthProperty());
-			image.fitHeightProperty().bind(window.heightProperty());
-		}
-		if(x == false){
-
-			image.fitWidthProperty().bind(pageBox.widthProperty());
-			image.fitHeightProperty().bind(pageBox.heightProperty());
+		public ResizeChangeListener(Pane parent, GraphicsContext context, Image image) {
+			this.parent = parent;
+			this.context = context;
+			this.img = image;
 		}
 
-		image.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-			// Add mouse event handler to the images part of the pagination
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				if (mouseEvent.isPrimaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
-				}
-				if (mouseEvent.isSecondaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
-				}
-
-				mouseEvent.consume();
-			}
-		});
-
-		pageBox.getChildren().add(image);
-
-		return pageBox;
+		@Override
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			final double width = parent.getWidth();
+			final double height = parent.getHeight();
+			context.clearRect(0, 0, width, height);
+			context.drawImage(img, 0, 0, width, height);
+		}
 	}
 
-	// method to create pagination content
-	public Image[] createContent(){
+	/* method to create pagination content of Image array */
+	public Image[] createContent()
+	{
 		Image[] images = new Image[3];
 
 		//Images for our pages
 		for (int i = 0; i < 3; i++) {
-			images[i] = new Image(MainGUI.class.getResource("animal" + (i + 1) + ".jpg").toExternalForm(), false);
+			images[i] = new Image(MainGuiPagination.class.getResource("animal" + (i + 1) + ".jpg").toExternalForm(), false);
 		}
 
 		return images;
 	}
+
 	/* Method for GridPane for Main Menu */
 	public GridPane addMainGridItems()
 	{
@@ -720,7 +783,6 @@ public class MainGUI extends Application
 				textFieldUsername.getText();
 				textFieldPassword2.getText();
 				textFieldConfirmPassword.getText();
-
 			}
 		}); 
 
@@ -728,3 +790,4 @@ public class MainGUI extends Application
 	}
 
 }
+

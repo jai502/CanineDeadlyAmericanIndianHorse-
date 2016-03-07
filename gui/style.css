@@ -31,6 +31,38 @@
 	-fx-text-fill: black;
 }
 
+.pagination {
+    -fx-border-color:  #0E5D79;
+}
+ 
+.pagination .page {
+    -fx-background-color: #DDF1F8;
+}
+ 
+.pagination .pagination-control {
+    -fx-background-color: #C8C6C6;    
+}
+ 
+.pagination .pagination-control .bullet-button {
+    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, white;
+}
+ 
+.pagination .pagination-control .bullet-button:selected {   
+    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, #0E5D79;
+}
+ 
+.pagination .pagination-control .left-arrow, .right-arrow{
+    -fx-background-color: #DDF1F8, #0E5D79;
+}
+
+/*.pagination{
+	-fx-page-information-visible: false;
+	-fx-max-page-indicator-count: 1;
+	-fx-arrows-visible: false;
+	-fx-tooltip-visible: false;
+	-fx-page-information-alignment: bottom;
+}*/
+
 /*.borders{ 
 	-fx-border-color: black; 
 	-fx-border-style: dashed; 
@@ -107,3 +139,21 @@
 	-fx-font: 15 arial;
 	-fx-base: #BAE98A;
 }
+
+/*****************************************************************************/
+
+/* Presentation Scene */
+
+/*****************************************************************************/
+/* Next and Previous Buttons */
+#Next, #Previous{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+}
+
+
+
+
+
+
+
