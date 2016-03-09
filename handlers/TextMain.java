@@ -21,9 +21,12 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import handlers.TextHandler;
+import Objects.TextItem;
 
 public class TextMain extends Application {
 		Stage window;
+		int windowHeight=400;
+		int windowWidth=400;
 		
 
 		public static void main(String[] args)
@@ -38,8 +41,8 @@ public class TextMain extends Application {
 			//Assign the primary stage to the window
 			window = primaryStage;
 			window.setTitle("Text viewer");
-			window.setHeight(400);//Set default height & width for window
-			window.setWidth(400);
+			window.setHeight(windowHeight);//Set default height & width for window
+			window.setWidth(windowWidth);
 
 			//Message to be displayed by the application for testing purposes
 			String message = "I am some <b>bold</b> and <i>italic</i> text and " +
@@ -50,12 +53,17 @@ public class TextMain extends Application {
 			String fontFamily = "serif";
 			int fontSize = 20;
 			Color fontColour = Color.BLACK;
-			int xStart = 100;
-			int yStart = 100;
+			float xStart = 0.1f;
+			float yStart = 0.5f;
+			
+			//Create the text item
+			TextItem textItem = new TextItem(0, 0, fontSize, xStart, yStart, fontFamily, fontColour, message);
 
 			//Declare the new textHandler object and create text on screen
 			TextHandler textHandler = new TextHandler();
-			TextFlow textFlow = textHandler.setText(message, xStart, yStart, fontFamily, fontSize, fontColour);
+			textHandler.setWindowSize(windowWidth, windowHeight); //To allow for positioning on screen
+			TextFlow textFlow = textHandler.setText(textItem);
+			
 
 			//Set the preferred width of the text object
 			textFlow.setPrefWidth(200);
