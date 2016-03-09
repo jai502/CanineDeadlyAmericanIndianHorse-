@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+
 public class AudioHandlerTest extends Application {
 
 	public static void main (String[] args) {
@@ -18,7 +19,7 @@ public class AudioHandlerTest extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
 		
-		AudioItem audioToHandle = new AudioItem(0,0,"files/Recording.mp3", false);
+		AudioItem audioToHandle = new AudioItem(0,0,"files/Recording.aac", false);
 		primaryStage.setTitle("Audio");
 		
 		BorderPane bp = new BorderPane();
