@@ -60,23 +60,25 @@ public class GraphicsHandlerExamples extends Application {
     	
     	// Set stage title and create new Canvas
     	primaryStage.setTitle("Drawing Operations Test");
-        Group root = new Group();
-        Canvas canvas = new Canvas(600, 600);        
+        Group root = new Group();      
         
-        // Return Graphics Context associated with canvas
-        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();        
+        // Return Graphics Context associated with canvas       
         
-        // Add the canvas to the group 
-        root.getChildren().add(canvas);        
+        // Add the canvas to the group        
         
         // Create a new GraphicsHandler to create a Circle,Rectangle,RoundRect and Polygon Item. 
         // The arguments of GraphicsHandler are GraphicsHandler(Item, Canvas) (see JavaDoc)
         // where Item is the Item to draw and Canvas is the canvas to draw it on.         
-        GraphicsHandler graphicsHandlerRect = new GraphicsHandler(createRectItem(), canvas);
-        GraphicsHandler graphicsHandlerCircle1 = new GraphicsHandler(createCircleItem1(), canvas); 
-        GraphicsHandler graphicsHandlerCircle2 = new GraphicsHandler(createCircleItem2(), canvas); 
-        GraphicsHandler graphicsHandlerRoundRect = new GraphicsHandler(createRoundRectItem(), canvas);
-        GraphicsHandler graphicsHandlerPolygon = new GraphicsHandler(createPolygonItem(), canvas);
+        GraphicsHandler graphicsHandlerRect = new GraphicsHandler();
+        GraphicsHandler graphicsHandlerCircle1 = new GraphicsHandler(); 
+//        GraphicsHandler graphicsHandlerCircle2 = new GraphicsHandler(createCircleItem2(), 600,800); 
+//        GraphicsHandler graphicsHandlerRoundRect = new GraphicsHandler(createRoundRectItem(), 600,800);
+//        GraphicsHandler graphicsHandlerPolygon = new GraphicsHandler(createPolygonItem(), 600,800);
+        
+        Canvas rectangleCanvas = graphicsHandlerRect.drawCanvas(createRectItem(), 600,600);
+        Canvas circle1Canvas = graphicsHandlerCircle1.drawCanvas(createCircleItem1(), 600,600);
+        
+        root.getChildren().addAll(rectangleCanvas, circle1Canvas);
         
         // Set the Scene on the top level container Stage and display
         primaryStage.setScene(new Scene(root));

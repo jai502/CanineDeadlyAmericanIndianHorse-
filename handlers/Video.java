@@ -11,8 +11,8 @@ package handlers;
 
 import java.io.File;
 
+import Objects.VideoItem;
 import javafx.animation.FadeTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,7 +24,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class Video extends Pane{
@@ -39,13 +38,13 @@ public class Video extends Pane{
 	private boolean endTransitionFinished = true;
 	private VideoControls vc;
 	
-	public Video(int startTime, int duration, float x, float y, String sourceFile, boolean loop) {
-		this.startTime = startTime;
-		this.duration = duration;
-		this.x = x;
-		this.y = y;
-		this.sourceFile = sourceFile;
-		this.loop = loop;
+	public Video(VideoItem video) {
+		this.startTime = video.getStartTime();
+		this.duration = video.getDuration();
+		this.x = video.getxStart();
+		this.y = video.getyStart();
+		this.sourceFile = video.getSourceFile();
+		this.loop = video.isLoop();
 		//retrieves video file from source folder
 	    final File f = new File(sourceFile);
 	    try {
