@@ -25,7 +25,7 @@ import javafx.util.Duration;
 public class AudioHandler extends HBox {
 	
 	private MediaPlayer mp; //
-	private final boolean repeat = false;
+	private boolean repeat;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
     private String fileName;
@@ -40,6 +40,7 @@ public class AudioHandler extends HBox {
 	{
 		
 		this.fileName = audio.getSourceFile();
+		this.repeat = audio.isLoop();
 		File file = new File(fileName);
 		
 		Media media = new Media(file.toURI().toString());
@@ -122,7 +123,7 @@ public class AudioHandler extends HBox {
                     atEndOfMedia = true;
                 }
                 else {
-                	
+                	 mp.seek(Duration.ZERO);
                 }
             }
        });
