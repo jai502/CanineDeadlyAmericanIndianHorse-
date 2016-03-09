@@ -19,6 +19,7 @@ public class SlideHandler {
 
 	public ArrayList<StackPane> compilePresentation(Presentation presentation) throws IOException {
 		setPres(presentation);
+		System.out.println("\nSlides in presentation according to handler: "+presentation.getSlides().size());
 		for (int i = 0; i < (presentation.getSlides().size()); i++)
 		{
 			for (int x = 0; x < presentation.getSlides().get(i).getTextList().size(); x++)
@@ -57,7 +58,7 @@ public class SlideHandler {
         	{
 				
         	}
-			getSetupPres().add(getTempPane());
+			getSetupPres().add(i,getTempPane());
 		}
 		
 		return getSetupPres();

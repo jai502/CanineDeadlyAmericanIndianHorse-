@@ -26,28 +26,21 @@ public class SlideHandlerTest extends Application {
 
 		Presentation pres = new Presentation();
 		XMLParser parser = new XMLParser();
-		parser.parseXML("PWS/pwsTest.xml");
-
 		pres = parser.getPresentation();
-		 System.out.println("\ntest 1");
-
 		ArrayList<StackPane> slides = new ArrayList();
-		 System.out.println("\ntest 2");
-
 		SlideHandler sh = new SlideHandler();
-		 System.out.println("\ntest 3");
 
 		slides = sh.compilePresentation(pres);
-		 System.out.println("\ntest 4");
-
+		 System.out.println("\n Number of slides according to this test: "+slides.size());		 
+		 
 		StackPane root = slides.get(0);
-		 System.out.println("\ntest 5");
+		 System.out.println("\ntest 1");
 
 		Scene scene = new Scene(root, 800, 600, Color.BLACK);
-		 System.out.println("\ntest 6");
+		 System.out.println("\ntest 2");
 
 		primary.setScene(scene);
-		 System.out.println("\ntest 7");
+		 System.out.println("\ntest 3");
 
 		primary.show();
 	}
