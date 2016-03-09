@@ -4,6 +4,8 @@
 package handlers;
 
 import java.io.File;
+
+import Objects.AudioItem;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -26,6 +28,7 @@ public class AudioHandler extends HBox {
 	private final boolean repeat = false;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
+    private String fileName;
     private Duration duration;
 	private Slider timeSlider;
 	private Label playTime;
@@ -33,9 +36,10 @@ public class AudioHandler extends HBox {
 	private Slider volumeSlider;
 	private Button playButton;
 	
-	public AudioHandler(String fileName) 
+	public AudioHandler(AudioItem audio)
 	{
 		
+		this.fileName = audio.getSourceFile();
 		File file = new File(fileName);
 		
 		Media media = new Media(file.toURI().toString());
@@ -116,6 +120,9 @@ public class AudioHandler extends HBox {
                     playButton.setText(">");
                     stopRequested = true;
                     atEndOfMedia = true;
+                }
+                else {
+                	
                 }
             }
        });

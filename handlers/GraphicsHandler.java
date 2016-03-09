@@ -46,29 +46,39 @@ public class GraphicsHandler {
 	 * 
 	 * @param item can be either PolygonItem or ShapeItem
 	 * @param canvas is the Canvas input to the object where the graphics will be
+	 * @return 
 	 * @throws IOException Exception thrown when reading CSV file incorrectly
 	 */
-	public GraphicsHandler(Item item, Canvas canvas) throws IOException {
-		//set return item for return methods
-		returnItem = item;
-		// Get canvas graphics
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		// Decide what type of graphics item to handle
-		if (item instanceof PolygonItem){
-			// Cast item to polygonItem
-			PolygonItem polygonItem = (PolygonItem) item;
-			PolygonHandler polygonHandler = new PolygonHandler(polygonItem, canvas);
-			// Set canvas graphics
-			graphicsCanvas = polygonHandler.createPolygon(gc, canvas);
-		} 
-		else if (item instanceof ShapeItem){
-			// Cast item to shapeItem
-			ShapeItem shapeItem = (ShapeItem) item;
-			ShapeHandler shapeHandler = new ShapeHandler(shapeItem, canvas);
-			// Set canvas graphics
-			graphicsCanvas = shapeHandler.createShape(gc, canvas);
-		}		
+	//public GraphicsHandler(Item item, Canvas canvas) throws IOException {
+	public GraphicsHandler()
+	{
+		super();
 	}
+	public Canvas drawCanvas(Item item, int canvasWidth, int canvasHeight) throws IOException{
+		//set return item for return methods
+				returnItem = item;
+				// Get canvas graphics
+				Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+				GraphicsContext gc = canvas.getGraphicsContext2D();
+				// Decide what type of graphics item to handle
+				if (item instanceof PolygonItem){
+					// Cast item to polygonItem
+					PolygonItem polygonItem = (PolygonItem) item;
+					PolygonHandler polygonHandler = new PolygonHandler(polygonItem, canvas);
+					// Set canvas graphics
+					graphicsCanvas = polygonHandler.createPolygon(gc, canvas);
+				} 
+				else if (item instanceof ShapeItem){
+					// Cast item to shapeItem
+					ShapeItem shapeItem = (ShapeItem) item;
+					ShapeHandler shapeHandler = new ShapeHandler(shapeItem, canvas);
+					// Set canvas graphics
+					graphicsCanvas = shapeHandler.createShape(gc, canvas);
+				}
+		return canvas;
+	}
+	
+	
 	
 	/** 
 	 * Return method for graphicsCanvas returns the canvas such that the object can be added to

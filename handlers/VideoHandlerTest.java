@@ -5,12 +5,13 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import Objects.VideoItem;
 import handlers.Video;
 
 public class VideoHandlerTest extends Application{
 
 	public VideoHandlerTest() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	public static void main(String[] args) {
@@ -20,8 +21,10 @@ public class VideoHandlerTest extends Application{
 
 	@Override
 	public void start(Stage primary) throws Exception {
-		// Creates Image of Images type (Sourcefile, start time, duration, x start, y start, width, height);
-				Video player = new Video(0,0,0,0,"files/test.mp4", true);
+		// Creates video of videoItem type (start time, duration, x start, y start, sourcefile, loop?);
+				VideoItem videoToHandle = new VideoItem(0,0,0,0,"files/test.mp4", true);
+		
+				Video player = new Video(videoToHandle);
 	
 			
 				// Create a Stack pane
