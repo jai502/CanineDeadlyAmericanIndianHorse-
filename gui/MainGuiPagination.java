@@ -17,6 +17,11 @@ package gui;
  */
 
 import javax.imageio.ImageIO;
+
+import Objects.Presentation;
+import Parsers.XMLParser;
+import handlers.SlideHandler;
+
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -56,8 +61,8 @@ public class MainGuiPagination extends Application
 	/* variables for the primary stage */
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, presentationMenu;
-	private double width = 900;
-	private double height = 600;
+	private int width = 900;
+	private int height = 600;
 
 	/* variables for addMainGridItems() method */
 	private Button signUp, logIn;
@@ -78,6 +83,9 @@ public class MainGuiPagination extends Application
 	private Text messageSignUp, response2;
 
 	/* variables for presentation scene */
+	private SlideHandler sh = new SlideHandler();
+	private Presentation tempPres;
+	private XMLParser parser;
 	private HBox buttonControls;
 	private BorderPane presentationLayout;
 	private Pagination pagination;
@@ -218,27 +226,33 @@ public class MainGuiPagination extends Application
 
 		// Create extra presentation controls
 		buttonControls = controls();
-		// Create a pagination layout. Currently 3 slides in implementation
-		pagination = new Pagination(3, 0);
+		// read pres
+		tempPres = new Presentation();
+		//		parser = new XMLParser();
+		//		parser.parseXML("PWS/pwsTest.xml");
+		//		tempPres = parser.getPresentation();
+		//		// Create a pagination layout. Currently 3 slides in implementation
+		//		
+		//		pagination = new Pagination(tempPres.getSlides().size(), 0);
 		// Set style of page controls
-		pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-
-
-		// Create the pagination page
-		pagination.setPageFactory(new Callback<Integer, Node>() {
-			@Override
-			public Node call(Integer pageIndex) {
-				try {
-					return presentationCanvas();
-				} catch (IOException e) {
-					return null;
-				}
-			}});
+		//		pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+		//
+		//
+		//		// Create the pagination page
+		//		pagination.setPageFactory(new Callback<Integer, Node>() {
+		//			@Override
+		//			public Node call(Integer pageIndex) {
+		//				try {
+		//					return sh.getSlideStack(tempPres, pageIndex);
+		//				} catch (IOException e) {
+		//					return null;
+		//				}
+		//			}});
 
 		presentationLayout.setTop(presentationMenuBar);
 		BorderPane.setAlignment(buttonControls, Pos.CENTER);
 		presentationLayout.setBottom(buttonControls);
-		presentationLayout.setCenter(pagination);
+//		presentationLayout.setCenter(pagination);
 
 
 		/* FullScreen for presentation screen */
@@ -421,6 +435,28 @@ public class MainGuiPagination extends Application
 		{
 			public void handle(ActionEvent e) 
 			{
+				// Parsing
+				parser = new XMLParser();
+				parser.parseXML("PWS/pwsTest.xml");
+				tempPres = parser.getPresentation();
+				
+				//Pagination
+				pagination = new Pagination(tempPres.getSlides().size(), 0);
+
+				pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+
+				// Create the pagination page
+				pagination.setPageFactory(new Callback<Integer, Node>() {
+					@Override
+					public Node call(Integer pageIndex) {
+						try {
+							return sh.getSlideStack(tempPres, pageIndex, width-200, height-150);
+						} catch (IOException e) {
+							return null;
+						}
+					}});
+				
+				presentationLayout.setCenter(pagination);
 				window.setTitle("Presentation");
 				window.setScene(presentationMenu);
 			}
@@ -434,6 +470,8 @@ public class MainGuiPagination extends Application
 		{
 			public void handle(ActionEvent e) 
 			{
+				tempPres = null;
+				System.out.println("Presentation screen is now cleared");
 				window.setTitle("Main Menu");
 				window.setScene(mainMenu);
 			}

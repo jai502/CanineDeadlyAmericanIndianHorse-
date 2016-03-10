@@ -30,7 +30,7 @@ public class SlideHandlerTest extends Application {
 		pres = parser.getPresentation();
 		SlideHandler sh = new SlideHandler();		
 		
-		StackPane root = sh.getSlideStack(pres, 1);
+		StackPane root = sh.getSlideStack(pres, 1, 800, 600);
 		Scene scene = new Scene(root, 800, 600, Color.BLACK);
 
 		primary.setScene(scene);
