@@ -28,7 +28,7 @@
   	</shape>
   	<shape width="0.1" ystart="0.3" duration="102" type="rectangle" starttime="0" xstart="0.1" height="0.1" fillColour="123456" lineColour="654300">
   	</shape>
-  	<shape width="0.1" ystart="0.5" duration="101" type="roundedRectangle" starttime="0" xstart="0.1" height="0.1" fillColour="ffff00" lineColour="00ffff">
+  	<shape width="0.1" ystart="0.4" duration="101" type="roundedRectangle" starttime="0" xstart="0.1" height="0.1" fillColour="ffff00" lineColour="00ffff">
   	</shape>
   	<polygon sourceFile="files/Pentagon.csv" starttime="1" duration="2" fillColour="123456" lineColour="654300">
   		<shading x2="0.1" x1="0.2" y2="0.2" y1="0.1" colour2="1234ff" colour1="654ff1"/>
