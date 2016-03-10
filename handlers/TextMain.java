@@ -25,8 +25,8 @@ import Objects.TextItem;
 
 public class TextMain extends Application {
 		Stage window;
-		int windowHeight=400;
-		int windowWidth=400;
+		int windowHeight=600;
+		int windowWidth=800;
 		
 
 		public static void main(String[] args)
@@ -53,7 +53,7 @@ public class TextMain extends Application {
 			String fontFamily = "serif";
 			int fontSize = 20;
 			Color fontColour = Color.BLACK;
-			float xStart = 0.1f;
+			float xStart = 0.5f;
 			float yStart = 0.5f;
 			
 			//Create the text item
@@ -72,7 +72,7 @@ public class TextMain extends Application {
 			//Create a group and add that to the root scene
 			Group group = new Group();  
 			group.getChildren().add(textFlow);
-			Scene scene = new Scene(group);
+			Scene scene = new Scene(group, 800, 600);
 
 			//Show the window
 			window.setScene(scene);

@@ -4,8 +4,10 @@
     <Title>Test</Title>
     <Author>Callum Silver</Author>
     <Version>1.1</Version>
-    <Comment>(C) Stammtisch; First version created by: Callum Silver; Date of first version: 17/02/16; Description: A test PWS file;</Comment>
-    <Comment>(C) Stammtisch; Version 1.1 modified by: Joseph Ingleby; Date: 09/03/16; Description: A test PWS file;</Comment>
+    <Comment>
+    (C) Stammtisch; Version 1.1 modified by: Joseph Ingleby; Date: 09/03/16; Description: A test PWS file;
+    (C) Stammtisch; First version created by: Callum Silver; Date of first version: 17/02/16; Description: A test PWS file;
+    </Comment>
   </documentInfo>
   <defaults>
     <backgroundColour>134567</backgroundColour>
@@ -29,8 +31,7 @@
   	</shape>
   	<polygon sourceFile="files/Pentagon.csv" starttime="1" duration="2" fillColour="123456" lineColour="654300">
   		<shading x2="0.1" x1="0.2" y2="0.2" y1="0.1" colour2="123456" colour1="654300"/>
-  	</polygon>
-  	
+  	</polygon>	
   </slide>
   <slide slideID="4" nextSlide="5">
   	<audio loop="true" sourceFile="files/Recording.mp3" starttime="0" duration="0" />
@@ -38,9 +39,9 @@
   <slide slideID="5" nextSlide="6">
   	<video ystart="0.1" loop="false" xstart="0.2" sourceFile="files/test.mp4" starttime="50" duration="100" />
   </slide>
-  <slide slideID="1" nextSlide="2">
-  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0" font="SansSerif" fontcolour="FFFFFF" fontsize="12" sourceFile="Parsers/test.txt" width="0.3" height="0.2">This is <b>bold</b> a <i>italics</i> test for testing.</text>
-  	<text ystart="0.6" xstart="0.6" starttime="500" duration="100" font="Serif" fontcolour="FF0FF1" fontsize="8" width="0.4" height="0.3">This is a <i>italics</i> test for testing the second text.</text>
+  <slide slideID="6" nextSlide="7">
+  	<text ystart="0.5" xstart="0.5" starttime="0" duration="0" font="SansSerif" fontcolour="FFFFFF" fontsize="20" width="0.3" height="0.2">This is <b>bold</b> a <i>italics</i> test for testing.</text>
+  	<text ystart="0.6" xstart="0.6" starttime="500" duration="100" font="Verdana" fontcolour="0FFFDD" fontsize="20" sourceFile="Parsers/test.txt" width="0.4" height="0.3"></text>
   </slide>
   <slide slideID="7">
   	<interactable targetSlide="3">

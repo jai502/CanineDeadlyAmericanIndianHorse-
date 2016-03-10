@@ -32,12 +32,14 @@ public class SlideHandlerTest extends Application {
 		SlideHandler sh = new SlideHandler();
 
 
-		slides = sh.compilePresentation(pres);
+		sh.compilePresentation(pres);
+		slides  = sh.getSlides();
+		
 		 System.out.println("Number of slides according to this test: "+slides.size());
 		 for(int i=0; i<slides.size();i++)
 			 System.out.println("To string of slides("+i+"): "+slides.get(i).toString());
 		
-		StackPane root = slides.get(0);
+		StackPane root = slides.get(4);
 		Scene scene = new Scene(root, 800, 600, Color.BLACK);
 
 		primary.setScene(scene);

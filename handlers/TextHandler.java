@@ -28,6 +28,7 @@ public class TextHandler
 
 	public TextFlow setText(TextItem text)
 	{
+
 		//Declare an empty text flow object to be returned
 		TextFlow textFlow = null;
 
