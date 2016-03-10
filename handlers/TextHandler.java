@@ -38,6 +38,8 @@ public class TextHandler
 		//Set the starting co-ordinates of the textFlow object
 		textFlow.setLayoutX(text.getxStart()*windowWidth);
 		textFlow.setLayoutY(text.getyStart()*windowHeight);
+		textFlow.setPrefHeight(text.getHeight()*windowHeight);
+		textFlow.setPrefWidth(text.getHeight()*windowWidth);
 
 		//Declare counter to keep track of HTML tag indexes
 		int endOfLastTag = 0;

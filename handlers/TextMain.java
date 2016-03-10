@@ -16,6 +16,8 @@ package handlers;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -70,9 +72,11 @@ public class TextMain extends Application {
 			textFlow.setTextAlignment(TextAlignment.JUSTIFY); //set text alignment of the text object
 
 			//Create a group and add that to the root scene
-			Group group = new Group();  
+			Group group = new Group();
 			group.getChildren().add(textFlow);
-			Scene scene = new Scene(group, 800, 600);
+			StackPane root = new StackPane();
+			root.getChildren().add(group);
+			Scene scene = new Scene(root, 800, 600);
 
 			//Show the window
 			window.setScene(scene);

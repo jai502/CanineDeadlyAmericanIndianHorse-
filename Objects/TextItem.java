@@ -79,6 +79,7 @@ public class TextItem extends Item
 	}
 	public float getyStart() 
 	{
+		System.out.println("yStart is: " + yStart);
 		return yStart;
 	}
 	public void setyStart(float yStart) 

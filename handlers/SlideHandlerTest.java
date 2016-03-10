@@ -28,18 +28,9 @@ public class SlideHandlerTest extends Application {
 		XMLParser parser = new XMLParser();
 		parser.parseXML("PWS/pwsTest.xml");
 		pres = parser.getPresentation();
-		ArrayList<StackPane> slides = new ArrayList();
-		SlideHandler sh = new SlideHandler();
-
-
-		sh.compilePresentation(pres);
-		slides  = sh.getSlides();
+		SlideHandler sh = new SlideHandler();		
 		
-		 System.out.println("Number of slides according to this test: "+slides.size());
-		 for(int i=0; i<slides.size();i++)
-			 System.out.println("To string of slides("+i+"): "+slides.get(i).toString());
-		
-		StackPane root = slides.get(4);
+		StackPane root = sh.getSlideStack(pres, 1);
 		Scene scene = new Scene(root, 800, 600, Color.BLACK);
 
 		primary.setScene(scene);

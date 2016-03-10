@@ -72,6 +72,7 @@ public class Video extends Pane{
 	    createSizeListeners(); //adjusts mediaView dimensions to fit container
 	    this.getChildren().add(mediaView);
 	    
+	    
 	    //instantiate video controls
 		vc = new VideoControls(mediaPlayer,loop);
 		vc.prefWidthProperty().bind(this.widthProperty());
