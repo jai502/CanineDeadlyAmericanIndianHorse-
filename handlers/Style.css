@@ -1,0 +1,15 @@
+.text-default{
+    -fx-font-family: serif;
+    -fx-font-size: 18;
+}
+
+.text-bold {
+    -fx-font-family: serif;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+.text-italic{
+    -fx-font-family: serif;
+    -fx-font-size: 18;
+    -fx-font-style: italic;
+}
