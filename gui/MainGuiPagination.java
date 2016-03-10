@@ -269,7 +269,7 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method which will add the panes (each slide) to the presentation screen */
-	private Pane presentationCanvas() throws IOException{
+	private StackPane presentationCanvas() throws IOException{
 
 		Image img = new Image(getClass().getResource("animal1.jpg").openStream());
 		Canvas canvas = new Canvas(presentationLayout.getWidth(), presentationLayout.getHeight());
@@ -306,7 +306,7 @@ public class MainGuiPagination extends Application
 		});
 
 		// Make a new root node
-		Pane pane = new Pane();
+		StackPane pane = new StackPane();
 		// Add the canvas to the root node
 		pane.getChildren().add(canvas);
 

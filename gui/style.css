@@ -98,7 +98,7 @@
 /*****************************************************************************/
 /* rootNode for Login Scene */
 #loginLayout{
-	-fx-background-image: url("Map_Background.png"), url("logo.png");
+	-fx-background-image: url("login_background.jpg"), url("logo.png");
 	-fx-background-size: cover, 300 200;
 	-background-position: CENTER, TOP LEFT;
 	-fx-background-repeat: no-repeat, no-repeat;	
@@ -122,7 +122,7 @@
 
 /*****************************************************************************/
 #signupLayout{
-	-fx-background-image: url("palm_beach.png"), url("logo.png");
+	-fx-background-image: url("signup_background.jpg"), url("logo.png");
 	-fx-background-size: cover, 300 200;
 	-background-position: CENTER, TOP LEFT;
 	-fx-background-repeat: no-repeat, no-repeat;	
