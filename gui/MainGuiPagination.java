@@ -6,10 +6,10 @@ package gui;
  * Date of first version: 21/02/16
  * 
  * Last version by: Mathew Gould & Alexander Stassis (Design Team)
- * Date of last update:  06/03/16
+ * Date of last update:  10/03/16
  * Version number: 1
  * 
- * Commit date: 07/03/16
+ * Commit date: 25/03/16
  * Description: Designing the Main GUI Class which will lead to other GUIs
  * This class currently is still in implementation
  * NOTE: Comments still need to be improved!
@@ -17,20 +17,19 @@ package gui;
  */
 
 import javax.imageio.ImageIO;
-
 import Objects.Presentation;
 import Parsers.XMLParser;
 import handlers.SlideHandler;
-
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.*;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+//import javafx.beans.InvalidationListener;
+//import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
@@ -74,6 +73,8 @@ public class MainGuiPagination extends Application
 	private TextField textFieldName;
 	private PasswordField textFieldPassword1;
 	private Text messageLogIn, response1;
+	private String sUsernameLogin, sPasswordLogin;
+	private ArrayList<String> inputData1 = new ArrayList<String>();
 
 	/* variables for addSignupGridItems() method */
 	private Button btnRegister, btnGoBack2;
@@ -81,6 +82,8 @@ public class MainGuiPagination extends Application
 	private TextField textFieldFirstName, textFieldSurname, textFieldEmail, textFieldConfirmEmail, textFieldUsername;
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
+	private String sFirstName, sSurname, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
@@ -97,7 +100,7 @@ public class MainGuiPagination extends Application
 	private FileChooser browseFiles = new FileChooser(); // For browsing files
 
 	/* variables for openFile() method */
-	//private Desktop desktop = Desktop.getDesktop();
+	private Desktop desktop = Desktop.getDesktop();
 
 	/* variables for createPage() method */
 	//	private AnchorPane pageBox;
@@ -117,6 +120,7 @@ public class MainGuiPagination extends Application
 
 	public static void main(String[] args) 
 	{
+		// Required for JavaFX to run
 		launch(args);
 	}
 
@@ -252,7 +256,7 @@ public class MainGuiPagination extends Application
 		presentationLayout.setTop(presentationMenuBar);
 		BorderPane.setAlignment(buttonControls, Pos.CENTER);
 		presentationLayout.setBottom(buttonControls);
-//		presentationLayout.setCenter(pagination);
+		//		presentationLayout.setCenter(pagination);
 
 
 		/* FullScreen for presentation screen */
@@ -409,7 +413,7 @@ public class MainGuiPagination extends Application
 					window.setScene(presentationMenu); // Change scene to presentationMenu
 					String filename = selectedFile.getName(); // get the name of selected file
 					System.out.println("File selected: " + filename); // display the details
-					//openFile(selectedFile);
+					openFile(selectedFile);
 					try {
 						BufferedImage bufferedImage = ImageIO.read(selectedFile);
 						WritableImage image = SwingFXUtils.toFXImage(bufferedImage, null);
@@ -430,19 +434,18 @@ public class MainGuiPagination extends Application
 
 		MenuItem goToPresentation = new MenuItem("Go To Presentation...");
 
-		// Go back to main menu
+		// Go back to presentation
 		goToPresentation.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			public void handle(ActionEvent e) 
 			{
-				// Parsing
+				// Parsing of the pws xml file
 				parser = new XMLParser();
 				parser.parseXML("PWS/pwsTest.xml");
 				tempPres = parser.getPresentation();
-				
-				//Pagination
-				pagination = new Pagination(tempPres.getSlides().size(), 0);
 
+				// Creates Pagination Layout
+				pagination = new Pagination(tempPres.getSlides().size(), 0);
 				pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 
 				// Create the pagination page
@@ -455,7 +458,7 @@ public class MainGuiPagination extends Application
 							return null;
 						}
 					}});
-				
+
 				presentationLayout.setCenter(pagination);
 				window.setTitle("Presentation");
 				window.setScene(presentationMenu);
@@ -506,7 +509,7 @@ public class MainGuiPagination extends Application
 		return menuBar;
 	}
 
-	/* Method for opening a file in the browser with normal OS procedure
+	// Method for opening a file in the browser with normal OS procedure
 	private void openFile(File file) {
 		try {
 			desktop.open(file);
@@ -514,7 +517,7 @@ public class MainGuiPagination extends Application
 			Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	 */
+
 
 	/* Inner Class for allowing the Resizing of Canvas objects */
 	private static class ResizeChangeListener implements ChangeListener<Number> {
@@ -708,13 +711,36 @@ public class MainGuiPagination extends Application
 		{
 			@Override
 			public void handle(ActionEvent e) 
-			{
-				response1.setText("Logging in, please wait");
-				//response1.setFill(Color.FUCHSIA);
-				response1.setFill(Color.BLACK);
-				textFieldName.getText();
-				textFieldPassword1.getText();
-				//System.out.println(textFieldName.getText() + ", " + textFieldPassword1.getText());
+			{								
+				sUsernameLogin = textFieldName.getText();
+				sPasswordLogin = textFieldPassword1.getText();
+
+				// Check if any of the textfields are null
+				if(sUsernameLogin.equals("") || sPasswordLogin.equals(""))
+				{	
+					response1.setText("Textfields are empty!");
+					response1.setFill(Color.RED);
+				}	
+				// Store the data in an ArrayList and send to sql database to check validity
+				else 
+				{
+					inputData1.add(sUsernameLogin);
+					inputData1.add(sPasswordLogin);
+
+					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
+					response1.setText("Logging in, please wait");
+					response1.setFill(Color.BLACK);
+				}
+				// Some input did not match, clear textfelds and try again
+//				else
+//				{
+//					response2.setText("Error in input, please try again!");
+//					response2.setFill(Color.RED);
+//					textFieldEmail.clear();
+//					textFieldConfirmEmail.clear();
+//					textFieldPassword2.clear();
+//					textFieldConfirmPassword.clear();
+//				}
 			}
 		}); 
 
@@ -805,6 +831,10 @@ public class MainGuiPagination extends Application
 		response2 = new Text();
 		grid.add(response2, 1, 9);
 
+		// String Variables for assigning text in textfields
+		//	final String firstName, surname, email, confirmEmail, username, password, confirmPassword;
+		//firstName = textFieldFirstName.getText();
+
 		// Event handler to get text from the text field 
 		// when button is pressed.
 		btnRegister.setOnAction(new EventHandler<ActionEvent>() 
@@ -812,15 +842,46 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				response2.setText("Registering with us, please wait");
-				response2.setFill(Color.BLACK);
-				textFieldFirstName.getText();
-				textFieldSurname.getText();
-				textFieldEmail.getText();
-				textFieldConfirmEmail.getText();
-				textFieldUsername.getText();
-				textFieldPassword2.getText();
-				textFieldConfirmPassword.getText();
+				sFirstName = textFieldFirstName.getText();
+				sSurname = textFieldSurname.getText();
+				sEmail = textFieldEmail.getText();
+				sConfirmEmail = textFieldConfirmEmail.getText();
+				sUsername = textFieldUsername.getText();
+				sPassword = textFieldPassword2.getText();
+				sConfirmPassword = textFieldConfirmPassword.getText();
+
+				// Check if any of the textfields are null
+				if(sFirstName.equals("") || sSurname.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
+						|| sUsername.equals("") || sPassword.equals("") || sConfirmPassword.equals(""))
+				{	
+					response2.setText("Textfields are empty!");
+					response2.setFill(Color.RED);
+				}	
+				// Check if input is valid and store the data in an ArrayList
+				else if(sEmail.equals(sConfirmEmail) && sPassword.equals(sConfirmPassword))
+				{
+					inputData2.add(sFirstName);
+					inputData2.add(sSurname);
+					inputData2.add(sEmail);
+					inputData2.add(sConfirmEmail);
+					inputData2.add(sUsername);
+					inputData2.add(sPassword);
+					inputData2.add(sConfirmPassword);
+
+					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
+					response2.setText("Registering with us, please wait");
+					response2.setFill(Color.BLACK);
+				}
+				// Some input did not match, clear textfelds and try again
+				else
+				{
+					response2.setText("Error in input, please try again!");
+					response2.setFill(Color.RED);
+					textFieldEmail.clear();
+					textFieldConfirmEmail.clear();
+					textFieldPassword2.clear();
+					textFieldConfirmPassword.clear();
+				}
 			}
 		}); 
 
