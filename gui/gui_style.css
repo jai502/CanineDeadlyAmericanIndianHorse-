@@ -1,0 +1,156 @@
+
+/* Default styles for every scenes */
+/*.root{
+    -fx-background-image: url("Main_Background.png"), url("logo5.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;
+}*/
+
+/*.button{
+	-fx-font: 22 arial;
+	-fx-base: #BAE98A;
+}*/
+
+.menu-bar{
+  -fx-background-color: #DAD6D4;
+  -fx-border-color:  black;
+  -fx-border-width: 4
+
+}
+
+.menu-bar .label {
+    -fx-font-size: 15 pt;
+    -fx-font-family: "Segoe UI Light";
+    -fx-text-fill: black;
+
+}
+
+.label{
+	-fx-font: 15px verdana; 
+	-fx-text-fill: black;
+}
+
+.pagination {
+    -fx-border-color:  #0E5D79;
+}
+ 
+.pagination .page {
+    -fx-background-color: #DDF1F8;
+}
+ 
+.pagination .pagination-control {
+    -fx-background-color: #C8C6C6;    
+}
+ 
+.pagination .pagination-control .bullet-button {
+    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, white;
+}
+ 
+.pagination .pagination-control .bullet-button:selected {   
+    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, #0E5D79;
+}
+ 
+.pagination .pagination-control .left-arrow, .right-arrow{
+    -fx-background-color: #DDF1F8, #0E5D79;
+}
+
+/*.pagination{
+	-fx-page-information-visible: false;
+	-fx-max-page-indicator-count: 1;
+	-fx-arrows-visible: false;
+	-fx-tooltip-visible: false;
+	-fx-page-information-alignment: bottom;
+}*/
+
+/*.borders{ 
+	-fx-border-color: black; 
+	-fx-border-style: dashed; 
+	-fx-border-width: 2; 
+}*/
+
+/******************************************************************************/
+
+/* Start to individually style every node inside the scenes */
+
+/*****************************************************************************/
+
+
+/* Main Menu Scene */
+
+/*****************************************************************************/
+/* rootNode for Main Menu Scene */
+#menuLayout{
+	-fx-background-image: url("Main_Background.png"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;	
+}
+
+/* signUp and logIn buttons for Main Menu Scene */
+#signUp, #logIn, #presentation{
+	-fx-font: 22 arial;
+	-fx-base: #BAE98A;
+}
+
+/*****************************************************************************/
+
+/* LogIn Scene */
+
+/*****************************************************************************/
+/* rootNode for Login Scene */
+#loginLayout{
+	-fx-background-image: url("login_background.jpg"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;	
+}
+
+/* Welcome Back Message */
+#messageLogIn{
+	-fx-font: 35 arial;
+	-fx-fill: black;
+}
+
+/* Login and GoBAck buttons */
+#btnLogIn, #btnGoBack1{
+	-fx-font: 15 arial;
+	-fx-base: #BEF769;
+}
+
+/*****************************************************************************/
+
+/* SignUp Scene */
+
+/*****************************************************************************/
+#signupLayout{
+	-fx-background-image: url("signup_background.jpg"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;	
+}
+
+/* Sign Up Message */
+#messageSignUp{
+	-fx-font: 35 arial;
+	-fx-text-color: red;
+}
+
+/* Login and GoBAck buttons */
+#btnRegister, #btnGoBack2{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+}
+
+/*****************************************************************************/
+
+/* Presentation Scene */
+
+/*****************************************************************************/
+/* Next and Previous Buttons */
+#Next, #Previous{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+}
+
+

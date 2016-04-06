@@ -6,14 +6,14 @@ package gui;
  * Date of first version: 21/02/16
  * 
  * Last version by: Mathew Gould & Alexander Stassis (Design Team)
- * Date of last update:  10/03/16
+ * Date of last update:  25/03/16
  * Version number: 1
  * 
- * Commit date: 25/03/16
+ * Commit date: 28/03/16
  * Description: Designing the Main GUI Class which will lead to other GUIs
  * This class currently is still in implementation
- * NOTE: Comments still need to be improved!
- * 		 Menu Items need to be implemented more.
+ * NOTE: Browsing works for specific xml file! Now need to rearrange gui to continue 
+ * 		 from login page and sign up page 
  */
 
 import javax.imageio.ImageIO;
@@ -74,7 +74,7 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword1;
 	private Text messageLogIn, response1;
 	private String sUsernameLogin, sPasswordLogin;
-	private ArrayList<String> inputData1 = new ArrayList<String>();
+	//private ArrayList<String> inputData1 = new ArrayList<String>();
 
 	/* variables for addSignupGridItems() method */
 	private Button btnRegister, btnGoBack2;
@@ -83,11 +83,12 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
 	private String sFirstName, sSurname, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
-	private ArrayList<String> inputData2 = new ArrayList<String>();
+	//private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
-	private Presentation tempPres;
+	private String filename1, filename2, parsingFileName;
+	private Presentation tempPres = new Presentation();
 	private XMLParser parser;
 	private HBox buttonControls;
 	private BorderPane presentationLayout;
@@ -131,6 +132,7 @@ public class MainGuiPagination extends Application
 		System.out.println("Setting up/initialising GUI now");
 	}
 
+	// Required method to run the JavaFX code
 	@Override
 	public void start(Stage primaryStage) throws IOException 
 	{
@@ -141,7 +143,7 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
-		System.out.println("Stopping GUI Now!");
+		System.out.println("Stopping/Closing GUI Now!");
 	}
 
 	/* Method which initialises and creates all the GUI */ 
@@ -159,12 +161,12 @@ public class MainGuiPagination extends Application
 		/******************** Main Menu Screen ************************/
 		// Create a root node called menuLayout which uses BorderPane
 		BorderPane menuLayout = new BorderPane();
-		menuLayout.setId("menuLayout"); // rootNode id for Main Menu Scene in CSS
+		menuLayout.setId("menuLayout"); // rootNode id for Main Menu Scene in gui_style.gui_style.css
 		// Add the root node to the scene
 		mainMenu = new Scene(menuLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		menuLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
+		menuLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		// Create the grid items
 		GridPane controls1 = addMainGridItems();
@@ -183,12 +185,12 @@ public class MainGuiPagination extends Application
 
 		// Create a root node called loginLayout which uses BorderPane
 		BorderPane loginLayout = new BorderPane();
-		loginLayout.setId("loginLayout"); // rootNode id for LogIn Scene in CSS
+		loginLayout.setId("loginLayout"); // rootNode id for LogIn Scene in gui_style.css
 		// Add the root node to the scene
 		logInMenu = new Scene(loginLayout, width, height);
 
-		// Load style.ccs from same directory to provide the styling for the scenes
-		loginLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
+		// Load gui_style.ccs from same directory to provide the styling for the scenes
+		loginLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls2 = addLoginGridItems();
@@ -202,12 +204,12 @@ public class MainGuiPagination extends Application
 		/******************** Sign Up screen *************************/
 		// Create a root node called loginLayout which uses BorderPane
 		BorderPane signupLayout = new BorderPane();
-		signupLayout.setId("signupLayout"); // rootNode id for Sign Up Scene in CSS
+		signupLayout.setId("signupLayout"); // rootNode id for Sign Up Scene in gui_style.css
 		// Add the root node to the scene
 		signUpMenu = new Scene(signupLayout, width, height);
 
-		// Load style.ccs from same directory to provide the styling for the scenes
-		signupLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
+		// Load gui_style.ccs from same directory to provide the styling for the scenes
+		signupLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls3 = addSignupGridItems();
@@ -221,45 +223,25 @@ public class MainGuiPagination extends Application
 		/******************* Presentation screen **********************/
 		// Create a root node called loginLayout which uses BorderPane
 		presentationLayout = new BorderPane();
-		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in CSS
+		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
 		presentationMenu = new Scene(presentationLayout, width, height);
 
 		// Load style.ccs from same directory to provide the styling for the scenes
-		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("style.css").toExternalForm());
+		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		// Create extra presentation controls
 		buttonControls = controls();
-		// read pres
-		tempPres = new Presentation();
-		//		parser = new XMLParser();
-		//		parser.parseXML("PWS/pwsTest.xml");
-		//		tempPres = parser.getPresentation();
-		//		// Create a pagination layout. Currently 3 slides in implementation
-		//		
-		//		pagination = new Pagination(tempPres.getSlides().size(), 0);
-		// Set style of page controls
-		//		pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-		//
-		//
-		//		// Create the pagination page
-		//		pagination.setPageFactory(new Callback<Integer, Node>() {
-		//			@Override
-		//			public Node call(Integer pageIndex) {
-		//				try {
-		//					return sh.getSlideStack(tempPres, pageIndex);
-		//				} catch (IOException e) {
-		//					return null;
-		//				}
-		//			}});
 
+		// create a temporary presentation
+		//tempPres = new Presentation();
+
+		// Add menu bar to presentation screen
 		presentationLayout.setTop(presentationMenuBar);
 		BorderPane.setAlignment(buttonControls, Pos.CENTER);
 		presentationLayout.setBottom(buttonControls);
-		//		presentationLayout.setCenter(pagination);
 
-
-		/* FullScreen for presentation screen */
+		/* FullScreen for presentation menu */
 		presentationMenu.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
 			@Override
@@ -278,9 +260,9 @@ public class MainGuiPagination extends Application
 			}
 		});
 
-		/****************************************/
+		/*************************************************/
 
-		// Show all GUI Visibility to true
+		// Set all GUI Visibility to true
 		window.show();
 
 		return true;
@@ -337,11 +319,11 @@ public class MainGuiPagination extends Application
 
 		Button next = new Button("Next");
 		next.setPrefSize(100, 50);
-		next.setId("Next"); // String ID for css
+		next.setId("Next"); // String ID for gui_style.css
 
 		Button previous = new Button("Previous");
 		previous.setPrefSize(100, 50);
-		previous.setId("Previous"); // String ID for css
+		previous.setId("Previous"); // String ID for gui_style.css
 
 		// Add the buttons to the HBox
 		controls.getChildren().addAll(next, previous);
@@ -374,10 +356,8 @@ public class MainGuiPagination extends Application
 	/* Method to add menu items and buttons for all GUIs */
 	public MenuBar menuItems()
 	{
+		// Instantiate the menu bar
 		menuBar = new MenuBar();
-
-		// Set the title of the dialogue window
-		// browseFiles.setTitle("Open File");
 
 		// File Menu \\
 		Menu fileMenu = new Menu("File");
@@ -388,44 +368,21 @@ public class MainGuiPagination extends Application
 		{
 			@Override
 			public void handle(ActionEvent e) {
-				System.out.println("Please open a file...");
+				System.out.println("Please select a file to open...");
 
 				// Set extension filters
-				FileChooser.ExtensionFilter extFilterJPG = 
-						new FileChooser.ExtensionFilter("JPG files (*.JPG)", "*.JPG");
-				FileChooser.ExtensionFilter extFilterjpg = 
-						new FileChooser.ExtensionFilter("jpg files (*.jpg)", "*.jpg");
-				FileChooser.ExtensionFilter extFilterPNG = 
-						new FileChooser.ExtensionFilter("PNG files (*.PNG)", "*.PNG");
-				FileChooser.ExtensionFilter extFilterpng = 
-						new FileChooser.ExtensionFilter("png files (*.png)", "*.png");
+				FileChooser.ExtensionFilter extFilterXML = new FileChooser.ExtensionFilter("PWS files (*.XML)", "*.XML");
+				FileChooser.ExtensionFilter extFilterxml = new FileChooser.ExtensionFilter("pws files (*.xml)", "*.xml");
 
 				// Add extension files to the file chooser
-				browseFiles.getExtensionFilters().addAll(extFilterJPG, extFilterjpg, extFilterPNG, extFilterpng);
+				browseFiles.getExtensionFilters().addAll(extFilterxml, extFilterXML);
 
-				// Assign a File object as the file chooser
+				// Assign a File object as the file chooser - open the system dialogue
 				selectedFile = browseFiles.showOpenDialog(window);
 
-				// Select a file and add it to myImage
-				if(selectedFile != null)
-				{	
-					window.setTitle("Presentation");
-					window.setScene(presentationMenu); // Change scene to presentationMenu
-					String filename = selectedFile.getName(); // get the name of selected file
-					System.out.println("File selected: " + filename); // display the details
-					openFile(selectedFile);
-					try {
-						BufferedImage bufferedImage = ImageIO.read(selectedFile);
-						WritableImage image = SwingFXUtils.toFXImage(bufferedImage, null);
-						myImage.setImage(image);
-					} catch (IOException ex) {
-						Logger.getLogger(MainGuiPagination.class.getName()).log(Level.SEVERE, null, ex);
-					}
-				}
-				else
-				{
-					System.out.println("File selection cancelled!");
-				}
+				// Open the PWS selected xml file and change the scene to presentation scene
+				// with a pagination layout
+				openSelectedFile(selectedFile);
 			}
 		});
 
@@ -434,14 +391,15 @@ public class MainGuiPagination extends Application
 
 		MenuItem goToPresentation = new MenuItem("Go To Presentation...");
 
-		// Go back to presentation
+		/*	// Go to presentation
 		goToPresentation.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			public void handle(ActionEvent e) 
 			{
 				// Parsing of the pws xml file
 				parser = new XMLParser();
-				parser.parseXML("PWS/pwsTest.xml");
+				//parser.parseXML("PWS/pwsTest.xml");
+				parser.parseXML(newFileName);
 				tempPres = parser.getPresentation();
 
 				// Creates Pagination Layout
@@ -465,6 +423,7 @@ public class MainGuiPagination extends Application
 			}
 
 		});
+		 */
 
 		MenuItem goBack = new MenuItem("Go Back...");
 
@@ -510,12 +469,69 @@ public class MainGuiPagination extends Application
 	}
 
 	// Method for opening a file in the browser with normal OS procedure
-	private void openFile(File file) {
+	/*	private void openFile(File file) {
 		try {
 			desktop.open(file);
 		} catch (IOException ex) {
 			Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
+	}
+	 */
+
+	/* Method for selecting a PWS xml file and if not null, return the string name of the 
+	   xml file and pass it into the parser  */
+	private File openSelectedFile(File xmlFile){		
+
+		selectedFile = xmlFile;
+
+		if(xmlFile != null)
+		{	
+			window.setTitle("Presentation");
+			// Change scene to presentationMenu
+			window.setScene(presentationMenu); 
+			filename1 = new String("PWS/");
+			// get the name of selected file
+			filename2 = xmlFile.getName();
+			// concatenate the strings and rename the file
+			parsingFileName = filename1 + filename2; 
+
+			// display the details
+			System.out.println("File selected: " + parsingFileName); 
+
+			// Parse the pws xml file
+			parser = new XMLParser();
+			//parser.parseXML("PWS/pwsTest.xml");
+			parser.parseXML(parsingFileName);
+			tempPres = parser.getPresentation();
+
+			// Creates Pagination Layout 
+			pagination = new Pagination(tempPres.getSlides().size(), 0);
+			// Setting the style of the pagination
+			pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+
+			// Create the pagination pages
+			pagination.setPageFactory(new Callback<Integer, Node>() {
+				@Override
+				public Node call(Integer pageIndex) {
+					try {
+						return sh.getSlideStack(tempPres, pageIndex, width-200, height-150);
+					} catch (IOException e) {
+						return null;
+					}
+				}});
+
+			// Add the pagination to the presentation scene
+			presentationLayout.setCenter(pagination);
+			window.setTitle("Presentation");
+			window.setScene(presentationMenu);
+
+		}
+		else
+		{
+			System.out.println("File selection cancelled!");
+		}
+
+		return xmlFile;
 	}
 
 
@@ -584,18 +600,18 @@ public class MainGuiPagination extends Application
 		// Create Sign Up and Login buttons
 		signUp = new Button("Sign Up");
 		signUp.setPrefSize(150, 50);
-		signUp.setId("signUp"); // id for CSS file
+		signUp.setId("signUp"); // id for gui_style.css file
 		//signUp.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
 
 		logIn = new Button("Login");
 		logIn.setPrefSize(150, 50);
-		logIn.setId("logIn"); // id for CSS file
+		logIn.setId("logIn"); // id for gui_style.css file
 		//logIn.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
 
 		/*
 		Button presentation = new Button("Presentation");
 		presentation.setPrefSize(150, 50);
-		presentation.setId("presentation"); // id for CSS file */
+		presentation.setId("presentation"); // id for gui_style.css file */
 
 		// Adding buttons to the hbox
 		hbox.getChildren().addAll(signUp, logIn);
@@ -672,8 +688,10 @@ public class MainGuiPagination extends Application
 		// Create the textfields for username and password
 		// and adding to the rootNode
 		textFieldName = new TextField();
+		textFieldName.setPromptText("Enter Username");
 		grid.add(textFieldName, 1, 1);
 		textFieldPassword1 = new PasswordField();
+		textFieldPassword1.setPromptText("Enter password");
 		grid.add(textFieldPassword1, 1, 2);
 
 		// Creating a Button for login and a response
@@ -715,32 +733,32 @@ public class MainGuiPagination extends Application
 				sUsernameLogin = textFieldName.getText();
 				sPasswordLogin = textFieldPassword1.getText();
 
+				// Create new LoginDetails class
+				LoginDetails loginDetails = new LoginDetails();
+				
 				// Check if any of the textfields are null
 				if(sUsernameLogin.equals("") || sPasswordLogin.equals(""))
 				{	
 					response1.setText("Textfields are empty!");
 					response1.setFill(Color.RED);
 				}	
-				// Store the data in an ArrayList and send to sql database to check validity
+				// Store the data and send to mysql database to check validity
 				else 
 				{
-					inputData1.add(sUsernameLogin);
-					inputData1.add(sPasswordLogin);
+					// Set the username and password fields in local LoginDetails class
+					loginDetails.setUsername(sUsernameLogin);
+					loginDetails.setPassword(sPasswordLogin);
 
+//					String x = (String) loginDetails.getUsername();
+//					String y = (String) loginDetails.getPassword();
+//					
+//					System.out.println("Username is: " + x);
+//					System.out.println("Password is: " + y);
+					
 					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response1.setText("Logging in, please wait");
 					response1.setFill(Color.BLACK);
-				}
-				// Some input did not match, clear textfelds and try again
-//				else
-//				{
-//					response2.setText("Error in input, please try again!");
-//					response2.setFill(Color.RED);
-//					textFieldEmail.clear();
-//					textFieldConfirmEmail.clear();
-//					textFieldPassword2.clear();
-//					textFieldConfirmPassword.clear();
-//				}
+				}								
 			}
 		}); 
 
@@ -749,6 +767,7 @@ public class MainGuiPagination extends Application
 
 	/* Method for GridPane items for Sign Up Menu */
 	public GridPane addSignupGridItems(){
+
 		// Create a root node called grid. In this case a grid pane layout 
 		// is used, with vertical and horizontal gaps of 10
 		GridPane grid = new GridPane();
@@ -763,7 +782,7 @@ public class MainGuiPagination extends Application
 
 		// Create the Default message
 		messageSignUp = new Text("An Exciting Experience!");
-		messageSignUp.setId("messageSignUp");
+		messageSignUp.setId("messageSignUp"); // Id for gui_style.css
 		//messageSignUp.setFill(Color.DARKCYAN);
 		//messageSignUp.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(messageSignUp, 0, 0, 2, 1);
@@ -788,18 +807,25 @@ public class MainGuiPagination extends Application
 		// Create the textfields for First Name, Surname Name, email,
 		// username and password, etc..and adding to the rootNode
 		textFieldFirstName = new TextField();
+		textFieldFirstName.setPromptText("Enter First Name");
 		grid.add(textFieldFirstName, 1, 1);
 		textFieldSurname = new TextField();
+		textFieldSurname.setPromptText("Enter Surame");
 		grid.add(textFieldSurname, 1, 2);
 		textFieldEmail = new TextField();
+		textFieldEmail.setPromptText("Enter valid Email address");
 		grid.add(textFieldEmail, 1, 3);
 		textFieldConfirmEmail = new TextField();
+		textFieldConfirmEmail.setPromptText("Confirm Email address");
 		grid.add(textFieldConfirmEmail, 1, 4);
 		textFieldUsername = new TextField();
+		textFieldUsername.setPromptText("Enter Username");
 		grid.add(textFieldUsername, 1, 5);
 		textFieldPassword2 = new PasswordField();
+		textFieldPassword2.setPromptText("Enter password of your choice");
 		grid.add(textFieldPassword2, 1, 6);
 		textFieldConfirmPassword = new PasswordField();
+		textFieldConfirmPassword.setPromptText("Confirm password");
 		grid.add(textFieldConfirmPassword, 1, 7);
 
 		// Creating a Button for Registering and going back to main menu
@@ -831,10 +857,6 @@ public class MainGuiPagination extends Application
 		response2 = new Text();
 		grid.add(response2, 1, 9);
 
-		// String Variables for assigning text in textfields
-		//	final String firstName, surname, email, confirmEmail, username, password, confirmPassword;
-		//firstName = textFieldFirstName.getText();
-
 		// Event handler to get text from the text field 
 		// when button is pressed.
 		btnRegister.setOnAction(new EventHandler<ActionEvent>() 
@@ -849,6 +871,8 @@ public class MainGuiPagination extends Application
 				sUsername = textFieldUsername.getText();
 				sPassword = textFieldPassword2.getText();
 				sConfirmPassword = textFieldConfirmPassword.getText();
+				
+				SignupDetails signupDetails = new SignupDetails();
 
 				// Check if any of the textfields are null
 				if(sFirstName.equals("") || sSurname.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
@@ -857,17 +881,34 @@ public class MainGuiPagination extends Application
 					response2.setText("Textfields are empty!");
 					response2.setFill(Color.RED);
 				}	
-				// Check if input is valid and store the data in an ArrayList
+				// Check if input is valid and store the data to send to mysql
 				else if(sEmail.equals(sConfirmEmail) && sPassword.equals(sConfirmPassword))
 				{
-					inputData2.add(sFirstName);
-					inputData2.add(sSurname);
-					inputData2.add(sEmail);
-					inputData2.add(sConfirmEmail);
-					inputData2.add(sUsername);
-					inputData2.add(sPassword);
-					inputData2.add(sConfirmPassword);
-
+					// Set the username and password fields in local LoginDetails class
+					signupDetails.setFirstName(sFirstName);
+					signupDetails.setSurname(sSurname);	
+					signupDetails.setEmail(sEmail);
+					signupDetails.setConfirmEmail(sConfirmEmail);
+					signupDetails.setUsername(sUsername);
+					signupDetails.setPassword(sPassword);
+					signupDetails.setConfirmPassword(sConfirmPassword);
+					
+//					String a = (String) signupDetails.getFirstName();
+//					String b = (String) signupDetails.getSurname();
+//					String c = (String) signupDetails.getEmail();
+//					String d = (String) signupDetails.getConfirmEmail();
+//					String ee = (String) signupDetails.getUsername();
+//					String f = (String) signupDetails.getPassword();
+//					String g = (String) signupDetails.getConfirmPassword();
+//					
+//					System.out.println("Firstname is: " + a);
+//					System.out.println("Surname is: " + b);
+//					System.out.println("Email is: " + c);
+//					System.out.println("ConfirmEmail is: " + d);
+//					System.out.println("Username is: " + ee);
+//					System.out.println("Password is: " + f);
+//					System.out.println("ConfirmPassword is: " + g);
+					
 					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response2.setText("Registering with us, please wait");
 					response2.setFill(Color.BLACK);
@@ -881,7 +922,7 @@ public class MainGuiPagination extends Application
 					textFieldConfirmEmail.clear();
 					textFieldPassword2.clear();
 					textFieldConfirmPassword.clear();
-				}
+				}				
 			}
 		}); 
 
