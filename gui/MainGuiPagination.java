@@ -488,13 +488,15 @@ public class MainGuiPagination extends Application
 		{	
 			window.setTitle("Presentation");
 			// Change scene to presentationMenu
-			window.setScene(presentationMenu); 
-			filename1 = new String("PWS/");
-			// get the name of selected file
-			filename2 = xmlFile.getName();
-			// concatenate the strings and rename the file
-			parsingFileName = filename1 + filename2; 
-
+			window.setScene(presentationMenu);
+			
+			//filename1 = new String("PWS/");
+			
+			filename1 = xmlFile.getParent(); // get the directory
+			filename2 = new String("/"); 
+			String filename3 = xmlFile.getName(); // get the filename
+			parsingFileName = filename1 + filename2 + filename3; // concatenate full path
+			
 			// display the details
 			System.out.println("File selected: " + parsingFileName); 
 
