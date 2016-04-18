@@ -87,7 +87,7 @@ public class MainGuiPagination extends Application
 
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
-	private String filename1, filename2, parsingFileName;
+	private String filename1, filename2, filename3, xmlPathname, parsingFileName;
 	private Presentation tempPres = new Presentation();
 	private XMLParser parser;
 	private HBox buttonControls;
@@ -482,8 +482,6 @@ public class MainGuiPagination extends Application
 	   xml file and pass it into the parser  */
 	private File openSelectedFile(File xmlFile){		
 
-		selectedFile = xmlFile;
-
 		if(xmlFile != null)
 		{	
 			window.setTitle("Presentation");
@@ -492,11 +490,12 @@ public class MainGuiPagination extends Application
 			
 			//filename1 = new String("PWS/");
 			
-			filename1 = xmlFile.getParent(); // get the directory
-			filename2 = new String("/"); 
-			String filename3 = xmlFile.getName(); // get the filename
-			parsingFileName = filename1 + filename2 + filename3; // concatenate full path
-			
+			//filename1 = xmlFile.getParent(); // get the directory
+			//filename2 = new String("/"); 
+			//filename3 = xmlFile.getName(); // get the filename
+			xmlPathname = xmlFile.getAbsolutePath();
+			//parsingFileName = filename1 + filename2 + filename3; // concatenate full path
+			parsingFileName = xmlPathname;
 			// display the details
 			System.out.println("File selected: " + parsingFileName); 
 
