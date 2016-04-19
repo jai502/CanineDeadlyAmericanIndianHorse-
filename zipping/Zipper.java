@@ -1,45 +1,52 @@
 package zipping;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.Enumeration;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
-public class Zipper {
-	static final int BUFFER = 2048;
+public class Zipper{
 
-	public static void main(String args[]) 
+	private static final int BUFFER_SIZE = 4096;
+
+	public void unzip(String input, String destination)	throws IOException 
 	{
-		try 
+		File output = new File(destination);
+		if (!output.exists()) 
+			output.mkdir();
+		
+		ZipInputStream inputStream = new ZipInputStream(new FileInputStream(input));
+		ZipEntry currentFile = inputStream.getNextEntry();
+		
+		while (currentFile != null)
 		{
-			BufferedOutputStream dest = null;
-			BufferedInputStream is = null;
-			ZipEntry entry;
-			ZipFile zipfile = new ZipFile("PWS/presentation.zip");
-			Enumeration e = zipfile.entries();
-			while (e.hasMoreElements()) 
+			String filePath = destination + File.separator + currentFile.getName();
+			if (!currentFile.isDirectory()) 
 			{
-				entry = (ZipEntry) e.nextElement();
-				System.out.println("Extracting: " + entry);
-				is = new BufferedInputStream(zipfile.getInputStream(entry));
-				int count;
-				byte data[] = new byte[BUFFER];
-				FileOutputStream fos = new FileOutputStream(entry.getName());
-				dest = new BufferedOutputStream(fos, BUFFER);
-				while ((count = is.read(data, 0, BUFFER)) != -1) 
-				{
-					dest.write(data, 0, count);
-				}
-				dest.flush();
-				dest.close();
-				is.close();
+				extractFile(inputStream, filePath);
+				System.out.println("Extracted file to: " + filePath);
+			} 
+			else
+			{
+				File file = new File(filePath);
+				file.mkdir();
 			}
-		} 
-		catch (Exception e)
-		{
-			e.printStackTrace();
+			inputStream.closeEntry();
+			currentFile = inputStream.getNextEntry();
 		}
+		inputStream.close();
+	}
+
+	private void extractFile(ZipInputStream zis, String input)throws IOException 
+	{
+		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(input));
+		byte[] bytesIn = new byte[BUFFER_SIZE];
+		int read = 0;
+		while ((read = zis.read(bytesIn)) != -1) 
+			bos.write(bytesIn, 0, read);
+		bos.close();
 	}
 }
