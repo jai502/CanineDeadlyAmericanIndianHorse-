@@ -13,10 +13,11 @@ package gui;
  * Description: Class which stores the data from the Signup Page
  */
 
-public class SignupDetails 
+public class SignupDetails implements java.io.Serializable 
 {
 
-	private String firstName, surname, email, confirmEmail; 
+	private static final long serialVersionUID = 479289220310432832L;
+	private String firstName, surname, dateOfBirth, email, confirmEmail; 
 	private String username, password, confirmPassword;
 
 	public SignupDetails()
@@ -35,6 +36,12 @@ public class SignupDetails
 		return surname;
 	}
 
+	// return the birth date credentials
+	protected Object getDateOfBirth()
+	{
+		return dateOfBirth;
+	}
+	
 	// return the email credentials
 	protected Object getEmail()
 	{
@@ -76,6 +83,12 @@ public class SignupDetails
 	protected void setSurname(String setSurname)
 	{
 		this.surname = setSurname;
+	}
+	
+	// Sets the birth date details
+	protected void setDateOfBirth(String setDateOfBirth)
+	{
+		this.dateOfBirth = setDateOfBirth;
 	}
 
 	// Sets the email details

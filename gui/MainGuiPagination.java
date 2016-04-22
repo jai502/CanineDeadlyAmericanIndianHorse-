@@ -1,5 +1,9 @@
 package gui;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 /*
  * (C) Stammtisch
  * First version created by: Mathew Gould & Alexander Stassis (Design Team)
@@ -19,11 +23,16 @@ package gui;
 import javax.imageio.ImageIO;
 import Objects.Presentation;
 import Parsers.XMLParser;
+import encryptionRSA.RSAEncryptDecrypt;
+import encryptionRSA.Serializer;
 import handlers.SlideHandler;
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,11 +87,11 @@ public class MainGuiPagination extends Application
 
 	/* variables for addSignupGridItems() method */
 	private Button btnRegister, btnGoBack2;
-	private Label firstName, surName, email, confirmEmail, userName2, passWord2, confirmPassword; 
-	private TextField textFieldFirstName, textFieldSurname, textFieldEmail, textFieldConfirmEmail, textFieldUsername;
+	private Label firstName, surName, dateOfBirth, email, confirmEmail, userName2, passWord2, confirmPassword; 
+	private TextField textFieldFirstName, textFieldSurname, textFieldDateOfBirth, textFieldEmail, textFieldConfirmEmail, textFieldUsername;
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
-	private String sFirstName, sSurname, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private String sFirstName, sSurname, sDateOfBirth, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for presentation scene */
@@ -794,16 +803,18 @@ public class MainGuiPagination extends Application
 		grid.add(firstName, 0, 1);
 		surName = new Label("Surname: ");
 		grid.add(surName, 0, 2);
+		dateOfBirth = new Label("Date of Birth: ");
+		grid.add(dateOfBirth, 0, 3);
 		email = new Label("Email: ");
-		grid.add(email, 0, 3);
+		grid.add(email, 0, 4);
 		confirmEmail = new Label("Confirm Email: ");
-		grid.add(confirmEmail, 0, 4);
+		grid.add(confirmEmail, 0, 5);
 		userName2 = new Label("Username: ");
-		grid.add(userName2, 0, 5);
+		grid.add(userName2, 0, 6);
 		passWord2 = new Label("Password: ");
-		grid.add(passWord2, 0, 6);
+		grid.add(passWord2, 0, 7);
 		confirmPassword = new Label("Confirm Password: ");
-		grid.add(confirmPassword, 0, 7);
+		grid.add(confirmPassword, 0, 8);
 
 		// Create the textfields for First Name, Surname Name, email,
 		// username and password, etc..and adding to the rootNode
@@ -813,21 +824,24 @@ public class MainGuiPagination extends Application
 		textFieldSurname = new TextField();
 		textFieldSurname.setPromptText("Enter Surame");
 		grid.add(textFieldSurname, 1, 2);
+		textFieldDateOfBirth = new TextField();
+		textFieldDateOfBirth.setPromptText("Enter Date of Birth");
+		grid.add(textFieldDateOfBirth, 1, 3);
 		textFieldEmail = new TextField();
 		textFieldEmail.setPromptText("Enter valid Email address");
-		grid.add(textFieldEmail, 1, 3);
+		grid.add(textFieldEmail, 1, 4);
 		textFieldConfirmEmail = new TextField();
 		textFieldConfirmEmail.setPromptText("Confirm Email address");
-		grid.add(textFieldConfirmEmail, 1, 4);
+		grid.add(textFieldConfirmEmail, 1, 5);
 		textFieldUsername = new TextField();
 		textFieldUsername.setPromptText("Enter Username");
-		grid.add(textFieldUsername, 1, 5);
+		grid.add(textFieldUsername, 1, 6);
 		textFieldPassword2 = new PasswordField();
 		textFieldPassword2.setPromptText("Enter password of your choice");
-		grid.add(textFieldPassword2, 1, 6);
+		grid.add(textFieldPassword2, 1, 7);
 		textFieldConfirmPassword = new PasswordField();
 		textFieldConfirmPassword.setPromptText("Confirm password");
-		grid.add(textFieldConfirmPassword, 1, 7);
+		grid.add(textFieldConfirmPassword, 1, 8);
 
 		// Creating a Button for Registering and going back to main menu
 		btnRegister = new Button("Register");
@@ -852,11 +866,11 @@ public class MainGuiPagination extends Application
 		});
 
 		// Adding hbArea with the button in it to the rootNode
-		grid.add(hbArea, 1, 8);
+		grid.add(hbArea, 1, 9);
 
 		// Add a response after pressing the button
 		response2 = new Text();
-		grid.add(response2, 1, 9);
+		grid.add(response2, 1, 10);
 
 		// Event handler to get text from the text field 
 		// when button is pressed.
@@ -867,6 +881,7 @@ public class MainGuiPagination extends Application
 			{
 				sFirstName = textFieldFirstName.getText();
 				sSurname = textFieldSurname.getText();
+				sDateOfBirth = textFieldDateOfBirth.getText();
 				sEmail = textFieldEmail.getText();
 				sConfirmEmail = textFieldConfirmEmail.getText();
 				sUsername = textFieldUsername.getText();
@@ -874,9 +889,13 @@ public class MainGuiPagination extends Application
 				sConfirmPassword = textFieldConfirmPassword.getText();
 				
 				SignupDetails signupDetails = new SignupDetails();
-
+				RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
+				Serializer serializer = new Serializer();
+				byte[] serializedSignupDetails = null;
+				byte[] encryptedData = null;
+				
 				// Check if any of the textfields are null
-				if(sFirstName.equals("") || sSurname.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
+				if(sFirstName.equals("") || sSurname.equals("") || sDateOfBirth.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
 						|| sUsername.equals("") || sPassword.equals("") || sConfirmPassword.equals(""))
 				{	
 					response2.setText("Textfields are empty!");
@@ -885,14 +904,49 @@ public class MainGuiPagination extends Application
 				// Check if input is valid and store the data to send to mysql
 				else if(sEmail.equals(sConfirmEmail) && sPassword.equals(sConfirmPassword))
 				{
-					// Set the username and password fields in local LoginDetails class
+					// Create key generation for encryption and decryption
+					try {
+						rsaEncryptDecrypt.createKeys();
+					} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					// Set the username and password fields in local SignUpDetails class
 					signupDetails.setFirstName(sFirstName);
 					signupDetails.setSurname(sSurname);	
+					signupDetails.setDateOfBirth(sDateOfBirth);
 					signupDetails.setEmail(sEmail);
 					signupDetails.setConfirmEmail(sConfirmEmail);
 					signupDetails.setUsername(sUsername);
 					signupDetails.setPassword(sPassword);
 					signupDetails.setConfirmPassword(sConfirmPassword);
+					
+					// Before Encryption
+					//String a = (String) signupDetails.getFirstName();
+					System.out.println("Test Object is: " + signupDetails);
+					
+					// Serialize signUpDetails
+					try {
+						serializedSignupDetails = Serializer.serialize(signupDetails);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					System.out.println("Serialized test object: " + serializedSignupDetails);
+					
+					try {
+						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
+					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					// After Encryption
+					//String b = (String) signupDetails.getFirstName();
+					System.out.println("Encrypted and Serialized Data is: " + encryptedData);
 					
 //					String a = (String) signupDetails.getFirstName();
 //					String b = (String) signupDetails.getSurname();
@@ -909,6 +963,8 @@ public class MainGuiPagination extends Application
 //					System.out.println("Username is: " + ee);
 //					System.out.println("Password is: " + f);
 //					System.out.println("ConfirmPassword is: " + g);
+					
+					
 					
 					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response2.setText("Registering with us, please wait");
