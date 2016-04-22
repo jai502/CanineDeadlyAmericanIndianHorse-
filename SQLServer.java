@@ -116,7 +116,7 @@ public class SQLServer
 	}
 	
 	// Check if a user exists in a database
-	public static boolean checkUser(Connection con, String table, String username)
+	public static boolean checkUser(Connection con, String table, String username, String email)
 	{
 		Statement command = null;
 		
@@ -131,6 +131,8 @@ public class SQLServer
 			data = command.executeQuery("SELECT id, username FROM " + table
 											+ " WHERE username = "
 											+ "('" + username + "')"
+											+ " OR email = "
+											+ "('" + email + "')"
 										);
 			// Extract data from results set
 			 while(data.next())
