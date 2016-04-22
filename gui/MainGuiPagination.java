@@ -409,7 +409,12 @@ public class MainGuiPagination extends Application {
 				// Open the PWS selected xml file and change the scene to
 				// presentation scene
 				// with a pagination layout
-				openSelectedFile(selectedFile);
+				try {
+					openSelectedFile(selectedFile);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 
@@ -489,7 +494,7 @@ public class MainGuiPagination extends Application {
 	 * Method for selecting a PWS xml file and if not null, return the string
 	 * name of the xml file and pass it into the parser
 	 */
-	private File openSelectedFile(File xmlFile) {
+	private File openSelectedFile(File xmlFile) throws IOException {
 
 		if (xmlFile != null) {
 			window.setTitle("Presentation");
@@ -501,7 +506,7 @@ public class MainGuiPagination extends Application {
 			// filename1 = xmlFile.getParent(); // get the directory
 			// filename2 = new String("/");
 			// filename3 = xmlFile.getName(); // get the filename
-			xmlPathname = xmlFile.getAbsolutePath();
+			xmlPathname = xmlFile.getCanonicalPath();
 			// parsingFileName = filename1 + filename2 + filename3; //
 			// concatenate full path
 			parsingFileName = xmlPathname;

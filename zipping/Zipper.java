@@ -59,9 +59,8 @@ public class Zipper{
 		
 		//extract the file by reading a buffer from the input stream and writing to new files 
 		int beingRead = 0;
-		while(beingRead>0)
+		while((beingRead=inputStream.read(bytesToRead))>0)
 		{
-			beingRead=inputStream.read(bytesToRead);
 			outputStream.write(bytesToRead,0,beingRead);
 		}
 		
