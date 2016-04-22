@@ -948,6 +948,16 @@ public class MainGuiPagination extends Application
 					//String b = (String) signupDetails.getFirstName();
 					System.out.println("Encrypted and Serialized Data is: " + encryptedData);
 					
+					System.out.println("Now for the Decrypting!");
+					
+//					try {
+//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
+//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
+//						// TODO Auto-generated catch block
+//						e1.printStackTrace();
+//					}
+					
 //					String a = (String) signupDetails.getFirstName();
 //					String b = (String) signupDetails.getSurname();
 //					String c = (String) signupDetails.getEmail();
