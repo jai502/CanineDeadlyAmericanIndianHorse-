@@ -50,7 +50,7 @@ public class Zipper{
 		inputStream.close();
 	}
 
-	private void extract(ZipInputStream inputStream, String input)throws IOException 
+	private void extract(ZipInputStream inputStream, String input)throws IOException
 	{
 		//create an outputstream and add a buffer to improve performance and reduce overhead during extraction
 		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(input));
@@ -59,8 +59,12 @@ public class Zipper{
 		
 		//extract the file by reading a buffer from the input stream and writing to new files 
 		int beingRead = 0;
-		while ((beingRead = inputStream.read(bytesToRead)) != -1) 
-			outputStream.write(bytesToRead, 0, beingRead);
+		while(beingRead>0)
+		{
+			beingRead=inputStream.read(bytesToRead);
+			outputStream.write(bytesToRead,0,beingRead);
+		}
+		
 		outputStream.close();
 	}
 	
