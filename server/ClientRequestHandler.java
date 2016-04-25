@@ -33,7 +33,13 @@ public class ClientRequestHandler implements Runnable {
 		
 		while (!done) {
 			// wait for request from client
-			currentRequest = getRequest(clientSocket);
+			try {
+				currentRequest = getRequest(clientSocket);
+			} catch(IOException e) {
+				System.out.printf("[ERROR]-%d Client disconnected unusually \n", handlerInstance);
+				e.printStackTrace();
+				break;
+			}
 			
 			switch(currentRequest.id.toString()) {
 				case "PING":		// ping command
@@ -45,7 +51,6 @@ public class ClientRequestHandler implements Runnable {
 					break;
 
 				case "DISCONNECT":	// disconnect request
-					System.out.printf("[INFO]-%d Exiting service thread \n", handlerInstance);
 					done = true;	// exit handler loop
 					break;
 					
@@ -57,6 +62,7 @@ public class ClientRequestHandler implements Runnable {
 		}
 		
 		// disconnect socket
+		System.out.printf("[INFO]-%d Exiting service thread \n", handlerInstance);
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
@@ -68,7 +74,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// Thread local request retrieval method
-	private RequestObject getRequest(Socket threadSocket) {
+	private RequestObject getRequest(Socket threadSocket) throws IOException {
 		ObjectInputStream inputFromClient;
 		RequestObject thisRequest;
 		try {
@@ -76,9 +82,6 @@ public class ClientRequestHandler implements Runnable {
 			thisRequest = (RequestObject)inputFromClient.readObject();
 			System.out.printf("[INFO]-%d Request recieved: %s\n", handlerInstance, thisRequest.id);
 			return thisRequest;
-		} catch (IOException e) {
-			System.out.printf("[ERROR]-%d Failed to get request\n", handlerInstance);
-			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			System.out.printf("[ERROR]-%d Request is of wrong format\n", handlerInstance);
 			e.printStackTrace();			
