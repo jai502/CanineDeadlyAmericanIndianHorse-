@@ -47,6 +47,8 @@ public class StammtischServer {
 	// Connection listener thread
 	// waits for incoming connection
 	Thread connectionListener = new Thread("Stammtish connection listener") {
+		private int nextInstance = 0;
+		
 		public void run() {
 			try {
 				sSocket = new ServerSocket(defaultPort);
@@ -56,9 +58,10 @@ public class StammtischServer {
 			
 			while(true) {
 				try {
-					System.out.printf("[INFO] Waiting for client connection... \n");
-					Thread thread = new Thread(new ClientRequestHandler(sSocket.accept()));
-					System.out.printf("[INFO] Client connected, starting handler thread \n");
+					// wait for client connection
+					Thread thread = new Thread(new ClientRequestHandler(sSocket.accept(), nextInstance));
+					System.out.printf("[INFO] Client connected, starting handler thread %d \n", nextInstance);
+					nextInstance++;
 					thread.start();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -71,9 +74,9 @@ public class StammtischServer {
 	
 	// Main method for launching server
 	public static void main(String[] args) {
-		// do input argument passing here
+		// do command-line argument passing here
 		
-		// start the stammtisch server
+		// start the stammtisch server connection listener
 		new StammtischServer(defaultPort);
 		
 		// "scanner" object for reading from command line (javawtf?)
