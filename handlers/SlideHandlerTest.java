@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import Objects.Presentation;
 import Parsers.XMLParser;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -29,11 +30,13 @@ public class SlideHandlerTest extends Application {
 		parser.parseXML("PWS/pwsTest.xml");
 		pres = parser.getPresentation();
 		SlideHandler sh = new SlideHandler();		
+		Group initialRoot = new Group();
+		Scene firstScene = new Scene(initialRoot, 800, 600);
+		Group root = sh.getSlideStack(pres, 2, 800, 600, firstScene);
+		Scene lastScene = new Scene(root, 800, 600);
 		
-		StackPane root = sh.getSlideStack(pres, 1, 800, 600);
-		Scene scene = new Scene(root, 800, 600, Color.BLACK);
 
-		primary.setScene(scene);
+		primary.setScene(lastScene);
 		primary.show();
 	}
 

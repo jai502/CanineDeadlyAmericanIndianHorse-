@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.sun.prism.paint.Color;
 
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -17,13 +18,18 @@ import Objects.*;
 public class SlideHandler {
 	
 	private Presentation pres;
+
 	
 	public SlideHandler() {
 		super();
 	}
 
-	public StackPane getSlideStack(Presentation presentation, int i, int width, int height) throws IOException {
+	public StackPane getSlideStack(Presentation presentation, int i, double myWidth, double myHeight, Scene scene) throws IOException {
 		this.pres = presentation;
+		double reducedHeight = (myHeight-60);
+		double reducedWidth = (myWidth-5);
+		int width = (int) Math.floor(reducedWidth);
+		int height =(int) Math.floor(reducedHeight);
 		System.out.println("\nSlides in presentation according to handler: " +presentation.getSlides().size());
 			StackPane slidePane = new StackPane();
 			for (int x = 0; x < presentation.getSlides().get(i).getTextList().size(); x++)
@@ -41,7 +47,7 @@ public class SlideHandler {
 				ImageHandler imageHandler = new ImageHandler();
 				Canvas imageCanvas = imageHandler.drawCanvas(presentation.getSlides().get(i).getImageList().get(x), width, height);
 				AnchorPane anchor = new AnchorPane();
-				anchor.getChildren().add(imageCanvas);
+				anchor.getChildren().add(imageCanvas);	
 				slidePane.getChildren().addAll(anchor);
         	}
 			for (int x = 0; x < presentation.getSlides().get(i).getPolygonList().size(); x++)
@@ -54,13 +60,22 @@ public class SlideHandler {
         	}
 			for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++)
         	{
-				Video videoHandler = new Video(presentation.getSlides().get(i).getVideoList().get(x));
-				slidePane.getChildren().add(videoHandler);
+				MediaFx videoPlayer = new MediaFx (presentation.getSlides().get(i).getVideoList().get(x));
+				AnchorPane anchor = new AnchorPane();
+				Group group = new Group();
+				anchor.getChildren().add(group);
+				group.getChildren().add(videoPlayer.createContent(scene));
+				
+				slidePane.getChildren().addAll(anchor);
         	}
 			for (int x = 0; x < presentation.getSlides().get(i).getAudioList().size(); x++)
         	{
-				AudioHandler audioHandler = new AudioHandler(presentation.getSlides().get(i).getAudioList().get(x));
-				slidePane.getChildren().add(audioHandler);
+				MediaFx audioPlayer = new MediaFx(presentation.getSlides().get(i).getAudioList().get(x));
+				Group group = new Group();
+				AnchorPane anchor = new AnchorPane();
+				group.getChildren().add(audioPlayer.createContent(scene));
+				anchor.getChildren().add(group);
+				slidePane.getChildren().addAll(anchor);
         	}
 			for (int x = 0; x < presentation.getSlides().get(i).getShapeList().size(); x++)
         	{

@@ -67,9 +67,10 @@ import javafx.scene.input.MouseEvent;
 public class MainGuiPagination extends Application 
 {	
 	/* variables for the primary stage */
+	
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, presentationMenu;
-	private int width = 900;
+	private int width = 800;
 	private int height = 600;
 
 	/* variables for addMainGridItems() method */
@@ -102,6 +103,8 @@ public class MainGuiPagination extends Application
 	private HBox buttonControls;
 	private BorderPane presentationLayout;
 	private Pagination pagination;
+	private double stackWidth;
+	private double stackHeight;
 
 	/* variables for menuItems() method */
 	private MenuBar menuBar;
@@ -234,8 +237,7 @@ public class MainGuiPagination extends Application
 		presentationLayout = new BorderPane();
 		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
-		presentationMenu = new Scene(presentationLayout, width, height);
-
+		presentationMenu = new Scene(presentationLayout, width, height, Color.BLACK);
 		// Load style.ccs from same directory to provide the styling for the scenes
 		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
@@ -489,7 +491,7 @@ public class MainGuiPagination extends Application
 
 	/* Method for selecting a PWS xml file and if not null, return the string name of the 
 	   xml file and pass it into the parser  */
-	private File openSelectedFile(File xmlFile){		
+	private File openSelectedFile(File xmlFile){	
 
 		if(xmlFile != null)
 		{	
@@ -518,17 +520,25 @@ public class MainGuiPagination extends Application
 			pagination = new Pagination(tempPres.getSlides().size(), 0);
 			// Setting the style of the pagination
 			pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-
-			// Create the pagination pages
-			pagination.setPageFactory(new Callback<Integer, Node>() {
+			
+			pageTurn();
+			
+			pagination.widthProperty().addListener(new ChangeListener()
+			{
 				@Override
-				public Node call(Integer pageIndex) {
-					try {
-						return sh.getSlideStack(tempPres, pageIndex, width-200, height-150);
-					} catch (IOException e) {
-						return null;
-					}
-				}});
+				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+					stackWidth  = pagination.getWidth();
+					pageTurn();
+				}
+			});
+			pagination.heightProperty().addListener(new ChangeListener()
+			{
+				@Override
+				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+					stackHeight = pagination.getHeight();
+					pageTurn();
+				}
+			});
 
 			// Add the pagination to the presentation scene
 			presentationLayout.setCenter(pagination);
@@ -542,6 +552,20 @@ public class MainGuiPagination extends Application
 		}
 
 		return xmlFile;
+	}
+	
+	private void pageTurn() {
+		// Create the pagination pages
+		pagination.setPageFactory(new Callback<Integer, Node>() {
+			@Override
+			public Node call(Integer pageIndex) {
+				try {
+					//TODO
+					return sh.getSlideStack(tempPres, pageIndex, stackWidth, stackHeight, presentationMenu);
+				} catch (IOException e) {
+					return null;
+				}
+			}});
 	}
 
 

@@ -15,12 +15,14 @@ package Objects;
 
 public class VideoItem extends Item
 {
-	private float xStart, yStart;
+	private double xStart, yStart, width, height;
 	private String sourceFile;
 	private boolean loop;
 	
-	public VideoItem(int myStartTime, int myDuration, float myXStart, float myYStart, String mySourceFile, boolean myLoop)
+	public VideoItem(int myStartTime, int myDuration, double myXStart, double myYStart, String mySourceFile, boolean myLoop, double myWidth, double myHeight)
 	{
+		width = myWidth;
+		height = myHeight;
 		xStart = myXStart;
 		yStart = myYStart;
 		sourceFile = mySourceFile;
@@ -31,34 +33,64 @@ public class VideoItem extends Item
 		super();
 	}
 
-	public float getxStart() 
+	public double getxStart() 
 	{
 		return xStart;
 	}
 
-	public void setxStart(float xStart) 
+	public void setxStart(double xStart) 
 	{
 		this.xStart = xStart;
 	}
 	
 	public void setxStart(String xStart)
 	{
-		this.xStart = Float.parseFloat(xStart);
+		this.xStart = Double.parseDouble(xStart);
 	}
 
-	public float getyStart() 
+	public double getyStart() 
 	{
 		return yStart;
 	}
 
-	public void setyStart(float yStart) 
+	public void setyStart(double yStart) 
 	{
 		this.yStart = yStart;
 	}
 	
 	public void setyStart(String yStart)
 	{
-		this.yStart = Float.parseFloat(yStart);
+		this.yStart = Double.parseDouble(yStart);
+	}
+	
+	public double getWidth() 
+	{
+		return width;
+	}
+	
+	public void setWidth(double width) 
+	{
+		this.width = width;
+	}
+	
+	public void setWidth(String width)
+	{
+		this.width = Double.parseDouble(width);
+	}
+
+	public double getHeight() 
+	{
+		return height;
+	}
+
+	public void setHeight(double height) 
+	{
+		this.height = height;
+	}
+	
+	public void setHeight(String height)
+	{
+		this.height = Double.parseDouble(height);
 	}
 
 	public String getSourceFile() 

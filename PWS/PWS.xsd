@@ -675,52 +675,116 @@
 								</element>
 								<element name="video" minOccurs="0">
 									<complexType>
-										<attribute name="starttime" type="nonNegativeInteger" use="required">
+										<attribute name="starttime"
+											type="nonNegativeInteger" use="required">
 											<annotation>
-												<documentation>How many milliseconds into the slide before the element will appear </documentation>
+												<documentation>
+													How many
+													milliseconds into
+													the slide before the
+													element will appear
+												</documentation>
 											</annotation>
 										</attribute>
-										<attribute name="duration" type="int" use="required">
+										<attribute name="duration"
+											type="int" use="required">
 											<annotation>
-												<documentation>How many milliseconds should the element be active for (-1 means it will stay to the end of the slide)</documentation>
+												<documentation>
+													How many
+													milliseconds should
+													the element be
+													active for (-1 means
+													it will stay to the
+													end of the slide)
+												</documentation>
 											</annotation>
 										</attribute>
-										<attribute name="xstart" use="required">
+										<attribute name="xstart"
+											use="required">
 											<annotation>
-												<documentation>What percentage across the screen (left-to-right) is the left edge of the element</documentation>
+												<documentation>
+													What percentage
+													across the screen
+													(left-to-right) is
+													the left edge of the
+													element
+												</documentation>
 											</annotation>
 											<simpleType>
 												<annotation>
-													<documentation>The percentage is a number between 0 and 1</documentation>
+													<documentation>
+														The percentage
+														is a number
+														between 0 and 1
+													</documentation>
 												</annotation>
-												<restriction base="float">
-													<minInclusive value="0"></minInclusive>
-													<maxInclusive value="1"></maxInclusive>
+												<restriction
+													base="float">
+													<minInclusive
+														value="0">
+													</minInclusive>
+													<maxInclusive
+														value="1">
+													</maxInclusive>
 												</restriction>
 											</simpleType>
 										</attribute>
-										<attribute name="ystart" use="required">
+										<attribute name="ystart"
+											use="required">
 											<annotation>
-												<documentation>What percentage down the screen (top-to-bottom) is the top edge of the element</documentation>
+												<documentation>
+													What percentage down
+													the screen
+													(top-to-bottom) is
+													the top edge of the
+													element
+												</documentation>
 											</annotation>
 											<simpleType>
 												<annotation>
-													<documentation>The percentage is a number between 0 and 1</documentation>
+													<documentation>
+														The percentage
+														is a number
+														between 0 and 1
+													</documentation>
 												</annotation>
-												<restriction base="float">
-													<minInclusive value="0"></minInclusive>
-													<maxInclusive value="1"></maxInclusive>
+												<restriction
+													base="float">
+													<minInclusive
+														value="0">
+													</minInclusive>
+													<maxInclusive
+														value="1">
+													</maxInclusive>
 												</restriction>
 											</simpleType>
 										</attribute>
-										<attribute name="sourceFile" type="string" use="required">
+										<attribute name="sourceFile"
+											type="string" use="required">
 											<annotation>
-												<documentation>Path to the video to be played</documentation>
-											</annotation></attribute>
-										<attribute name="loop" type="boolean" use="required">
+												<documentation>
+													Path to the video to
+													be played
+												</documentation>
+											</annotation>
+										</attribute>
+										<attribute name="loop"
+											type="boolean" use="required">
 											<annotation>
-												<documentation>Should the video automatically replay when it has finished playing.</documentation>
-											</annotation></attribute>
+												<documentation>
+													Should the video
+													automatically replay
+													when it has finished
+													playing.
+												</documentation>
+											</annotation>
+										</attribute>
+										<attribute name="width"
+											type="double">
+										</attribute>
+										<attribute name="height"
+											type="double">
+										</attribute>
 									</complexType>
 								</element>
 								<element name="audio" minOccurs="0">

@@ -1,5 +1,13 @@
 package handlers;
 
+/*
+ * Author : Oliver Rushton and Seb Pillon
+ * Group: 4
+ * Description: This module creates a control panel to control a media player.
+ * 				Functionality includes : play, pause, replay, mute, volume control
+ * 										 and time control
+ */
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -23,21 +31,22 @@ import javafx.util.Duration;
 
 public class VideoControls extends GridPane {
 	//DECLARE CONSTANTS
-	private static final int BUTTONSIZE = 40;
+	private static final int BUTTONSIZE = 30;
 	//corresponds to order of images in IMAGE_NAME
 	private static final int PAUSE = 0, PLAY = 1, REPLAY = 2, VOLUME_ON = 3, MUTE = 4;
 	private static final int PLAY_BUTTON = 0, VOLUME_BUTTON = 1; //control buttons in imageState
 	private static final String[] IMAGE_NAME = {"pause.png","play.png","replay.png",
 												"volume_on.png","mute.png"};
 	//declare local variables
-	private MediaPlayer mediaPlayer;
+	private final MediaPlayer mediaPlayer;
 	private boolean loop;
 	//keeps track of image for each button
 	private int[] imageState = {PAUSE,VOLUME_ON};
-	private Duration mediaLength;
+	private Duration mediaLength = Duration.ZERO;
 	private Slider volumeSlider, mediaSlider;
 	private Button playButton, volumeButton;
 	private Label mediaTime;
+	private int startTime;
 	
 	public VideoControls(MediaPlayer mediaPlayer, boolean loop) {
 		this.mediaPlayer = mediaPlayer;
@@ -49,7 +58,7 @@ public class VideoControls extends GridPane {
 		//create play button
 		playButton = new Button();
 		playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
-		playButton.setShape(new Circle(0,0,20));
+		playButton.setShape(new Circle(0,0,BUTTONSIZE/2));
 		playButton.setPrefSize(BUTTONSIZE, BUTTONSIZE);
 		//shadow effect while button is being pressed
 		playButton.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -63,8 +72,10 @@ public class VideoControls extends GridPane {
             public void handle(MouseEvent e) {
                 Status status = mediaPlayer.getStatus();
                 playButton.setEffect(null);
-
-                if (status == Status.PAUSED || status == Status.STOPPED) {
+                if (status == Status.PAUSED || status == Status.STOPPED ) {
+                	if (mediaSlider.getValue() >= 99) {
+                		mediaPlayer.stop();
+                	}
                     mediaPlayer.play();
                     imageState[PLAY_BUTTON] = PAUSE;
                 } else {
@@ -74,16 +85,17 @@ public class VideoControls extends GridPane {
                 playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON))); //load next image
             }
         });
+		
 		mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); //repeat as often as required
 		mediaPlayer.setOnEndOfMedia(new Runnable() {
+			@Override
 			public void run() {
 				//when media has finished, set replay button
-				mediaPlayer.stop();
 				if (!loop) {
-				imageState[PLAY_BUTTON] = REPLAY;
-				}
-				else {
+					imageState[PLAY_BUTTON] = REPLAY;
+				} else {
 					imageState[PLAY_BUTTON] = PAUSE;
+					mediaPlayer.stop();
 					mediaPlayer.play();
 				}
 				playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
@@ -92,7 +104,7 @@ public class VideoControls extends GridPane {
 		//volume button for controlling mute/unmute
 		volumeButton = new Button();
 		volumeButton.setGraphic(new ImageView(loadImage(VOLUME_BUTTON)));
-		volumeButton.setShape(new Circle(0,0,20));
+		volumeButton.setShape(new Circle(0,0,BUTTONSIZE/2));
 		volumeButton.setPrefSize(BUTTONSIZE, BUTTONSIZE);
 		volumeButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
@@ -101,6 +113,7 @@ public class VideoControls extends GridPane {
 			}
 		});
 		volumeButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override
 			public void handle(MouseEvent e) {
 				volumeButton.setEffect(null);
 				if (mediaPlayer.isMute()) {
@@ -117,8 +130,9 @@ public class VideoControls extends GridPane {
 		volumeSlider = new Slider(0,100,100);
 		volumeSlider.setBlockIncrement(10);
 		volumeSlider.setOrientation(Orientation.HORIZONTAL);
-		volumeSlider.setPrefSize(100, 40);
+		volumeSlider.setPrefSize(100, BUTTONSIZE);
 		volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
 			public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
 				mediaPlayer.setVolume(volumeSlider.getValue()/100); //takes a number between 0 and 1
 				if (mediaPlayer.isMute()) {
@@ -133,11 +147,11 @@ public class VideoControls extends GridPane {
 		mediaSlider.setMinWidth(50);
 		mediaSlider.setMaxWidth(Double.MAX_VALUE);
         mediaSlider.valueProperty().addListener(new InvalidationListener() {
+        	@Override
         	public void invalidated(Observable ov) {
                 if (mediaSlider.isValueChanging()) {
                 	//if slider is dragged while media is finished, switch button graphic to play
-                	Status status = mediaPlayer.getStatus();
-                    if (status == Status.STOPPED && !loop) {
+                    if (mediaSlider.getValue() >= 99 && !loop) {
                     	mediaPlayer.pause();
                     	imageState[PLAY_BUTTON] = PLAY;
                     	playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
@@ -151,11 +165,12 @@ public class VideoControls extends GridPane {
         });
         //as mediaPlayer time changes, we update the media slider position and time label
 		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+			@Override
 			public void invalidated(Observable ov) {
 				Duration currentTime = mediaPlayer.getCurrentTime();
-				if (currentTime.toSeconds() == 0.0 && loop)
-				{
+				if (currentTime.toSeconds() == 0.0 && loop) {
 					mediaPlayer.play();
+					System.out.println("played because time changed and loop");
 				}
 				mediaSlider.setValue(currentTime.toMillis()/mediaLength.toMillis()*100);
 				mediaTime.setText(createTimeLabel(currentTime) + "/" + createTimeLabel(mediaLength));
@@ -163,7 +178,8 @@ public class VideoControls extends GridPane {
 		});
 		//gets the length of the media and positions media slider and creates time label
 	 	mediaPlayer.setOnReady(new Runnable() {
-			 	public void run() {
+			 	@Override
+	            public void run() {
 	                mediaLength = mediaPlayer.getMedia().getDuration();
 	                mediaSlider.setDisable(mediaLength.isUnknown());
                     if (!mediaSlider.isDisabled()
@@ -172,7 +188,12 @@ public class VideoControls extends GridPane {
                     	Duration currentTime = mediaPlayer.getCurrentTime();
         				mediaSlider.setValue(currentTime.toMillis()/mediaLength.toMillis()*100);
         				mediaTime.setText(createTimeLabel(currentTime) + "/" + createTimeLabel(mediaLength));
+                    } 
+                    //pause and wait to be played by PresentationFx
+                    if (getStartTime() > 0) {
+                    	mediaPlayer.pause();
                     }
+                    
 	            }
         });
 	 	//sets style for mediaTime label
@@ -192,11 +213,11 @@ public class VideoControls extends GridPane {
  		ColumnConstraints growColumn = new ColumnConstraints(10,10,Double.MAX_VALUE);
  		growColumn.setFillWidth(true);
  		growColumn.setHgrow(Priority.ALWAYS);
-		ColumnConstraints fixedButtonColumn = new ColumnConstraints(60,playButton.getWidth(),100);
+		ColumnConstraints fixedButtonColumn = new ColumnConstraints(BUTTONSIZE+20,playButton.getWidth(),100);
 		fixedButtonColumn.setHgrow(Priority.NEVER);
-		ColumnConstraints fixedVolumeSliderColumn = new ColumnConstraints(60,volumeSlider.getWidth(),100);
+		ColumnConstraints fixedVolumeSliderColumn = new ColumnConstraints(BUTTONSIZE+15,volumeSlider.getWidth(),100);
 		fixedVolumeSliderColumn.setHgrow(Priority.NEVER);
-		ColumnConstraints fixedTimeLabelColumn = new ColumnConstraints(60,100,120);
+		ColumnConstraints fixedTimeLabelColumn = new ColumnConstraints(BUTTONSIZE+15,100,120);
 		fixedTimeLabelColumn.setHgrow(Priority.NEVER);
 		//add constraints to gridpane
 		this.getColumnConstraints().addAll(growColumn,fixedButtonColumn,fixedButtonColumn,fixedVolumeSliderColumn,fixedTimeLabelColumn,growColumn);
@@ -218,9 +239,32 @@ public class VideoControls extends GridPane {
 	}
 	//manual stop method
 	public void stop() {
+		mediaPlayer.pause();
 		mediaPlayer.stop();
 		imageState[PLAY_BUTTON] = REPLAY;
     	playButton.setGraphic(new ImageView(loadImage(PLAY_BUTTON)));
+	}
+	
+	//disposes the media player object
+	public void dispose() {
+		mediaPlayer.dispose();
+	}
+	
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
+	}
+	
+	private int getStartTime() {
+		return startTime;
+	}
+	
+	public Integer getDuration() {
+		if (mediaLength != Duration.ZERO) {
+			return (int) mediaLength.toMillis();
+		} else {
+			return null;
+					//PresentationFx.durationUnconfirmed;
+		}
 	}
 	
 	private String createTimeLabel(Duration time) {
@@ -238,9 +282,8 @@ public class VideoControls extends GridPane {
 		try {
 			controlIcon = new Image(getClass().getResourceAsStream("/images/" + IMAGE_NAME[imageState[button]]),BUTTONSIZE,BUTTONSIZE,true,true);
 		} catch (NullPointerException npe) {
-			System.out.println("The image '" + IMAGE_NAME[imageState[button]] + "' could not be found using the relative path: /images/" + IMAGE_NAME[imageState[button]]);
+			System.out.println("The image '" + IMAGE_NAME[imageState[button]] + "' could not be found using the relative path: " + IMAGE_NAME[imageState[button]]);
 		}
-		
 		return controlIcon;
 	}
 	
