@@ -14,9 +14,9 @@ import java.sql.*;
 
 public class SQLServer 
 {
-	private static String username = "root";
+	private static String username = "admin";
 	private static String password = "canine_horse";	
-	private static String connectionString = "jdbc:mysql://localhost:3306/userdetails";
+	private static String connectionString = "jdbc:mysql://192.168.1.64:3306/userdetails";
 	
 	// Connect  to the server defined by
 	public static Connection connect(String server, int port, String database)
@@ -165,20 +165,20 @@ public class SQLServer
 		Connection con = null;
 		
 		// SQL 
-		String server = "localhost";
+		String server = "192.168.1.64";
 		int port = 3306;
-		String database = "userdetails";
-		String table = "user";
+		String database = "useraccounts";
+		String table = "users";
 		Date test;
 		
 		
 		con = connect(server, port, database);
 		
-		//addUser(con, "user", "test123", "pass", "email@gmail.com", "1990-01-01");
-		//deleteUser(con, "user", "test123", "pass");
+		addUser(con, table, "test123", "pass", "email@gmail.com", "1990-01-01");
+		//deleteUser(con, table, "test123", "pass");
 		
-		//boolean result = checkUser(con, table, "test123");
-		//System.out.println("User found? " + result);
+		boolean result = checkUser(con, table, "test123", "email@gmail.com");
+		System.out.println("User found? " + result);
 	}
 
 }
