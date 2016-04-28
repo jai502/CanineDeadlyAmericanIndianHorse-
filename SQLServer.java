@@ -14,7 +14,7 @@ import java.sql.*;
 
 public class SQLServer 
 {
-	private static String username = "admin";
+	private static String username = "bot1";
 	private static String password = "canine_horse";	
 	private static String connectionString = "jdbc:mysql://192.168.1.64:3306/userdetails";
 	
@@ -165,7 +165,7 @@ public class SQLServer
 		Connection con = null;
 		
 		// SQL 
-		String server = "192.168.1.64";
+		String server = "stammtischsql.ddns.net";
 		int port = 3306;
 		String database = "useraccounts";
 		String table = "users";
@@ -174,7 +174,7 @@ public class SQLServer
 		
 		con = connect(server, port, database);
 		
-		addUser(con, table, "test123", "pass", "email@gmail.com", "1990-01-01");
+		//addUser(con, table, "test123", "pass", "email@gmail.com", "1990-01-01");
 		//deleteUser(con, table, "test123", "pass");
 		
 		boolean result = checkUser(con, table, "test123", "email@gmail.com");
