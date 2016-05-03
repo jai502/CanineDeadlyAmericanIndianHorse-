@@ -1,8 +1,6 @@
 package gui;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
 
 /*
  * (C) Stammtisch
@@ -19,7 +17,9 @@ import javax.crypto.NoSuchPaddingException;
  * NOTE: Browsing works for specific xml file! Now need to rearrange gui to continue 
  * 		 from login page and sign up page 
  */
-
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
 import Objects.Presentation;
 import Parsers.XMLParser;
@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.*;
+import javafx.beans.property.Property;
 //import javafx.beans.InvalidationListener;
 //import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -48,6 +49,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.*;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -270,7 +272,7 @@ public class MainGuiPagination extends Application
 		});
 
 		/*************************************************/
-
+		
 		// Set all GUI Visibility to true
 		window.show();
 
@@ -531,7 +533,7 @@ public class MainGuiPagination extends Application
 				}});
 
 			// Add the pagination to the presentation scene
-			presentationLayout.setCenter(pagination);
+			presentationLayout.setCenter(pagination);			
 			window.setTitle("Presentation");
 			window.setScene(presentationMenu);
 
@@ -544,7 +546,7 @@ public class MainGuiPagination extends Application
 		return xmlFile;
 	}
 
-
+	
 	/* Inner Class for allowing the Resizing of Canvas objects */
 	private static class ResizeChangeListener implements ChangeListener<Number> {
 
@@ -893,6 +895,8 @@ public class MainGuiPagination extends Application
 				Serializer serializer = new Serializer();
 				byte[] serializedSignupDetails = null;
 				byte[] encryptedData = null;
+				byte[] decryptedData = null;
+				Object deserializedSignupDetails = null;
 				
 				// Check if any of the textfields are null
 				if(sFirstName.equals("") || sSurname.equals("") || sDateOfBirth.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
@@ -934,7 +938,7 @@ public class MainGuiPagination extends Application
 						e1.printStackTrace();
 					}
 					
-					System.out.println("Serialized test object: " + serializedSignupDetails);
+					System.out.println("Serialized test object: " + serializedSignupDetails.length);
 					
 					try {
 						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
@@ -950,14 +954,43 @@ public class MainGuiPagination extends Application
 					
 					System.out.println("Now for the Decrypting!");
 					
-//					try {
-//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
-//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
+					try {
+						decryptedData = RSAEncryptDecrypt.rsaDecrypt(encryptedData);
+					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
+					System.out.println("Decrypted and Serialized Data is: " + decryptedData);
+					
+					try {
+						deserializedSignupDetails = Serializer.deserialize(decryptedData);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					System.out.println("Decrypted and deserialized Data is: " + deserializedSignupDetails);
+					String secretFirstName = (String) ((SignupDetails) deserializedSignupDetails).getFirstName();
+					System.out.println(secretFirstName);
+					String secretSurname = (String) ((SignupDetails) deserializedSignupDetails).getSurname();
+					System.out.println(secretSurname);
+					String secretDateOfBirth = (String) ((SignupDetails) deserializedSignupDetails).getDateOfBirth();
+					System.out.println(secretDateOfBirth);
+					String secretUsername = (String) ((SignupDetails) deserializedSignupDetails).getUsername();
+					System.out.println(secretUsername);
+					String secretEmail = (String) ((SignupDetails) deserializedSignupDetails).getEmail();
+					System.out.println(secretEmail);
+					String secretConfirmEmail = (String) ((SignupDetails) deserializedSignupDetails).getConfirmEmail();
+					System.out.println(secretConfirmEmail);
+					String secretPassword = (String) ((SignupDetails) deserializedSignupDetails).getPassword();
+					System.out.println(secretPassword);
+					String secretConfirmPassword = (String) ((SignupDetails) deserializedSignupDetails).getConfirmPassword();
+					System.out.println(secretConfirmPassword);
 //					String a = (String) signupDetails.getFirstName();
 //					String b = (String) signupDetails.getSurname();
 //					String c = (String) signupDetails.getEmail();

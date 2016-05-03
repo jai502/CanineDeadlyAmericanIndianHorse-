@@ -34,7 +34,7 @@ public class RSAEncryptDecrypt {
 	private RSAPublicKeySpec pubTemp;
 	private RSAPrivateKeySpec privTemp;
 
-	private int keySize = 2048;
+	private int keySize = 4096;
 	private static BigInteger encryptModulus;
 	private static BigInteger encryptExponent;
 	private static BigInteger decryptModulus;
