@@ -521,21 +521,9 @@ public class MainGuiPagination extends Application
 			// Setting the style of the pagination
 			pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 			
-			//pageTurn();
+			pageTurn();
 			
-			// Create the pagination pages
-			pagination.setPageFactory(new Callback<Integer, Node>() {
-				@Override
-				public Node call(Integer pageIndex) {
-					try {
-						//TODO
-						return sh.getSlideStack(tempPres, pageIndex, width-200, height-150, presentationMenu);
-					} catch (IOException e) {
-						return null;
-					}
-				}});
-			
-			/*pagination.widthProperty().addListener(new ChangeListener()
+			pagination.widthProperty().addListener(new ChangeListener()
 			{
 				@Override
 				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -551,7 +539,7 @@ public class MainGuiPagination extends Application
 					pageTurn();
 				}
 			});
-*/
+
 			// Add the pagination to the presentation scene
 			presentationLayout.setCenter(pagination);
 			window.setTitle("Presentation");
@@ -567,7 +555,17 @@ public class MainGuiPagination extends Application
 	}
 	
 	private void pageTurn() {
-		
+		// Create the pagination pages
+					pagination.setPageFactory(new Callback<Integer, Node>() {
+						@Override
+						public Node call(Integer pageIndex) {
+							try {
+								//TODO
+								return sh.getSlideStack(tempPres, pageIndex, stackWidth, stackHeight, presentationMenu);
+							} catch (IOException e) {
+								return null;
+							}
+						}});
 	}
 
 
