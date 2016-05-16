@@ -38,7 +38,7 @@ public class MainClientTest {
 		//Launch the client and setup a socket
 		serverSocket = MainClient.setupSocket(remoteHost,remotePort);
 		//Send a request to the server
-		MainClient.sendToServer(serverSocket, id, parameter);
+		//MainClient.sendToServer(serverSocket, id, parameter);
 	
 	}
 

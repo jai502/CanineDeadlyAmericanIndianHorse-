@@ -27,7 +27,8 @@ import java.util.Scanner;
 public class StammtischServer {
 	
 	// Socket stuff
-	public static int defaultPort = 26656; // Port to run server on
+	//public static int defaultPort = 26656; // Port to run server on
+	public static int defaultPort = 4444;
 	public ServerSocket sSocket;
 	
 	
