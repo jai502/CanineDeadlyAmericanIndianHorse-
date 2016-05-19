@@ -160,4 +160,41 @@ public class QueryPresentations
 		}
 		return searchResults;
 	}
+	
+	public static void createPresentationStats(Connection con, Presentation pres)
+	{
+		//Careful of injection!
+		Statement command = null;
+		String sqlComments = "CREATE TABLE " + pres.getTitle() + "_comments ("
+				+ "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+				+ " commentcontent VARCHAR(200) NOT NULL,"
+				+ " user VARCHAR(100) NOT NULL,"
+				+ " commenttimestamp TIMESTAMP NOT NULL);";
+		
+		try {
+			command = con.createStatement();
+			command.executeUpdate(sqlComments);
+			System.out.println("Successfully created comments table for presentation: " + pres.getTitle());
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+      if (command != null)
+      {
+      	try
+      	{
+      		command.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
+		}
+		
+	}
+	
 }

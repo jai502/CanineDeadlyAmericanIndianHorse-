@@ -62,6 +62,8 @@ public class QueryUsers {
 			command = con.prepareStatement(sqlDeleteUsr);
 			command.setString(1, username);
 			command.setString(2, password);
+			int row = command.executeUpdate();
+			System.out.println("User " + username + " was deleted with code: " + row);
 			
 		} catch (SQLException e) {
 			System.out.println("Unable to delete user");
@@ -122,5 +124,70 @@ public class QueryUsers {
 		
 		return result;
 	}
+	
+	public static void createUserStats(Connection con, User user)
+	{
+		//Careful of injection!
+		Statement command = null;
+		String sqlStats = "CREATE TABLE " + user.getUsername() + "_tracking (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+				+ " presentationid INT NOT NULL, presentationname VARCHAR(100) NOT NULL,"
+				+ " userrating INT NOT NULL, userprogress INT NOT NULL)";
+		
+		try {
+			command = con.createStatement();
+			command.executeUpdate(sqlStats);
+			System.out.println("Successfully created tracking table for user: " + user.getUsername());
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+      if (command != null)
+      {
+      	try
+      	{
+      		command.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
+		}
+	}
+	
+	public static void userFirstAccess(Connection userDetailsCon, Connection presCon, User user, Presentation pres)
+	{
+		String presentationsTable = "testpresentations";
+		Statement command = null;
+		Integer presID = new Integer(0);
+		
+		String sqlCheckPres = "SELECT id FROM " + presentationsTable + " WHERE title= '" + pres.getTitle() + "' AND author= '" + pres.getAuthor() + "'";
+		String sqlFirstAccess = "INSERT INTO " + user.getUsername() + "_tracking (presentationid, presentationname, userrating,userprogress)"
+				+ " VALUES (" + presID + ", '" + pres.getTitle() + "', 0, 0)" ;
+		
+		ResultSet data;
+		
+		try {
+			command = presCon.createStatement();
+			data = command.executeQuery(sqlCheckPres);
 
+			while(data.next())
+			{
+				presID = data.getInt("id");
+				System.out.println("Returned id is: " + presID);
+			}
+			
+			command = userDetailsCon.createStatement();
+			command.executeUpdate(sqlFirstAccess);
+			System.out.println("Updated user: " + user.getUsername() + " for presentation: " + pres.getTitle());
+			
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
