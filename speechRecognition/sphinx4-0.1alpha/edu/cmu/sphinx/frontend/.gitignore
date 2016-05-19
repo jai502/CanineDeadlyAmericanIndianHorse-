@@ -1,0 +1,11 @@
+/BaseDataProcessor.class
+/Data.class
+/DataEndSignal.class
+/DataProcessingException.class
+/DataProcessor.class
+/DataStartSignal.class
+/DoubleData.class
+/FloatData.class
+/FrontEnd.class
+/Signal.class
+/SignalListener.class

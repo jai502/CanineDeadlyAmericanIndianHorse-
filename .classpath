@@ -5,5 +5,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/lib/commons-codec-1.10/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/lib/mysql-connector-java-5.1.38-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/speechRecognition/sphinx4-core-5prealpha-20160218.203526-7.jar"/>
+	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/speechRecognition/sphinx4-data-5prealpha-20160218.203535-7.jar"/>
+	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/speechRecognition/sphinx4-0.1alpha/lib/jsapi.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
