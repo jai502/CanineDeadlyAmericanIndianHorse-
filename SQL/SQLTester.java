@@ -5,9 +5,9 @@
  * 
  * Last version by: Jonathan Bones & Peter Mills
  * Date of last update: 18/05/2016
- * Version number: 1.1
+ * Version number: 1.2
  * 
- * Commit date: 18/06/2015
+ * Commit date: 21/05/2015
  * Description: Simple class for testing SQL presentation and user account databases
  *
  */
@@ -37,9 +37,9 @@ public class SQLTester
 		
 		Presentation pres = new Presentation();
 		//Set the presenation metadata
-		pres.setAuthor(null);
-		pres.setTitle("testDemo");
-		pres.setLanguage(null);
+		pres.setAuthor("Le bleu");
+		pres.setTitle("Saturday Sweng");
+		pres.setLanguage("French");
 		pres.setTagOne(null);
 		pres.setTagTwo(null);
 		pres.setTagThree(null);
@@ -54,7 +54,17 @@ public class SQLTester
 		QueryPresentations.deletePresentation(presCon, presTable, pres.getTitle(), pres.getAuthor()); //Delete the specified presentation from the SQL presentation table
 		*/
 		
-		/*
+		Presentation pres = new Presentation();
+		//Set the presenation metadata
+		pres.setAuthor("Le bleu");
+		pres.setTitle("Saturday Sweng");
+		pres.setLanguage("French");
+		pres.setTagOne(null);
+		pres.setTagTwo(null);
+		pres.setTagThree(null);
+		pres.setTagFour(null);
+		pres.setTagFive(null);
+		
 		//===========================================================================
 		//Search the presentations table for a specific presentation
 		ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
@@ -80,12 +90,6 @@ public class SQLTester
       	}
       }
   	}
-		*/
-		/*
-		//===========================================================================
-		//Create presentation statistics data on the presentations table
-		QueryPresentations.createPresentationStats(presCon, pres);
-		*/
 		
 		/*
 		//===========================================================================
@@ -137,9 +141,9 @@ public class SQLTester
 		user1.setDob("1800-01-01");
 		
 		Presentation pres = new Presentation();
-		pres.setAuthor("J.Everard");
-		pres.setTitle("Analogue Filters");
-		pres.setLanguage("Electronics");
+		pres.setAuthor("Le bleu");
+		pres.setTitle("Saturday Sweng");
+		pres.setLanguage("French");
 		pres.setTagOne(null);
 		pres.setTagTwo(null);
 		pres.setTagThree(null);
@@ -147,6 +151,64 @@ public class SQLTester
 		pres.setTagFive(null);
 		
 		QueryUsers.userFirstAccess(userTrackingCon, presCon, user1, pres);
-		 */
+		*/
+		
+		/*
+	  //===========================================================================
+		// Update User rating of specified presentation
+		//===========================================================================
+		String userDatabase = "useraccounts";
+		String userTable = "users";
+		Connection userCon = SQLServer.connect(server, port, userDatabase);
+		
+		String statsDatabase = "usertracking";
+		Connection userTrackingCon = SQLServer.connect(server, port, statsDatabase);
+		
+		//Create three users for testing of the user rating system
+		//N.B. Spaces or semicolons are forbidden characters for the usernames
+		User user1 = new User();
+		user1.setUsername("Tangents4Life");
+		user1.setEmail("myemail@email.com");
+		user1.setPassword("A secret word");
+		user1.setDob("1800-01-01");
+		
+		User user2 = new User();
+		user2.setUsername("felix");
+		user2.setEmail("felix@gmail.com");
+		user2.setPassword("hush hush");
+		user2.setDob("2001-05-12");
+		
+		User user3 = new User();
+		user3.setUsername("Topcat");
+		user3.setEmail("topcat@yahoo.cat");
+		user3.setPassword("Kitten");
+		user3.setDob("1961-09-27");
+		
+		//Add the users to the database which also creates each tracking table
+		QueryUsers.addUser(userCon, userTrackingCon, userTable, user1);
+		QueryUsers.addUser(userCon, userTrackingCon, userTable, user2);
+		QueryUsers.addUser(userCon, userTrackingCon, userTable, user3);
+
+		//Create a presentation to be rated by the users
+		Presentation pres = new Presentation();
+		pres.setAuthor("Le bleu");
+		pres.setTitle("Saturday Sweng");
+		pres.setLanguage("French");
+		pres.setTagOne(null);
+		pres.setTagTwo(null);
+		pres.setTagThree(null);
+		pres.setTagFour(null);
+		pres.setTagFive(null);
+		
+		//Signal that each user has accessed the presentation
+		QueryUsers.userFirstAccess(userTrackingCon, presCon, user1, pres);
+		QueryUsers.userFirstAccess(userTrackingCon, presCon, user2, pres);
+		QueryUsers.userFirstAccess(userTrackingCon, presCon, user3, pres);
+		
+		//Rate the presentation from each user - the globalrating variable is the sum of these
+		QueryUsers.setUserRating(userTrackingCon, presCon, user1, pres, -1); //Indicates dislike
+		QueryUsers.setUserRating(userTrackingCon, presCon, user2, pres, 1); //Indicates like
+		QueryUsers.setUserRating(userTrackingCon, presCon, user3, pres, 0); //Indicates no rating
+		*/
 	}	
 }

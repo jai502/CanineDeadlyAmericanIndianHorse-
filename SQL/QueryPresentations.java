@@ -5,9 +5,9 @@
  * 
  * Last version by: Jonathan Bones & Peter Mills
  * Date of last update: 18/05/2016
- * Version number: 1.1
+ * Version number: 1.2
  * 
- * Commit date: 18/05/2016
+ * Commit date: 21/05/2016
  * Description: Access to presentation database
  */
 
@@ -24,7 +24,8 @@ public class QueryPresentations
 	public static void addPresentation(Connection con, String table,  Presentation pres)
 	{
 		PreparedStatement command = null;
-		String sqlAdd = "INSERT INTO " + table + " (title, languagetype, author, tagone, tagtwo, tagthree, tagfour, tagfive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		//Set rating to a new presentation as 0
+		String sqlAdd = "INSERT INTO " + table + " (title, languagetype, author, tagone, tagtwo, tagthree, tagfour, tagfive, totalrating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
 	
 		try 
 		{
@@ -59,6 +60,46 @@ public class QueryPresentations
       	// Failed to close command
       		e.printStackTrace();
       	} 
+      }
+		}
+		
+		//Create a linked Comments table for the newly created presentation
+		int presID = SQLTools.checkPresID(con, pres);
+		createUserCommentsTable(con, presID);
+		
+	}
+	
+	//======================================================================================================================
+	// Method for creating user comments table linked to each new presentation creation
+	//======================================================================================================================
+	public static void createUserCommentsTable(Connection con, int presID)
+	{
+		Statement command = null;
+		String sqlComments = "CREATE TABLE " + presID + "_comments (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+				+ " userid INT NOT NULL, username VARCHAR(100) NOT NULL,"
+				+ " comment VARCHAR(500), timeleft TIMESTAMP)";
+		
+		try {
+			command = con.createStatement();
+			command.executeUpdate(sqlComments);
+			System.out.println("Successfully created comments table for presentation with ID: " + presID);
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+			if (command != null)
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					// Failed to close command
+					e.printStackTrace();
+				} 
       }
 		}
 	}
@@ -100,6 +141,7 @@ public class QueryPresentations
 			}
 		}
 	}
+	
 	public static ArrayList<String[]> searchPresentation(Connection con, String table, Presentation pres)
 	{		
 		//Note - this is susceptible to malicious attacks - ensure that semicolons are checked first in the input data!
@@ -197,4 +239,9 @@ public class QueryPresentations
 		
 	}
 	
+	public static void addComment(Connection presCon, int presID, int userID, User user, Presentation pres)
+	{
+		Statement command = null;
+		String sqlComment = "INSERT INTO " + presID + "_comments";
+	}
 }

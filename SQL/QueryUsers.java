@@ -4,10 +4,10 @@
  * Date of first version: 18/05/2016
  * 
  * Last version by: Jonathan Bones & Peter Mills
- * Date of last update: 18/05/2016
- * Version number: 1.0
+ * Date of last update: 21/05/2016
+ * Version number: 1.2
  * 
- * Commit date: 18/06/2015
+ * Commit date: 21/05/2015
  * Description: Simple class for handling user account SQL table requests
  *
  */
@@ -21,14 +21,14 @@ import java.sql.*;
 
 public class QueryUsers {
 //Add a user using function argument values
-	public static void addUser(Connection con, String table, User user) 
+	public static void addUser(Connection userCon, Connection userTrackCon, String table, User user) 
 	{
 		PreparedStatement command = null;
 		String sqlAddUsr = "INSERT INTO " + table + " (username, password, email, dob) VALUES (?, ?, ?, ?)";
 		
 		try {
 			// Create new JDBC statement
-			command = con.prepareStatement(sqlAddUsr);
+			command = userCon.prepareStatement(sqlAddUsr);
 			command.setString(1, user.getUsername());
 			command.setString(2, user.getPassword());
 			command.setString(3, user.getEmail());
@@ -50,6 +50,8 @@ public class QueryUsers {
 	        	} 
 	        }
 	    }
+		//Now create the user stats
+		createUserStats(userTrackCon, user);
 	}
 	
 	// Delete the user with username and password matching function argument values
@@ -143,7 +145,43 @@ public class QueryUsers {
 			e.printStackTrace();
 		}
 		finally {
-      if (command != null)
+			if (command != null)
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					// Failed to close command
+					e.printStackTrace();
+				} 
+      }
+		}
+	}
+	
+	//======================================================================================================================
+	// Method for creation of table with presentation and user tracking details
+	//======================================================================================================================
+	public static void userFirstAccess(Connection userDetailsCon, Connection presCon, User user, Presentation pres)
+	{
+		Statement command = null;
+		int presID = SQLTools.checkPresID(presCon, pres); //Check for presentation and return presentation ID
+		
+		String sqlFirstAccess = "INSERT INTO " + user.getUsername() 
+				+ "_tracking (presentationid, presentationname, userrating,userprogress)"
+				+ " VALUES (" + presID + ", '" + pres.getTitle() + "', 0, 0)" ;
+		try {
+			command = userDetailsCon.createStatement();
+			command.executeUpdate(sqlFirstAccess);
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally 
+		{
+			if (command != null)
       {
       	try
       	{
@@ -155,39 +193,121 @@ public class QueryUsers {
       		e.printStackTrace();
       	} 
       }
-		}
+		}	
+		System.out.println("Updated user: " + user.getUsername() + " for presentation: " + pres.getTitle());
 	}
 	
-	public static void userFirstAccess(Connection userDetailsCon, Connection presCon, User user, Presentation pres)
-	{
+  //======================================================================================================================
+	// Method for updating user rating of the specified presentation
+	//======================================================================================================================
+	public static void setUserRating(Connection userDetailsCon, Connection presCon, User user, Presentation pres, int userRating){
+		String userTrackingTable = user.getUsername() + "_tracking";
 		String presentationsTable = "testpresentations";
-		Statement command = null;
-		Integer presID = new Integer(0);
+		Statement userCommand = null;
+		Statement presCommand = null;
 		
-		String sqlCheckPres = "SELECT id FROM " + presentationsTable + " WHERE title= '" + pres.getTitle() + "' AND author= '" + pres.getAuthor() + "'";
-		String sqlFirstAccess = "INSERT INTO " + user.getUsername() + "_tracking (presentationid, presentationname, userrating,userprogress)"
-				+ " VALUES (" + presID + ", '" + pres.getTitle() + "', 0, 0)" ;
+		int presID = SQLTools.checkPresID(presCon, pres);
+		int currentUserRating = SQLTools.checkPreviousRating(presID, userDetailsCon, user);
+		int newUserRating = 0;
 		
-		ResultSet data;
+		if(currentUserRating == -1)
+		{
+			switch(userRating){
+				case -1:
+					newUserRating = 0;
+					break;
+				case 0:
+					newUserRating = 1;
+					break;
+				case 1:
+					newUserRating = 2;
+					break;
+			}
+		}
+		else if(currentUserRating == 0)
+		{
+			switch(userRating){
+			case -1:
+				newUserRating = -1;
+				break;
+			case 0:
+				newUserRating = 0;
+				break;
+			case 1:
+				newUserRating = 1;
+				break;
+			}
+		}
+		else if(currentUserRating == 1)
+		{
+				switch(userRating){
+				case -1:
+					newUserRating = -2;
+					break;
+				case 0:
+					newUserRating = -1;
+					break;
+				case 1:
+					newUserRating = 0;
+					break;
+				}
+		}
+		
+		String updateUserRating = "UPDATE " + userTrackingTable 
+				+ " SET userrating = " + userRating 
+				+ " WHERE presentationid = " + presID 
+				+ " AND presentationname = '" + pres.getTitle() + "'";
 		
 		try {
-			command = presCon.createStatement();
-			data = command.executeQuery(sqlCheckPres);
-
-			while(data.next())
-			{
-				presID = data.getInt("id");
-				System.out.println("Returned id is: " + presID);
-			}
-			
-			command = userDetailsCon.createStatement();
-			command.executeUpdate(sqlFirstAccess);
-			System.out.println("Updated user: " + user.getUsername() + " for presentation: " + pres.getTitle());
-			
+			userCommand = userDetailsCon.createStatement();
+			userCommand.executeUpdate(updateUserRating);
+			System.out.println("Updated user tracking, now updating global rating...");
 		}
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		finally 
+		{
+			if (userCommand != null)
+      {
+      	try
+      	{
+      		userCommand.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
+		}
+		
+		String updateGlobalRating = "UPDATE " + presentationsTable + " SET totalrating = totalrating+" + newUserRating + " WHERE id = " + presID;
+		
+		try {
+			presCommand = presCon.createStatement();
+			presCommand.executeUpdate(updateGlobalRating);
+			System.out.println("Updated global rating");
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally 
+		{
+			if (presCommand != null)
+      {
+      	try
+      	{
+      		presCommand.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
 		}
 	}
 }
