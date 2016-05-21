@@ -149,15 +149,13 @@ public class QueryPresentations
 		
 		String sqlSearch = "SELECT title, author, languagetype FROM " + table
 				+ " WHERE title = COALESCE(" + SQLTools.testNull(pres.getTitle()) + ", title)"
-				+ " AND author = COALESCE(" + SQLTools.testNull(pres.getAuthor()) + ", author)"
-				+ " AND languagetype = COALESCE(" + SQLTools.testNull(pres.getLanguage()) + ", languagetype)"
-				+ " AND ("
-				+ "tagone = COALESCE(" + SQLTools.testNull(pres.getTagOne()) + ", tagone)"
+				+ " OR author = COALESCE(" + SQLTools.testNull(pres.getAuthor()) + ", author)"
+				+ " OR languagetype = COALESCE(" + SQLTools.testNull(pres.getLanguage()) + ", languagetype)"
+				+ " OR tagone = COALESCE(" + SQLTools.testNull(pres.getTagOne()) + ", tagone)"
 				+ " OR tagtwo = COALESCE(" + SQLTools.testNull(pres.getTagTwo()) + ", tagtwo)"
 				+ " OR tagthree = COALESCE(" + SQLTools.testNull(pres.getTagThree()) + ", tagthree)"
 				+ " OR tagfour = COALESCE(" + SQLTools.testNull(pres.getTagFour()) + ", tagfour)"
-				+ " OR tagfive = COALESCE(" + SQLTools.testNull(pres.getTagFive()) + ", tagfive))";
-		
+				+ " OR tagfive = COALESCE(" + SQLTools.testNull(pres.getTagFive()) + ", tagfive)";
 		
 		ArrayList<String[]> searchResults = new ArrayList<String[]>();
 		ResultSet data;

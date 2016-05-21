@@ -56,9 +56,9 @@ public class SQLTester
 		
 		Presentation pres = new Presentation();
 		//Set the presenation metadata
-		pres.setAuthor("Le bleu");
-		pres.setTitle("Saturday Sweng");
-		pres.setLanguage("French");
+		pres.setAuthor(null);
+		pres.setTitle(null);
+		pres.setLanguage(null);
 		pres.setTagOne(null);
 		pres.setTagTwo(null);
 		pres.setTagThree(null);
