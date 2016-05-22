@@ -12,9 +12,11 @@ public class RequestObject implements Serializable{
 	
 	public String id;
 	public Object param;
+	public int order;
 
-	public RequestObject(String ident, Object parameter) {
-		id = ident;
-		param = parameter;
+	public RequestObject(String ident, Object parameter, int order) {
+		this.id = ident;
+		this.param = parameter;
+		this.order = order;
 	}
 }
