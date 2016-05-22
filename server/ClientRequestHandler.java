@@ -12,7 +12,7 @@ public class ClientRequestHandler implements Runnable {
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
 	boolean done = false;			    // main loop complete
-	int requestNumber;
+	int order;
 	
 	
 	
@@ -20,7 +20,6 @@ public class ClientRequestHandler implements Runnable {
 	public ClientRequestHandler(Socket thisSocket, int thisInstance){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
-		requestNumber = 0;
 	}
 	
 	
@@ -43,9 +42,15 @@ public class ClientRequestHandler implements Runnable {
 				break;
 			}
 			
+			order = currentRequest.order;
+			
 			switch(currentRequest.id.toString()) {
 				case "PING":		// ping command
 					sendResponse(clientSocket, "PONG", null);
+					break;
+
+				case "DISCONNECT":	// disconnect request
+					done = true;	// exit handler loop
 					break;
 					
 				case "CREATE_ACCOUNT":
@@ -53,9 +58,14 @@ public class ClientRequestHandler implements Runnable {
 					
 				case "REQUEST_LOGIN":
 					break;
-
-				case "DISCONNECT":	// disconnect request
-					done = true;	// exit handler loop
+					
+				case "SEARCH_PRESENTATIONS":
+					break;
+				
+				case "LOAD_PRESENTATIONS":
+					break;
+					
+				case "VOTE_PRESENTATION":
 					break;
 				
 				default:			// unrecognised request
@@ -99,8 +109,7 @@ public class ClientRequestHandler implements Runnable {
 	private void sendResponse(Socket socket, String id, Object param) {
 		// instantiate request object
 		System.out.printf("[INFO]-%d Sending response: %s\n", handlerInstance, id);
-		RequestObject thisRequest = new RequestObject(id, param, requestNumber);
-		requestNumber++;
+		RequestObject thisRequest = new RequestObject(id, param, order);
 		try {
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.writeObject(thisRequest);
