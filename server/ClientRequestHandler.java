@@ -12,6 +12,7 @@ public class ClientRequestHandler implements Runnable {
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
 	boolean done = false;			    // main loop complete
+	int requestNumber;
 	
 	
 	
@@ -19,6 +20,7 @@ public class ClientRequestHandler implements Runnable {
 	public ClientRequestHandler(Socket thisSocket, int thisInstance){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
+		requestNumber = 0;
 	}
 	
 	
@@ -46,14 +48,16 @@ public class ClientRequestHandler implements Runnable {
 					sendResponse(clientSocket, "PONG", null);
 					break;
 					
-				case "PONG":
-					sendResponse(clientSocket, "NO, JUST NO.", null);
+				case "CREATE_ACCOUNT":
+					break;
+					
+				case "REQUEST_LOGIN":
 					break;
 
 				case "DISCONNECT":	// disconnect request
 					done = true;	// exit handler loop
 					break;
-					
+				
 				default:			// unrecognised request
 					sendResponse(clientSocket, "RESPONSE_UNKNOWN", null);
 					// print to console stream
@@ -95,7 +99,8 @@ public class ClientRequestHandler implements Runnable {
 	private void sendResponse(Socket socket, String id, Object param) {
 		// instantiate request object
 		System.out.printf("[INFO]-%d Sending response: %s\n", handlerInstance, id);
-		RequestObject thisRequest = new RequestObject(id, param);
+		RequestObject thisRequest = new RequestObject(id, param, requestNumber);
+		requestNumber++;
 		try {
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			outputStream.writeObject(thisRequest);
