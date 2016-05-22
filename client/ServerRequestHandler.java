@@ -9,7 +9,7 @@
 * 
 * Commit date:
 * Description: Threading to enable network communications
- */
+*/
 
 package client;
 
@@ -70,6 +70,8 @@ public class ServerRequestHandler implements Runnable
 		{
 			System.out.println("[INFO] Waiting for server...");
 			contentFromServer = readFromServer(socket);
+			
+			//do something now based on what is returned from the server!
 		}
 	}
 	

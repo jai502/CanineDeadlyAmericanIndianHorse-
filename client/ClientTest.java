@@ -4,8 +4,8 @@
 * Date of first version: 21.05.2016
 * 
 * Last version by: J.Bones
-* Date of last update: 21.05.2016
-* Version number: 1.0
+* Date of last update: 22.05.2016
+* Version number: 1.1
 * 
 * Commit date:
 * Description: A basic client test class to communicate with the server

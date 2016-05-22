@@ -6,3 +6,5 @@
 /CommsHandler.class
 /RequestObject.class
 /ServerRequestHandler.class
+/ClientTest.class
+/Server.class
