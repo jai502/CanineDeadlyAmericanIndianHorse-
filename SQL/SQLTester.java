@@ -4,10 +4,10 @@
  * Date of first version: 17/05/2016
  * 
  * Last version by: Jonathan Bones & Peter Mills
- * Date of last update: 18/05/2016
- * Version number: 1.2
+ * Date of last update: 22/05/2016
+ * Version number: 1.3
  * 
- * Commit date: 21/05/2015
+ * Commit date: 22/05/2015
  * Description: Simple class for testing SQL presentation and user account databases
  *
  */
@@ -45,7 +45,7 @@ public class SQLTester
 		pres.setTagThree(null);
 		pres.setTagFour(null);
 		pres.setTagFive(null);
-		QueryPresentations.addPresentation(presCon, presTable, pres); //Add the presentation to the SQL presentation table
+		//QueryPresentations.addPresentation(presCon, presTable, pres); //Add the presentation to the SQL presentation table
 		*/
 		
 		/*
@@ -54,17 +54,7 @@ public class SQLTester
 		QueryPresentations.deletePresentation(presCon, presTable, pres.getTitle(), pres.getAuthor()); //Delete the specified presentation from the SQL presentation table
 		*/
 		
-		Presentation pres = new Presentation();
-		//Set the presenation metadata
-		pres.setAuthor(null);
-		pres.setTitle(null);
-		pres.setLanguage(null);
-		pres.setTagOne(null);
-		pres.setTagTwo(null);
-		pres.setTagThree(null);
-		pres.setTagFour(null);
-		pres.setTagFive(null);
-		
+		/*
 		//===========================================================================
 		//Search the presentations table for a specific presentation
 		ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
@@ -90,6 +80,7 @@ public class SQLTester
       	}
       }
   	}
+		*/
 		
 		/*
 		//===========================================================================
@@ -210,5 +201,87 @@ public class SQLTester
 		QueryUsers.setUserRating(userTrackingCon, presCon, user2, pres, 1); //Indicates like
 		QueryUsers.setUserRating(userTrackingCon, presCon, user3, pres, 0); //Indicates no rating
 		*/
+		
+		/*
+		//===========================================================================
+		// Add comments into the comments table
+		//===========================================================================
+		User user1 = new User();
+		user1.setUsername("Tangents4Life");
+		user1.setEmail("myemail@email.com");
+		user1.setPassword("A secret word");
+		user1.setDob("1800-01-01");
+		
+		User user2 = new User();
+		user2.setUsername("felix");
+		user2.setEmail("felix@gmail.com");
+		user2.setPassword("hush hush");
+		user2.setDob("2001-05-12");
+		
+		User user3 = new User();
+		user3.setUsername("Topcat");
+		user3.setEmail("topcat@yahoo.cat");
+		user3.setPassword("Kitten");
+		user3.setDob("1961-09-27");
+		
+		String userDatabase = "useraccounts";
+		String userTable = "users";
+		Connection userCon = SQLServer.connect(server, port, userDatabase);
+		
+		Presentation pres = new Presentation();
+		pres.setAuthor("Le bleu");
+		pres.setTitle("Saturday Sweng");
+		pres.setLanguage("French");
+		pres.setTagOne(null);
+		pres.setTagTwo(null);
+		pres.setTagThree(null);
+		pres.setTagFour(null);
+		pres.setTagFive(null);
+		
+		int presID = SQLTools.checkPresID(presCon, pres); //Obtain the presentation ID
+		
+		//Append comments to the comments table for the specified presentation
+		QueryPresentations.addComment(presCon, userCon, presID, user1, "What is going on?");
+		QueryPresentations.addComment(presCon, userCon, presID, user2, "Great presentation!");
+		QueryPresentations.addComment(presCon, userCon, presID, user3, "Really helped!");
+		*/
+		
+		/*
+		//===========================================================================
+		// Delete particular comment from the comments table
+		//===========================================================================
+		int userID = SQLTools.checkUserID(userCon, user1);
+		int commentID = 2; //This will be provided to the admin
+		QueryPresentations.removeComment(presCon, userID, presID, commentID);
+		*/
+		
+		/*
+		//===========================================================================
+		// Display all comments in the comments table
+		//===========================================================================
+		ArrayList<String[]> searchResults = new ArrayList<String[]>();
+		searchResults = QueryPresentations.searchComments(presCon, presID);
+		
+		//Print out the comments list currently available on the SQL presentation table
+			for(int i = 0; i<searchResults.size(); i++)
+			{
+	      System.out.print("Presentation " + (i+1) + " is: ");
+	      for (int j = 0; j < 3; j++)
+	      {
+	      	switch(j)
+	      	{
+		      	case 0:
+		      		System.out.print("'" + searchResults.get(i)[j] + "' ");
+		      		break;
+		      	case 1:
+		      		System.out.print("says '" + searchResults.get(i)[j] + "' ");
+		      		break;
+		      	case 2:
+		      		System.out.println(" (" + searchResults.get(i)[j] + ") ");
+		      		break;
+	      	}
+	      }
+			}
+			*/
 	}	
 }
