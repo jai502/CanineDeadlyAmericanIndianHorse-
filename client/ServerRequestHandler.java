@@ -27,7 +27,8 @@ public class ServerRequestHandler implements Runnable
 {
 	private int port;
 	private String host;
-	private boolean done = false;
+	private static boolean done = false;
+	private int order = 0;
 	
 	public static Socket socket;
 	public RequestObject contentFromServer;
@@ -70,9 +71,16 @@ public class ServerRequestHandler implements Runnable
 		{
 			System.out.println("[INFO] Waiting for server...");
 			contentFromServer = readFromServer(socket);
-			
-			//do something now based on what is returned from the server!
 		}
+		try {
+			socket.close();
+			System.out.println("[INFO] Socket successfully closed");
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		done = true;
 	}
 	
 	//=========================================================================
@@ -83,6 +91,8 @@ public class ServerRequestHandler implements Runnable
 		//Open the output stream to the server
 		ObjectOutputStream infoToServer;
 		
+		request.order = this.order;
+		
 		if(request.id.equals("DISCONNECT"))
 		{
 			try 
@@ -90,9 +100,6 @@ public class ServerRequestHandler implements Runnable
 				infoToServer = new ObjectOutputStream(socket.getOutputStream());
 				infoToServer.writeObject(request);
 				infoToServer.flush();
-				
-				socket.close();//close the socket once disconnect command is sent
-				System.out.println("[INFO] Socket successfully closed");
 				done = true; //stop the thread from listening on a closed socket
 			}
 			catch (IOException e) 
@@ -113,6 +120,8 @@ public class ServerRequestHandler implements Runnable
 				e.printStackTrace();
 			}
 		}
+		order += 1;
+		System.out.println(order);
 	}
 	
 	//=========================================================================
@@ -127,6 +136,19 @@ public class ServerRequestHandler implements Runnable
 		{
 			infoFromServer = new ObjectInputStream(socket.getInputStream());
 			content = (RequestObject) infoFromServer.readObject();
+			
+			switch(content.id)
+			{
+				case "PONG":
+					System.out.println(content.id);
+					break;
+				case "DISCONNECT":
+					done = true;
+					break;
+				default:
+					
+			}
+			
 		}
 		catch (IOException e)
 		{

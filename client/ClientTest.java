@@ -31,6 +31,7 @@ public class ClientTest {
 		com.start();
 		
 		boolean done = false;
+		
 		while(!done)
 		{
 			String id;
@@ -39,7 +40,8 @@ public class ClientTest {
 			id = scanner.next();
 			scanner.close();
 			
-			RequestObject request = new RequestObject(id, null);
+
+			RequestObject request = new RequestObject(id, null, 0); //Initialised order to 0 but is changed in send to server method
 			com.sendToServer(request);
 			
 			if(id.equals("DISCONNECT"))
