@@ -23,11 +23,11 @@ import org.junit.Test;
 public class MainClientTest {
 	
 	//Initialise the variables for the local host & port locations
-	String localHost = "127.0.0.1";
-	int localPort = 4444;
+	String remoteHost = "2.102.60.24";
+	int remotePort = 26656;
 	Socket serverSocket = null;
 	
-	String clientMessage = "hello";
+	String id, parameter = null;
 	String serverMessage = null;
 
 	@Before
@@ -36,11 +36,10 @@ public class MainClientTest {
 		/*Place code for server launch here!!*/
 		
 		//Launch the client and setup a socket
-		serverSocket = MainClient.setupSocket(localHost,localPort);
-		//Send a string to the server
-		MainClient.sendToServer(serverSocket, "Hello");
-		serverMessage = MainClient.readFromServer(serverSocket);
-		
+		serverSocket = MainClient.setupSocket(remoteHost,remotePort);
+		//Send a request to the server
+		//MainClient.sendToServer(serverSocket, id, parameter);
+	
 	}
 
 	@Test
@@ -48,8 +47,8 @@ public class MainClientTest {
 		
 		try {
 			//Test that the port number and host address match that in the test
-			assertEquals(MainClient.setupSocket(localHost, localPort).getInetAddress(), localHost);
-			assertEquals(MainClient.setupSocket(localHost, localPort).getLocalPort(), localPort);
+			assertEquals(MainClient.setupSocket(remoteHost, remotePort).getInetAddress(), remoteHost);
+			assertEquals(MainClient.setupSocket(remoteHost, remotePort).getLocalPort(), remotePort);
 			
 			//Check that the correct information is sent to the server
 			
