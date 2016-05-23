@@ -17,7 +17,6 @@ package server;
 
 // our imports
 import SQL.*;
-import com.*;
 
 
 // java imports
@@ -54,6 +53,7 @@ public class StammtischServer {
 	Connection userTrackingCon;
 
 	// client request handlers
+	static ArrayList<Command> commands; 
 	static ArrayList<ClientRequestHandler> handlers;
 	static ArrayList<ClientRequestHandler> boundHandlers;
 	
@@ -87,11 +87,32 @@ public class StammtischServer {
 		boundHandlers = new ArrayList<ClientRequestHandler>();
 		boundHandlers.clear();
 		
+		// set up commands
+		setUpCommands();
+		commands.get(0).execute(new Scanner(System.in));
+		
 		// Initialise connection listener
 		System.out.printf("Starting connection listener \n");
 		connectionListener.start();
 	}
 
+	
+	
+	// sets up commands
+	public static void setUpCommands(){
+		// clear commands
+		commands = new ArrayList<Command>();
+		commands.clear();
+		
+		// stop command
+		commands.add(new Command("stop"){
+			@Override public void execute(Scanner cs){
+				// some code here
+				System.out.printf("VICTORY! >:D\n");
+			}
+		});
+	}
+	
 	
 	
 	// Connection listener thread
@@ -127,29 +148,20 @@ public class StammtischServer {
 	// Remove client handlers that are no longer connected
 	// returns the number of client request handlers removed
 	public static int pruneHandlerLists(){
-		ArrayList<Integer> inactiveHandlers = new ArrayList<Integer>();
-		ArrayList<Integer> inactiveBoundHandlers = new ArrayList<Integer>();
+		ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
 		
 		inactiveHandlers.clear();
-		inactiveBoundHandlers.clear();
 		
 		// loop through all request handlers, determine which of them are inactive
 		for(int i = 0; i < handlers.size(); i++)
 			if (handlers.get(i).isDone()) 
-				inactiveHandlers.add(i);
-		
-		// loop through bound handlers
-		for(int i = 0; i < boundHandlers.size(); i++)
-			if (boundHandlers.get(i).isDone())
-				inactiveBoundHandlers.add(i);
+				inactiveHandlers.add(handlers.get(i));
 		
 		// remove all inactive request handlers from the handler list
-		for(int i = 0; i < inactiveHandlers.size(); i++)
+		for(int i = 0; i < inactiveHandlers.size(); i++){
+			boundHandlers.remove(inactiveHandlers.get(i));
 			handlers.remove(inactiveHandlers.get(i));
-		
-		// remove all inactive handlers from bound handlers list
-		for(int i = 0; i < inactiveBoundHandlers.size(); i++)
-			boundHandlers.remove(inactiveBoundHandlers.get(i));
+		}
 		
 		// return number of pruned handlers
 		return inactiveHandlers.size();
@@ -247,23 +259,12 @@ public class StammtischServer {
 	}
 	
 	
+	
 	// bind all handlers
 	static void bindAllHandlers(){
-		for(int i = 0; i < handlers.size(); i++){
-			
-		}
-	}
-	
-	
-	// sends a custom request object to bound clients
-	static void sendCustomRequestObject(Scanner commandScanner){
-		
-		String id = commandScanner.next();
-		RequestObject thisRequest = new RequestObject(id, null, -1);
-		
-		for(int i = 0; i < boundHandlers.size(); i++){
-			boundHandlers.get(i).sendCommand(thisRequest);
-		}
+		boundHandlers.clear();
+		for(int i = 0; i < handlers.size(); i++)
+			boundHandlers.add(handlers.get(i));
 	}
 	
 	
@@ -315,9 +316,6 @@ public class StammtischServer {
 				
 				// unbind handler
 				case "unbind": unbindHandler(commandScanner); break;
-				
-				// send request to client serviced by bound handler
-				case "send": sendCustomRequestObject(commandScanner); break;
 					
 				// remove inactive handlers
 				case "prune": pruneHandlerLists(); break;

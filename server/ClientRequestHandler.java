@@ -1,15 +1,14 @@
 package server;
 
 
+// java imports
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-import gui.LoginDetails;
-
-
+// our imports
 import com.*;
 
 
@@ -48,10 +47,9 @@ public class ClientRequestHandler implements Runnable {
 				break;
 			}
 			
-			if(done) break;
-			
 			// take order number for current request
 			order = currentRequest.order;
+			System.out.printf("[H-%d] Recieved: %s\n", handlerInstance, currentRequest.id);
 			
 			switch(currentRequest.id.toString()) {
 				case "PING":		// ping command
@@ -59,17 +57,10 @@ public class ClientRequestHandler implements Runnable {
 					break;
 
 				case "DISCONNECT":	// disconnect request
-					System.out.printf("[H-%d] Requested disconnect \n", handlerInstance);
 					done = true;	// exit handler loop
 					break;
 					
 				case "REQUEST_LOGIN":
-					// get login data object 
-					LoginDetails loginData = (LoginDetails)currentRequest.param;
-					System.out.printf("[H-%d] Requested login: %s, %s \n", 
-									  handlerInstance,
-									  loginData.getUsername(),
-									  loginData.getPassword());
 					break;
 				
 				default:			// unrecognised request
