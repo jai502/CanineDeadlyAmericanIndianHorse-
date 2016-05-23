@@ -62,7 +62,8 @@ public class ServerRequestHandler implements Runnable
 		}
 		
 		//run the thread to listen on the specified port
-		run();
+		Thread thread = new Thread(this);
+		thread.run();
 	}
 	
 	public final void run()
