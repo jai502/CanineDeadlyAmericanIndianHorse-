@@ -87,7 +87,7 @@ public class QueryUsers {
 	}
 	
 	// Check if a user exists in a database
-	public static boolean checkUser(Connection con, String table, User user)
+	public boolean checkUser(Connection con, String table, User user)
 	{
 		Statement command = null;
 		

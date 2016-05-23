@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
+import java.sql.Connection;
 
 // our imports
 import com.*;
+import SQL.*;
 
 
 public class ClientRequestHandler implements Runnable {
@@ -19,11 +20,23 @@ public class ClientRequestHandler implements Runnable {
 	boolean done = false;			    // main loop complete
 	int order;
 	
+	// sql server connections
+	Connection userCon;
+	Connection presCon;
+	Connection userTrackingCon;
+	
+	QueryUsers qUsers = new QueryUsers();
+	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, Connection userCon, Connection presCon, Connection userTrackingCon){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
+		
+		// pass in SQL connections
+		this.userCon = userCon;
+		this.presCon = presCon;
+		this.userTrackingCon = userTrackingCon;
 	}
 	
 	
@@ -60,14 +73,24 @@ public class ClientRequestHandler implements Runnable {
 					done = true;	// exit handler loop
 					break;
 					
+					
+					
 				case "REQUEST_LOGIN":
 					User thisUser = (User)currentRequest.param;
 					System.out.printf("Name: %s, Pass: %s\n",
 									  thisUser.getUsername(),
 									  thisUser.getPassword());
-					sendResponse(new RequestObject("RESPONSE_OK", new String("success"), order));
+					
+					// does user exist
+					if(qUsers.checkUser(userCon, "users", thisUser))
+						sendResponse(new RequestObject("RESPONSE_OK", new String("success"), order));
+					else
+						sendResponse(new RequestObject("RESPONSE_OK", new String("mildlyFunnyString"), order));
 					break;
 				
+					
+					
+					
 				default:			// unrecognised request
 					sendResponse(new RequestObject("RESPONSE_UNKNOWN", new String(currentRequest.id.toString()), order));
 					// print to console stream

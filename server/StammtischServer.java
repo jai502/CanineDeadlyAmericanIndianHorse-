@@ -73,11 +73,11 @@ public class StammtischServer {
 		
 		// connect to presentation database
 		System.out.printf("Connecting to presentation database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, presDB);
+		presCon = SQLServer.connect(sqlServer, sqlPort, presDB);
 
 		// connect to user 
 		System.out.printf("Connecting to user tracking database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, userTrackingDB);
+		userTrackingCon = SQLServer.connect(sqlServer, sqlPort, userTrackingDB);
 
 		// initialise client request handler list
 		handlers = new ArrayList<ClientRequestHandler>();
@@ -112,9 +112,20 @@ public class StammtischServer {
 			
 			while(true) {
 				try {
-					// wait for client connection
-					handlers.add(new ClientRequestHandler(sSocket.accept(), nextInstance));		// create client handler object
-					Thread thread = new Thread(handlers.get(handlers.size()-1));					// start client request handler in its own thread
+					// wait for client connection & make handler
+					ClientRequestHandler thisHandler = 
+						new ClientRequestHandler(
+							sSocket.accept(), 
+							nextInstance,
+							userCon,
+							presCon,
+							userTrackingCon);
+					
+					// add handler to handler list
+					handlers.add(thisHandler);
+					
+					// start request handler thread
+					Thread thread = new Thread(handlers.get(handlers.size()-1));					
 					System.out.printf("[INFO] Client connected, starting handler thread %d \n", nextInstance);
 					nextInstance++;
 					thread.start();
@@ -265,6 +276,24 @@ public class StammtischServer {
 				done = true;
 			}
 		});
+		
+		// list handlers command
+		commands.add(new Command("lh"){
+			@Override public void execute(Scanner cs){
+				System.out.printf("%d running request handlers:\n", handlers.size());
+				printHandlerList(handlers);
+			}
+		});
+	
+		// list bound handlers
+		commands.add(new Command("lbh"){
+			@Override public void execute(Scanner cs){
+				System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
+				printHandlerList(boundHandlers); 
+			}
+		});		
+		
+
 	}
 	
 	
@@ -307,18 +336,6 @@ public class StammtischServer {
 			
 			// handle command input
 			switch(command) {
-				// list currently running handlers
-				case "lh": 
-					System.out.printf("%d running request handlers:\n", handlers.size());
-					printHandlerList(handlers); 
-					break;	
-				
-				// list all currently bound handlers
-				case "lbh": 
-					System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
-					printHandlerList(boundHandlers); 
-					break;
-				
 				// bind all handlers
 				case "bindAll": bindAllHandlers(); break;
 					
@@ -336,7 +353,7 @@ public class StammtischServer {
 				
 				// unrecognised command
 				default:
-					System.out.printf("[ERR] Unrecognised command! '%s'.\n", command);
+					//System.out.printf("[ERR] Unrecognised command! '%s'.\n", command);
 					break;
 			}
 		}
