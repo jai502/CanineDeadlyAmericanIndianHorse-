@@ -17,7 +17,6 @@ package server;
 
 // our imports
 import SQL.*;
-import com.*;
 
 
 // java imports
@@ -54,6 +53,7 @@ public class StammtischServer {
 	Connection userTrackingCon;
 
 	// client request handlers
+	static ArrayList<Command> commands; 
 	static ArrayList<ClientRequestHandler> handlers;
 	static ArrayList<ClientRequestHandler> boundHandlers;
 	
@@ -87,11 +87,14 @@ public class StammtischServer {
 		boundHandlers = new ArrayList<ClientRequestHandler>();
 		boundHandlers.clear();
 		
+		// set up commands
+		setUpCommands();
+		
 		// Initialise connection listener
 		System.out.printf("Starting connection listener \n");
 		connectionListener.start();
 	}
-
+	
 	
 	
 	// Connection listener thread
@@ -127,29 +130,20 @@ public class StammtischServer {
 	// Remove client handlers that are no longer connected
 	// returns the number of client request handlers removed
 	public static int pruneHandlerLists(){
-		ArrayList<Integer> inactiveHandlers = new ArrayList<Integer>();
-		ArrayList<Integer> inactiveBoundHandlers = new ArrayList<Integer>();
+		ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
 		
 		inactiveHandlers.clear();
-		inactiveBoundHandlers.clear();
 		
 		// loop through all request handlers, determine which of them are inactive
 		for(int i = 0; i < handlers.size(); i++)
 			if (handlers.get(i).isDone()) 
-				inactiveHandlers.add(i);
-		
-		// loop through bound handlers
-		for(int i = 0; i < boundHandlers.size(); i++)
-			if (boundHandlers.get(i).isDone())
-				inactiveBoundHandlers.add(i);
+				inactiveHandlers.add(handlers.get(i));
 		
 		// remove all inactive request handlers from the handler list
-		for(int i = 0; i < inactiveHandlers.size(); i++)
+		for(int i = 0; i < inactiveHandlers.size(); i++){
+			boundHandlers.remove(inactiveHandlers.get(i));
 			handlers.remove(inactiveHandlers.get(i));
-		
-		// remove all inactive handlers from bound handlers list
-		for(int i = 0; i < inactiveBoundHandlers.size(); i++)
-			boundHandlers.remove(inactiveBoundHandlers.get(i));
+		}
 		
 		// return number of pruned handlers
 		return inactiveHandlers.size();
@@ -247,23 +241,41 @@ public class StammtischServer {
 	}
 	
 	
+	
 	// bind all handlers
 	static void bindAllHandlers(){
-		for(int i = 0; i < handlers.size(); i++){
-			
-		}
+		boundHandlers.clear();
+		for(int i = 0; i < handlers.size(); i++)
+			boundHandlers.add(handlers.get(i));
+	}
+	
+
+	
+	// sets up commands
+	public static void setUpCommands(){
+		// clear commands
+		commands = new ArrayList<Command>();
+		commands.clear();
+		
+		// stop command
+		commands.add(new Command("stop"){
+			@Override public void execute(Scanner cs){
+				// some code here
+				System.out.printf("Stopping stammtisch server.\n");
+				done = true;
+			}
+		});
 	}
 	
 	
-	// sends a custom request object to bound clients
-	static void sendCustomRequestObject(Scanner commandScanner){
-		
-		String id = commandScanner.next();
-		RequestObject thisRequest = new RequestObject(id, null, -1);
-		
-		for(int i = 0; i < boundHandlers.size(); i++){
-			boundHandlers.get(i).sendCommand(thisRequest);
+	
+	// searches for a command
+	public static Command searchCommands(String command){
+		for(int i = 0; i < commands.size(); i++){
+			if(command.equalsIgnoreCase(commands.get(i).toString()))
+				return commands.get(i);
 		}
+		return null;
 	}
 	
 	
@@ -277,21 +289,24 @@ public class StammtischServer {
 		
 		// "scanner" object for reading from command line (javawtf?)
 		Scanner commandScanner = new Scanner(System.in);	
-		String command = new String();	// command typed on the command line
+		String command = new String();
+		Command currentCommand = null;
 		
 		// command handling loop
 		while(!done) {
-			// wait for command input
 			command = commandScanner.next();
+			currentCommand = searchCommands(command);
+			
+			// run command
+			if (currentCommand != null){
+				currentCommand.execute(commandScanner);
+			}else{
+				System.out.printf("[ERR] '%s' not recognised as command\n", command);
+			}
+				
 			
 			// handle command input
 			switch(command) {
-				// exit command 
-				case "stop":
-					System.out.printf("Stopping stammtisch server.\n");
-					done = true;
-					break;
-				
 				// list currently running handlers
 				case "lh": 
 					System.out.printf("%d running request handlers:\n", handlers.size());
@@ -315,9 +330,6 @@ public class StammtischServer {
 				
 				// unbind handler
 				case "unbind": unbindHandler(commandScanner); break;
-				
-				// send request to client serviced by bound handler
-				case "send": sendCustomRequestObject(commandScanner); break;
 					
 				// remove inactive handlers
 				case "prune": pruneHandlerLists(); break;

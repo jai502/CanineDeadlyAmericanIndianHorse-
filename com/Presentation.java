@@ -14,8 +14,12 @@
 
 package com;
 
-public class Presentation 
+import java.io.Serializable;
+
+public class Presentation implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	private String title, language, author, tagOne, tagTwo, tagThree, tagFour, tagFive;
 	
 	/**

@@ -1,15 +1,14 @@
 package server;
 
 
+// java imports
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-import gui.LoginDetails;
-
-
+// our imports
 import com.*;
 
 
@@ -48,32 +47,29 @@ public class ClientRequestHandler implements Runnable {
 				break;
 			}
 			
-			if(done) break;
-			
 			// take order number for current request
 			order = currentRequest.order;
+			System.out.printf("[H-%d] Recieved: %s\n", handlerInstance, currentRequest.id);
 			
 			switch(currentRequest.id.toString()) {
 				case "PING":		// ping command
-					sendCommand(new RequestObject("PONG", null, order));
+					sendResponse(new RequestObject("PONG", null, order));
 					break;
 
 				case "DISCONNECT":	// disconnect request
-					System.out.printf("[H-%d] Requested disconnect \n", handlerInstance);
 					done = true;	// exit handler loop
 					break;
 					
 				case "REQUEST_LOGIN":
-					// get login data object 
-					LoginDetails loginData = (LoginDetails)currentRequest.param;
-					System.out.printf("[H-%d] Requested login: %s, %s \n", 
-									  handlerInstance,
-									  loginData.getUsername(),
-									  loginData.getPassword());
+					User thisUser = (User)currentRequest.param;
+					System.out.printf("Name: %s, Pass: %s\n",
+									  thisUser.getUsername(),
+									  thisUser.getPassword());
+					sendResponse(new RequestObject("RESPONSE_OK", new String("success"), order));
 					break;
 				
 				default:			// unrecognised request
-					sendCommand(new RequestObject("RESPONSE_UNKNOWN", new String(currentRequest.id.toString()), order));
+					sendResponse(new RequestObject("RESPONSE_UNKNOWN", new String(currentRequest.id.toString()), order));
 					// print to console stream
 					break;
 			}
@@ -108,7 +104,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// method for sending a response to the client
-	public void sendCommand(RequestObject thisRequest) {
+	public void sendResponse(RequestObject thisRequest) {
 		// instantiate request object
 		try {
 			ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
