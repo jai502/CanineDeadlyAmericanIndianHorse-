@@ -83,6 +83,7 @@ public class ServerRequestHandler
 		{
 			login = true;
 		}
+		System.out.println(message);
 		return login;
 	}
 	

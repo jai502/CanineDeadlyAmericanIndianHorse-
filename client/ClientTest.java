@@ -48,8 +48,8 @@ public class ClientTest {
 			case "login":
 				//Create a user to login
 				User user1 = new User();
-				user1.setUsername("Oboe");
-				user1.setPassword("abcdefg");
+				user1.setUsername("nope");
+				user1.setPassword("nope");
 				
 				boolean loginResponse = com.loginToServer(user1);
 				System.out.println("Login returns: " + loginResponse);
