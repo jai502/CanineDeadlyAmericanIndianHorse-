@@ -20,7 +20,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import gui.LoginDetails;
-import server.RequestObject;
+import com.RequestObject;
 
 //=========================================================================
 // Class for handling server requests

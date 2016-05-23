@@ -14,7 +14,7 @@
 package client;
 
 import java.util.Scanner;
-import server.RequestObject;
+import com.RequestObject;
 
 public class ClientTest {
 

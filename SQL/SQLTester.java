@@ -16,7 +16,8 @@ package SQL;
 
 import java.sql.*;
 import java.util.ArrayList;
-import SQL.Presentation;
+
+import com.Presentation;
 
 public class SQLTester 
 {

@@ -12,7 +12,7 @@
  *
  */
 
-package SQL;
+package com;
 
 public class Presentation 
 {

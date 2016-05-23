@@ -18,7 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.Callable;
-import server.RequestObject;
+import com.RequestObject;
 
 public class CommsHandler implements Callable<RequestObject>
 {
