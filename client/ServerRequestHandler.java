@@ -18,17 +18,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import gui.LoginDetails;
 import server.RequestObject;
 
 //=========================================================================
 // Class for handling server requests
 //=========================================================================
-public class ServerRequestHandler implements Runnable
+public class ServerRequestHandler
 {
 	private int port;
 	private String host;
-	private static boolean done = false;
-	private int order = 0;
+	private static int order = 0;
 	
 	public static Socket socket;
 	public RequestObject contentFromServer;
@@ -37,8 +38,6 @@ public class ServerRequestHandler implements Runnable
 	{
 		this.port = port;
 		this.host = host;
-		
-		start();
 	}
 	
 	public final void start()
@@ -60,28 +59,30 @@ public class ServerRequestHandler implements Runnable
 		{
 			e.printStackTrace();
 		}
-		
-		//run the thread to listen on the specified port
-		Thread thread = new Thread(this);
-		thread.run();
 	}
 	
-	public final void run()
+	//=========================================================================
+	// Method for sending login details to Server
+	//=========================================================================
+	public final void loginToServer(LoginDetails loginDetails)
 	{
-		while(!done)
-		{
-			System.out.println("[INFO] Waiting for server...");
-			contentFromServer = readFromServer(socket);
-		}
+		RequestObject loginRequest = new RequestObject("REQUEST_LOGIN", (Object)loginDetails, order);
+		System.out.println(loginRequest.id + "being sent...");
+		sendToServer(loginRequest);
+		System.out.println("Successfully Sent");
+	}
+	
+	public void close()
+	{
+		RequestObject disconnect = new RequestObject("DISCONNECT",null, order);
 		try {
+			System.out.println("Closing connections...");
+			sendToServer(disconnect);
 			socket.close();
-			System.out.println("[INFO] Socket successfully closed");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		done = true;
 	}
 	
 	//=========================================================================
@@ -101,11 +102,12 @@ public class ServerRequestHandler implements Runnable
 				infoToServer = new ObjectOutputStream(socket.getOutputStream());
 				infoToServer.writeObject(request);
 				infoToServer.flush();
-				done = true; //stop the thread from listening on a closed socket
 			}
 			catch (IOException e) 
 			{
 				e.printStackTrace();
+				System.out.println("Exiting ... ");
+				System.exit(0);
 			}
 		}
 		else
@@ -121,14 +123,13 @@ public class ServerRequestHandler implements Runnable
 				e.printStackTrace();
 			}
 		}
-		order += 1;
-		System.out.println(order);
+		order = order + 1;
 	}
 	
 	//=========================================================================
 	// Method for reading content from the specified socket
 	//=========================================================================
-	public static RequestObject readFromServer(Socket socket)
+	public final RequestObject readFromServer()
 	{
 		RequestObject content = null;
 		ObjectInputStream infoFromServer;
@@ -137,19 +138,6 @@ public class ServerRequestHandler implements Runnable
 		{
 			infoFromServer = new ObjectInputStream(socket.getInputStream());
 			content = (RequestObject) infoFromServer.readObject();
-			
-			switch(content.id)
-			{
-				case "PONG":
-					System.out.println(content.id);
-					break;
-				case "DISCONNECT":
-					done = true;
-					break;
-				default:
-					
-			}
-			
 		}
 		catch (IOException e)
 		{

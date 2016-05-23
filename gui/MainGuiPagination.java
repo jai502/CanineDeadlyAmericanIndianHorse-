@@ -23,6 +23,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
 import Objects.Presentation;
 import Parsers.XMLParser;
+import client.ServerRequestHandler;
 import encryptionRSA.RSAEncryptDecrypt;
 import encryptionRSA.Serializer;
 import handlers.SlideHandler;
@@ -48,6 +49,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.*;
 import javafx.util.Callback;
+import server.RequestObject;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -66,10 +68,10 @@ import javafx.scene.input.MouseEvent;
 
 public class MainGuiPagination extends Application 
 {	
+	private MenuItem exit;
 	/* variables for the primary stage */
-	
 	private Stage window;
-	private Scene mainMenu, logInMenu, signUpMenu, presentationMenu;
+	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu;
 	private int width = 800;
 	private int height = 600;
 
@@ -93,6 +95,9 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
 	private String sFirstName, sSurname, sDateOfBirth, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private static String serverHost = "192.168.1.91";
+	private static int serverPort = 26656;
+	private static String id;
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for presentation scene */
@@ -126,6 +131,8 @@ public class MainGuiPagination extends Application
 	//	private ImageView image;
 	//	private boolean x = false;
 
+	private ServerRequestHandler com;
+
 	// Constructor
 	public MainGuiPagination(){
 
@@ -141,6 +148,8 @@ public class MainGuiPagination extends Application
 	@Override
 	public void init()
 	{
+		com = new ServerRequestHandler(serverPort, serverHost);
+		com.start();
 		System.out.println("Setting up/initialising GUI now");
 	}
 
@@ -155,7 +164,9 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
+		com.close();
 		System.out.println("Stopping/Closing GUI Now!");
+		System.exit(0);
 	}
 
 	/* Method which initialises and creates all the GUI */ 
@@ -165,9 +176,10 @@ public class MainGuiPagination extends Application
 		window = stage;
 
 		// Create menu bar objects ready to add to the Scenes
-		MenuBar mainMenuBar = menuItems(); // Main Menu
-		MenuBar loginMenuBar = menuItems(); // Login Menu
-		MenuBar signupMenuBar = menuItems(); // Sign Up Menu
+		//MenuBar mainMenuBar = menuItems(); // Main Menu
+		//MenuBar loginMenuBar = menuItems(); // Login Menu
+		//MenuBar signupMenuBar = menuItems(); // Sign Up Menu
+		MenuBar userScreenMenuBar =  menuItems(); // User Screen Menu
 		MenuBar presentationMenuBar = menuItems(); // Presentation Menu
 
 		/******************** Main Menu Screen ************************/
@@ -184,7 +196,7 @@ public class MainGuiPagination extends Application
 		GridPane controls1 = addMainGridItems();
 
 		// Add the menu and buttons to the root node
-		menuLayout.setTop(mainMenuBar);
+		//menuLayout.setTop(mainMenuBar);
 		menuLayout.setCenter(controls1);
 
 		// As Default, Display Main Menu at first
@@ -208,7 +220,7 @@ public class MainGuiPagination extends Application
 		GridPane controls2 = addLoginGridItems();
 
 		// Add the menu and textfields and buttons to the root node
-		loginLayout.setTop(loginMenuBar);
+		//loginLayout.setTop(loginMenuBar);
 		loginLayout.setCenter(controls2);
 
 		/*************************************************************/
@@ -227,8 +239,22 @@ public class MainGuiPagination extends Application
 		GridPane controls3 = addSignupGridItems();
 
 		// Add the menu, textfields and buttons to the root node
-		signupLayout.setTop(signupMenuBar);
+		//signupLayout.setTop(signupMenuBar);
 		signupLayout.setCenter(controls3);
+
+		/**************************************************************/
+
+		/******************* User Screen ******************************/
+		// Create a root node called loginLayout which uses BorderPane
+		BorderPane userScreenLayout = new BorderPane();
+		userScreenLayout.setId("userScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
+		// Add the root node to the scene
+		userScreenMenu = new Scene(userScreenLayout, width, height, Color.BLACK);
+		// Load style.ccs from same directory to provide the styling for the scenes
+		userScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+
+		// Add menu bar to User screen
+		userScreenLayout.setTop(userScreenMenuBar);
 
 		/**************************************************************/
 
@@ -447,13 +473,14 @@ public class MainGuiPagination extends Application
 		});
 
 		//fileMenu.getItems().add(new SeparatorMenuItem());
-		MenuItem exit = new MenuItem("Exit...");
+		exit = new MenuItem("Exit...");
 
 		// Close System
 		exit.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			public void handle(ActionEvent t) 
 			{
+				com.close();
 				System.exit(0);
 			}
 
@@ -493,9 +520,9 @@ public class MainGuiPagination extends Application
 			window.setTitle("Presentation");
 			// Change scene to presentationMenu
 			window.setScene(presentationMenu);
-			
+
 			//filename1 = new String("PWS/");
-			
+
 			//filename1 = xmlFile.getParent(); // get the directory
 			//filename2 = new String("/"); 
 			//filename3 = xmlFile.getName(); // get the filename
@@ -515,9 +542,9 @@ public class MainGuiPagination extends Application
 			pagination = new Pagination(tempPres.getSlides().size(), 0);
 			// Setting the style of the pagination
 			pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-			
+
 			pageTurn();
-			
+
 			/*pagination.widthProperty().addListener(new ChangeListener()
 			{
 				@Override
@@ -548,19 +575,19 @@ public class MainGuiPagination extends Application
 
 		return xmlFile;
 	}
-	
+
 	private void pageTurn() {
 		// Create the pagination pages
-					pagination.setPageFactory(new Callback<Integer, Node>() {
-						@Override
-						public Node call(Integer pageIndex) {
-							try {
-								//TODO
-								return sh.getSlideStack(tempPres, pageIndex, width-100, height, presentationMenu);
-							} catch (IOException e) {
-								return null;
-							}
-						}});
+		pagination.setPageFactory(new Callback<Integer, Node>() {
+			@Override
+			public Node call(Integer pageIndex) {
+				try {
+					//TODO
+					return sh.getSlideStack(tempPres, pageIndex, width-100, height, presentationMenu);
+				} catch (IOException e) {
+					return null;
+				}
+			}});
 	}
 
 
@@ -764,7 +791,7 @@ public class MainGuiPagination extends Application
 
 				// Create new LoginDetails class
 				LoginDetails loginDetails = new LoginDetails();
-				
+
 				// Check if any of the textfields are null
 				if(sUsernameLogin.equals("") || sPasswordLogin.equals(""))
 				{	
@@ -778,15 +805,43 @@ public class MainGuiPagination extends Application
 					loginDetails.setUsername(sUsernameLogin);
 					loginDetails.setPassword(sPasswordLogin);
 
-//					String x = (String) loginDetails.getUsername();
-//					String y = (String) loginDetails.getPassword();
-//					
-//					System.out.println("Username is: " + x);
-//					System.out.println("Password is: " + y);
-					
+					//					String x = (String) loginDetails.getUsername();
+					//					String y = (String) loginDetails.getPassword();
+					//					
+					//					System.out.println("Username is: " + x);
+					//					System.out.println("Password is: " + y);
+
 					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response1.setText("Logging in, please wait");
 					response1.setFill(Color.BLACK);
+
+
+					/***** Client/Server Communication *****/
+					com.loginToServer(loginDetails);
+
+					System.out.println("On next line");
+
+					//Response from server
+					RequestObject info = com.readFromServer();
+
+					System.out.println("Response from server has ID: " + info.id);
+
+
+					if(info.id.equals("LOGIN_SUCCESSFUL")){
+						window.setTitle("User Menu Screen");
+						window.setScene(userScreenMenu);
+					}
+					else
+					{
+						window.setTitle("Login Screen");
+						window.setScene(logInMenu);
+						response1.setText("Error in input, please try again!");
+						response1.setFill(Color.RED);
+						textFieldUsername.clear();
+						textFieldPassword1.clear();
+					}			
+
+					/**************************************/
 				}								
 			}
 		}); 
@@ -906,13 +961,13 @@ public class MainGuiPagination extends Application
 				sUsername = textFieldUsername.getText();
 				sPassword = textFieldPassword2.getText();
 				sConfirmPassword = textFieldConfirmPassword.getText();
-				
+
 				SignupDetails signupDetails = new SignupDetails();
-				RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
-				Serializer serializer = new Serializer();
-				byte[] serializedSignupDetails = null;
-				byte[] encryptedData = null;
-				
+				//				RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
+				//				Serializer serializer = new Serializer();
+				//				byte[] serializedSignupDetails = null;
+				//				byte[] encryptedData = null;
+
 				// Check if any of the textfields are null
 				if(sFirstName.equals("") || sSurname.equals("") || sDateOfBirth.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
 						|| sUsername.equals("") || sPassword.equals("") || sConfirmPassword.equals(""))
@@ -923,14 +978,14 @@ public class MainGuiPagination extends Application
 				// Check if input is valid and store the data to send to mysql
 				else if(sEmail.equals(sConfirmEmail) && sPassword.equals(sConfirmPassword))
 				{
-					// Create key generation for encryption and decryption
-					try {
-						rsaEncryptDecrypt.createKeys();
-					} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					
+					//					// Create key generation for encryption and decryption
+					//					try {
+					//						rsaEncryptDecrypt.createKeys();
+					//					} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
+					//						// TODO Auto-generated catch block
+					//						e1.printStackTrace();
+					//					}
+
 					// Set the username and password fields in local SignUpDetails class
 					signupDetails.setFirstName(sFirstName);
 					signupDetails.setSurname(sSurname);	
@@ -940,61 +995,77 @@ public class MainGuiPagination extends Application
 					signupDetails.setUsername(sUsername);
 					signupDetails.setPassword(sPassword);
 					signupDetails.setConfirmPassword(sConfirmPassword);
-					
+
 					// Before Encryption
 					//String a = (String) signupDetails.getFirstName();
 					System.out.println("Test Object is: " + signupDetails);
-					
-					// Serialize signUpDetails
-					try {
-						serializedSignupDetails = Serializer.serialize(signupDetails);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					
-					System.out.println("Serialized test object: " + serializedSignupDetails);
-					
-					try {
-						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
-					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					
-					// After Encryption
-					//String b = (String) signupDetails.getFirstName();
-					System.out.println("Encrypted and Serialized Data is: " + encryptedData);
-					
-					System.out.println("Now for the Decrypting!");
-					
-//					try {
-//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
-//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
-					
-//					String a = (String) signupDetails.getFirstName();
-//					String b = (String) signupDetails.getSurname();
-//					String c = (String) signupDetails.getEmail();
-//					String d = (String) signupDetails.getConfirmEmail();
-//					String ee = (String) signupDetails.getUsername();
-//					String f = (String) signupDetails.getPassword();
-//					String g = (String) signupDetails.getConfirmPassword();
-//					
-//					System.out.println("Firstname is: " + a);
-//					System.out.println("Surname is: " + b);
-//					System.out.println("Email is: " + c);
-//					System.out.println("ConfirmEmail is: " + d);
-//					System.out.println("Username is: " + ee);
-//					System.out.println("Password is: " + f);
-//					System.out.println("ConfirmPassword is: " + g);
-					
-					
-					
+
+					//					// Serialize signUpDetails
+					//					try {
+					//						serializedSignupDetails = Serializer.serialize(signupDetails);
+					//					} catch (IOException e1) {
+					//						// TODO Auto-generated catch block
+					//						e1.printStackTrace();
+					//					}
+					//					
+					//					System.out.println("Serialized test object: " + serializedSignupDetails);
+					//					
+					//					try {
+					//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
+					//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+					//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
+					//						// TODO Auto-generated catch block
+					//						e1.printStackTrace();
+					//					}
+					//					
+					//					// After Encryption
+					//					//String b = (String) signupDetails.getFirstName();
+					//					System.out.println("Encrypted and Serialized Data is: " + encryptedData);
+
+					/***** Client/Server Communication *****/
+
+					ServerRequestHandler com = new ServerRequestHandler(serverPort, serverHost);
+					com.start();
+
+					RequestObject signUpRequest = new RequestObject(id, signupDetails, 0);
+					com.sendToServer(signUpRequest);
+
+					RequestObject info = com.contentFromServer;
+					String content = info.id; //Tells you about the content
+
+					//window.setTitle("User Screen Menu");
+					//window.setScene(userScreenMenu);
+
+					/**************************************/
+
+					//					System.out.println("Now for the Decrypting!");
+
+					//					try {
+					//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
+					//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+					//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
+					//						// TODO Auto-generated catch block
+					//						e1.printStackTrace();
+					//					}
+
+					//					String a = (String) signupDetails.getFirstName();
+					//					String b = (String) signupDetails.getSurname();
+					//					String c = (String) signupDetails.getEmail();
+					//					String d = (String) signupDetails.getConfirmEmail();
+					//					String ee = (String) signupDetails.getUsername();
+					//					String f = (String) signupDetails.getPassword();
+					//					String g = (String) signupDetails.getConfirmPassword();
+					//					
+					//					System.out.println("Firstname is: " + a);
+					//					System.out.println("Surname is: " + b);
+					//					System.out.println("Email is: " + c);
+					//					System.out.println("ConfirmEmail is: " + d);
+					//					System.out.println("Username is: " + ee);
+					//					System.out.println("Password is: " + f);
+					//					System.out.println("ConfirmPassword is: " + g);
+
+
+
 					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response2.setText("Registering with us, please wait");
 					response2.setFill(Color.BLACK);

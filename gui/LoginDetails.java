@@ -1,5 +1,7 @@
 package gui;
 
+import java.io.Serializable;
+
 /*
  * (C) Stammtisch
  * First version created by: Mathew Gould & Alexander Stassis (Design Team)
@@ -13,9 +15,9 @@ package gui;
  * Description: Class which stores the data from the Login Page
  */
 
-public class LoginDetails 
+public class LoginDetails implements Serializable
 {
-
+	private static final long serialVersionUID = 1L;
 	private String username, password;
 
 	public LoginDetails()
@@ -23,25 +25,25 @@ public class LoginDetails
 	}
 
 	// return the username credentials
-	protected Object getUsername()
+	public String getUsername()
 	{
 		return username;
 	}
 
 	// return the password credentials
-	protected Object getPassword()
+	public String getPassword()
 	{
 		return password;
 	}
 
 	// Sets the username details
-	protected void setUsername(String setName)
+	public void setUsername(String setName)
 	{
 		this.username = setName;
 	}
 
 	// Sets the password details
-	protected void setPassword(String setCode)
+	public void setPassword(String setCode)
 	{
 		this.password = setCode;
 	}
