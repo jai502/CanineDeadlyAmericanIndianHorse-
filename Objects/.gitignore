@@ -11,3 +11,16 @@
 /Audio.class
 /Interactable.class
 /Shading.class
+/Images.class
+/ShapeItem.class
+/Gradient.class
+/Item.class
+/AudioItem.class
+/DefaultsItem.class
+/ImageItem.class
+/InteractableItem.class
+/PolygonItem.class
+/ShadingItem.class
+/SlideItem.class
+/TextItem.class
+/VideoItem.class

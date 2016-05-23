@@ -4,10 +4,10 @@
  * Date of first version: 17/05/2016
  * 
  * Last version by: Jonathan Bones & Peter Mills
- * Date of last update: 18/05/2016
- * Version number: 1.2
+ * Date of last update: 22/05/2016
+ * Version number: 1.3
  * 
- * Commit date: 21/05/2016
+ * Commit date: 22/05/2016
  * Description: Access to presentation database
  */
 
@@ -237,9 +237,118 @@ public class QueryPresentations
 		
 	}
 	
-	public static void addComment(Connection presCon, int presID, int userID, User user, Presentation pres)
+	public static void addComment(Connection presCon, Connection userCon, int presID, User user, String comment)
+	{
+		int userID = SQLTools.checkUserID(userCon, user);
+		PreparedStatement command = null;
+		String sqlComment = "INSERT INTO " + presID + "_comments (userid, username, comment) VALUES (?, ?, ?)";
+		
+		try 
+		{
+			command = presCon.prepareStatement(sqlComment);
+			command.setInt(1, userID);
+			command.setString(2, user.getUsername());
+			command.setString(3, comment);
+			
+			command.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		finally {
+      if (command != null)
+      {
+      	try
+      	{
+      		command.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
+		}
+	}
+	
+	public static void removeComment(Connection presCon, int userID, int presID, int commentID)
 	{
 		Statement command = null;
-		String sqlComment = "INSERT INTO " + presID + "_comments";
+		String sqlRemove = "DELETE FROM " + presID + "_comments WHERE userid = " + userID + " AND id = " + commentID;
+		
+		try {
+			command = presCon.createStatement();
+			command.executeUpdate(sqlRemove);
+			System.out.println("[INFO] Comment with id: " + commentID + " was successfully removed from presentation:" + presID);
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+      if (command != null)
+      {
+      	try
+      	{
+      		command.close();
+      	} 
+      	catch (SQLException e) 
+      	{
+      		// Failed to close command
+      		e.printStackTrace();
+      	} 
+      }
+		}
+		
+	}
+	
+	public static ArrayList<String[]> searchComments(Connection con, int presID)
+	{		
+		//Note - this is susceptible to malicious attacks - ensure that semicolons are checked first in the input data!
+		Statement command = null;
+		ArrayList<String[]> searchResults = new ArrayList<String[]>();
+		ResultSet data;
+		
+		try 
+		{
+			command = con.createStatement();
+			data = command.executeQuery("SELECT username, comment, timeleft FROM "+ presID +"_comments");
+			int index = 0;
+			
+			while(data.next())
+			{
+				String[] searchResult = new String[3];
+				
+				searchResult[0] = data.getString("username");
+				searchResult[1] = data.getString("comment");
+				searchResult[2] = data.getTimestamp("timeleft").toString();
+				
+				searchResults.add(index, searchResult);
+				
+				index++; //increment the index
+			}
+			
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (command != null)
+			{ 
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e)
+				{
+					// Failed to close command
+					e.printStackTrace();
+				} 
+			}
+		}
+		return searchResults;
 	}
 }

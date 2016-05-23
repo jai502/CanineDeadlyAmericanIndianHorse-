@@ -18,10 +18,14 @@ import java.util.ArrayList;
 public class Presentation 
 {
 	private	DocumentInfo docInfo;
-	private Defaults defaults;
-	private ArrayList slides = new ArrayList<Slide>() ;
+	private DefaultsItem defaults;
+	private ArrayList<SlideItem> slides;
 	
-	public Presentation(DocumentInfo docInfo, Defaults defaults,ArrayList slides)
+	public Presentation() {
+		super();
+	}
+
+	public Presentation(DocumentInfo docInfo, DefaultsItem defaults,ArrayList<SlideItem> slides)
 	{
 		super();
 		this.docInfo = docInfo;
@@ -39,22 +43,22 @@ public class Presentation
 		this.docInfo = docInfo;
 	}
 
-	public Defaults getDefaults() 
+	public DefaultsItem getDefaults() 
 	{
 		return defaults;
 	}
 
-	public void setDefaults(Defaults defaults) 
+	public void setDefaults(DefaultsItem defaults) 
 	{
 		this.defaults = defaults;
 	}
 
-	public ArrayList getSlides()
+	public ArrayList<SlideItem> getSlides()
 	{
 		return slides;
 	}
 
-	public void setSlides(ArrayList slides)
+	public void setSlides(ArrayList<SlideItem> slides)
 	{
 		this.slides = slides;
 	}

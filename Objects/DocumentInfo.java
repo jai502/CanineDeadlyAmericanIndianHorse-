@@ -24,6 +24,10 @@ public class DocumentInfo {
 		version = myVersion;
 		comment = myComment;
 	}
+	
+	public DocumentInfo(){
+		super();
+	}
 
 	public String getTitle() 
 	{
