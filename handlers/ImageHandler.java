@@ -13,11 +13,12 @@
 */
 package handlers;
 
+import javafx.scene.Parent;
 // Imports
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
+import javafx.scene.layout.Pane;
 import Objects.*;
 
 public class ImageHandler
@@ -33,6 +34,9 @@ public class ImageHandler
 	//returns a canvas that contains the image
 	public Canvas drawCanvas(ImageItem imageToHandle , int canvasSizeX, int canvasSizeY) 
 	{
+		
+		
+		
 		this.imageToHandle = imageToHandle;
 		
 		// set up a new canvas
@@ -42,8 +46,14 @@ public class ImageHandler
 		// draw image (image, x start, y start, width, height)
 		gContext.drawImage(image, getXPosition(canvasSizeX), getYPosition(canvasSizeY), getWidth(canvasSizeX), getHeight(canvasSizeY));
 		
+		
+		
+		//imageCanvas.widthProperty().addListener();
+       // imageCanvas.heightProperty().bind(pane.heightProperty());
+           
 		return imageCanvas;
 	}
+	
 	
 	//this method gets the starting X position of the image for use in the canvas
 	public double getXPosition(int sizeOfCanvasX)

@@ -241,16 +241,11 @@ public class MainGuiPagination extends Application
 		// Load style.ccs from same directory to provide the styling for the scenes
 		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
-		// Create extra presentation controls
-		buttonControls = controls();
-
 		// create a temporary presentation
 		//tempPres = new Presentation();
 
 		// Add menu bar to presentation screen
 		presentationLayout.setTop(presentationMenuBar);
-		BorderPane.setAlignment(buttonControls, Pos.CENTER);
-		presentationLayout.setBottom(buttonControls);
 
 		/* FullScreen for presentation menu */
 		presentationMenu.setOnKeyPressed(new EventHandler<KeyEvent>()
@@ -523,7 +518,7 @@ public class MainGuiPagination extends Application
 			
 			pageTurn();
 			
-			pagination.widthProperty().addListener(new ChangeListener()
+			/*pagination.widthProperty().addListener(new ChangeListener()
 			{
 				@Override
 				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -538,7 +533,7 @@ public class MainGuiPagination extends Application
 					stackHeight = pagination.getHeight();
 					pageTurn();
 				}
-			});
+			});*/
 
 			// Add the pagination to the presentation scene
 			presentationLayout.setCenter(pagination);
@@ -561,7 +556,7 @@ public class MainGuiPagination extends Application
 						public Node call(Integer pageIndex) {
 							try {
 								//TODO
-								return sh.getSlideStack(tempPres, pageIndex, stackWidth, stackHeight, presentationMenu);
+								return sh.getSlideStack(tempPres, pageIndex, width-100, height, presentationMenu);
 							} catch (IOException e) {
 								return null;
 							}
