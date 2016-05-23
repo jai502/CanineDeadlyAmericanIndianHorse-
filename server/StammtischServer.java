@@ -89,28 +89,10 @@ public class StammtischServer {
 		
 		// set up commands
 		setUpCommands();
-		commands.get(0).execute(new Scanner(System.in));
 		
 		// Initialise connection listener
 		System.out.printf("Starting connection listener \n");
 		connectionListener.start();
-	}
-
-	
-	
-	// sets up commands
-	public static void setUpCommands(){
-		// clear commands
-		commands = new ArrayList<Command>();
-		commands.clear();
-		
-		// stop command
-		commands.add(new Command("stop"){
-			@Override public void execute(Scanner cs){
-				// some code here
-				System.out.printf("VICTORY! >:D\n");
-			}
-		});
 	}
 	
 	
@@ -267,6 +249,35 @@ public class StammtischServer {
 			boundHandlers.add(handlers.get(i));
 	}
 	
+
+	
+	// sets up commands
+	public static void setUpCommands(){
+		// clear commands
+		commands = new ArrayList<Command>();
+		commands.clear();
+		
+		// stop command
+		commands.add(new Command("stop"){
+			@Override public void execute(Scanner cs){
+				// some code here
+				System.out.printf("Stopping stammtisch server.\n");
+				done = true;
+			}
+		});
+	}
+	
+	
+	
+	// searches for a command
+	public static Command searchCommands(String command){
+		for(int i = 0; i < commands.size(); i++){
+			if(command.equalsIgnoreCase(commands.get(i).toString()))
+				return commands.get(i);
+		}
+		return null;
+	}
+	
 	
 	
 	// Main method for launching server
@@ -278,21 +289,24 @@ public class StammtischServer {
 		
 		// "scanner" object for reading from command line (javawtf?)
 		Scanner commandScanner = new Scanner(System.in);	
-		String command = new String();	// command typed on the command line
+		String command = new String();
+		Command currentCommand = null;
 		
 		// command handling loop
 		while(!done) {
-			// wait for command input
 			command = commandScanner.next();
+			currentCommand = searchCommands(command);
+			
+			// run command
+			if (currentCommand != null){
+				currentCommand.execute(commandScanner);
+			}else{
+				System.out.printf("[ERR] '%s' not recognised as command\n", command);
+			}
+				
 			
 			// handle command input
 			switch(command) {
-				// exit command 
-				case "stop":
-					System.out.printf("Stopping stammtisch server.\n");
-					done = true;
-					break;
-				
 				// list currently running handlers
 				case "lh": 
 					System.out.printf("%d running request handlers:\n", handlers.size());
