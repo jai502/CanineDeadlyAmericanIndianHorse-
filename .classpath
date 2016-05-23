@@ -3,9 +3,9 @@
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="C:/Users/Callum/Desktop/Stammtisch/GraphicsHandler/Source Files/lib/opencsv-3.7.jar"/>
-	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/lib/commons-codec-1.10/commons-codec-1.10.jar"/>
-	<classpathentry kind="lib" path="/Users/jonathanbones/git/CanineDeadlyAmericanIndianHorse-/lib/mysql-connector-java-5.1.38-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AC/git/CanineDeadlyAmericanIndianHorse-/lib/opencsv-3.7 2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AC/git/CanineDeadlyAmericanIndianHorse-/lib/commons-codec-1.10/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AC/git/CanineDeadlyAmericanIndianHorse-/lib/mysql-connector-java-5.1.38-bin.jar"/>
 	<classpathentry kind="lib" path="email/jaf-1.1.1/activation.jar"/>
 	<classpathentry kind="lib" path="email/javamail-1.3.1/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>

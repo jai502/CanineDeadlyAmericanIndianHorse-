@@ -15,8 +15,12 @@
 
 package server;
 
+// our imports
 import SQL.*;
+import com.*;
 
+
+// java imports
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
@@ -122,24 +126,33 @@ public class StammtischServer {
 	
 	// Remove client handlers that are no longer connected
 	// returns the number of client request handlers removed
-	public static int pruneRequestHandlers(){
-		ArrayList<Integer> inactiveClients = new ArrayList<Integer>();
+	public static int pruneHandlerLists(){
+		ArrayList<Integer> inactiveHandlers = new ArrayList<Integer>();
+		ArrayList<Integer> inactiveBoundHandlers = new ArrayList<Integer>();
+		
+		inactiveHandlers.clear();
+		inactiveBoundHandlers.clear();
 		
 		// loop through all request handlers, determine which of them are inactive
 		for(int i = 0; i < handlers.size(); i++)
 			if (handlers.get(i).isDone()) 
-				inactiveClients.add(i);
+				inactiveHandlers.add(i);
+		
+		// loop through bound handlers
+		for(int i = 0; i < boundHandlers.size(); i++)
+			if (boundHandlers.get(i).isDone())
+				inactiveBoundHandlers.add(i);
 		
 		// remove all inactive request handlers from the handler list
-		for(int i = 0; i < inactiveClients.size(); i++){
-			// if inactive client was bound, unbind client
-			
-			// remove from handler list
-			handlers.remove(inactiveClients.get(i));
-		}
+		for(int i = 0; i < inactiveHandlers.size(); i++)
+			handlers.remove(inactiveHandlers.get(i));
+		
+		// remove all inactive handlers from bound handlers list
+		for(int i = 0; i < inactiveBoundHandlers.size(); i++)
+			boundHandlers.remove(inactiveBoundHandlers.get(i));
 		
 		// return number of pruned handlers
-		return inactiveClients.size();
+		return inactiveHandlers.size();
 	}
 	
 	
@@ -152,7 +165,7 @@ public class StammtischServer {
 		}else{ 
 			// print out info for all clients
 			for (int i = 0; i < handler.size(); i++) {
-				System.out.printf("Client: %d, %s\n",i , handler.get(i).getInfoString());
+				System.out.printf("%d) %s\n",i ,handler.get(i).getInfoString());
 			}
 		}
 	}
@@ -192,9 +205,6 @@ public class StammtischServer {
 		Integer p1int = parseCommandInt(p1, 0, handlers.size());
 		if(p1int == null) return;
 		
-		// prune inactive request handlers
-		pruneRequestHandlers();
-		
 		// check that client with this number actually exists
 		if(p1int > handlers.size()){
 			System.out.printf("[ERR] '%d' - no such handler.\n", p1int);			
@@ -202,7 +212,8 @@ public class StammtischServer {
 		}
 		
 		// your parse succeeded! add handler to bound handlers list
-		boundHandlers.add(handlers.get(p1int));
+		if(!boundHandlers.contains(handlers.get(p1int)))
+			boundHandlers.add(handlers.get(p1int));
 		System.out.printf("Handler '%d' added to bound handlers.\n", p1int);	
 	}
 	
@@ -216,9 +227,6 @@ public class StammtischServer {
 		// attempt to parse command input
 		Integer p1int = parseCommandInt(p1, 0, boundHandlers.size());
 		
-		// prune inactive request handlers
-		pruneRequestHandlers();
-		
 		// check that client with this number actually exists
 		if(p1int > handlers.size()){
 			System.out.printf("[ERR] '%d' - no such handler.\n", p1int);			
@@ -231,6 +239,7 @@ public class StammtischServer {
 	}
 	
 	
+	
 	// unbind all handlers
 	static void unbindAllHandlers(){
 		System.out.printf("Unbound %d client request handlers\n", boundHandlers.size());
@@ -238,12 +247,23 @@ public class StammtischServer {
 	}
 	
 	
+	// bind all handlers
+	static void bindAllHandlers(){
+		for(int i = 0; i < handlers.size(); i++){
+			
+		}
+	}
 	
-	// sends a custom request object to given client
+	
+	// sends a custom request object to bound clients
 	static void sendCustomRequestObject(Scanner commandScanner){
-		String id = null;
 		
-		RequestObject thisRequest = new RequestObject(id, null, 0);
+		String id = commandScanner.next();
+		RequestObject thisRequest = new RequestObject(id, null, -1);
+		
+		for(int i = 0; i < boundHandlers.size(); i++){
+			boundHandlers.get(i).sendCommand(thisRequest);
+		}
 	}
 	
 	
@@ -273,29 +293,35 @@ public class StammtischServer {
 					break;
 				
 				// list currently running handlers
-				case "listHandlers": 
+				case "lh": 
 					System.out.printf("%d running request handlers:\n", handlers.size());
 					printHandlerList(handlers); 
 					break;	
 				
 				// list all currently bound handlers
-				case "listBoundHandlers": 
+				case "lbh": 
 					System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
 					printHandlerList(boundHandlers); 
 					break;
 				
+				// bind all handlers
+				case "bindAll": bindAllHandlers(); break;
+					
 				// unbind all handlers
 				case "unbindAll": unbindAllHandlers(); break;
 				
 				// bind handler
-				case "bindHandler": bindHandler(commandScanner); break; 
+				case "bind": bindHandler(commandScanner); break; 
 				
 				// unbind handler
-				case "unbindHandler": unbindHandler(commandScanner); break;
+				case "unbind": unbindHandler(commandScanner); break;
 				
 				// send request to client serviced by bound handler
-				case "sendReq": sendCustomRequestObject(commandScanner); break;
+				case "send": sendCustomRequestObject(commandScanner); break;
 					
+				// remove inactive handlers
+				case "prune": pruneHandlerLists(); break;
+				
 				// unrecognised command
 				default:
 					System.out.printf("[ERR] Unrecognised command! '%s'.\n", command);
