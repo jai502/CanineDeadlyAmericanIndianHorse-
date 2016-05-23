@@ -3,6 +3,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 import org.apache.commons.codec.binary.Base64;
+
 /*
 *	First version created by:	Peter Mills
 *	Date of first version:		25/02/16

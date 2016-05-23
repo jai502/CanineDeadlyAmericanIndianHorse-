@@ -75,7 +75,7 @@ public class CommsHandler implements Callable<RequestObject>
 	public static void sendToServer(Socket socket, String id, Object parameter) throws IOException
 	{
 		//Create a request object to communicate with the server
-		RequestObject request = new RequestObject(id,parameter);
+		RequestObject request = new RequestObject(id, parameter, 0);
 
 		//Open the output stream to the server
 		ObjectOutputStream infoToServer = new ObjectOutputStream(socket.getOutputStream());
