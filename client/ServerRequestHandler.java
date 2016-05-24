@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import com.*;
 
 //=========================================================================
@@ -27,7 +28,7 @@ public class ServerRequestHandler
 {
 	private int port;
 	private String host;
-	private static int order = 0;
+	private static int order = 1;
 	
 	public static Socket socket;
 	public RequestObject contentFromServer;
@@ -108,6 +109,18 @@ public class ServerRequestHandler
 			signUp = true;
 		}
 		return signUp;
+	}
+	
+	public final ArrayList<String[]> searchForPresentation(Presentation pres)
+	{
+		RequestObject searchPresentationRequest = new RequestObject("SEARCH_PRES", (Object) pres, order);
+		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received: " + response.id + " wih order: " + response.order);
+		ArrayList<String[]> presentationList = (ArrayList<String[]>) response.param; //suppress warning since we know object has type ArrayList<String[]>
+
+		return presentationList;
 	}
 	
 	public final String ping()
