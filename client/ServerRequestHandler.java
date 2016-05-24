@@ -4,8 +4,8 @@
 * Date of first version: 16.05.2016
 * 
 * Last version by: J.Bones & A.Cramb
-* Date of last update: 22.05.2016
-* Version number: 1.2
+* Date of last update: 23.05.2016
+* Version number: 1.3
 * 
 * Commit date:
 * Description: Threading to enable network communications
@@ -18,9 +18,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import gui.LoginDetails;
-import com.RequestObject;
+import java.util.ArrayList;
+import com.*;
 
 //=========================================================================
 // Class for handling server requests
@@ -29,7 +28,7 @@ public class ServerRequestHandler
 {
 	private int port;
 	private String host;
-	private static int order = 0;
+	private static int order = 1;
 	
 	public static Socket socket;
 	public RequestObject contentFromServer;
@@ -40,6 +39,9 @@ public class ServerRequestHandler
 		this.host = host;
 	}
 	
+	//=========================================================================
+	// Setup the socket on the named host and port
+	//=========================================================================
 	public final void start()
 	{
 		try
@@ -60,87 +62,140 @@ public class ServerRequestHandler
 			e.printStackTrace();
 		}
 	}
-	
+
 	//=========================================================================
-	// Method for sending login details to Server
+	// Send the login details to Server
 	//=========================================================================
-	public final void loginToServer(LoginDetails loginDetails)
+	public final boolean loginToServer(User user)
 	{
-		RequestObject loginRequest = new RequestObject("REQUEST_LOGIN", (Object)loginDetails, order);
-		System.out.println(loginRequest.id + "being sent...");
-		sendToServer(loginRequest);
-		System.out.println("Successfully Sent");
+		boolean login = false;
+		
+		RequestObject loginRequest = new RequestObject("REQUEST_LOGIN", (Object) user, order);
+		System.out.println("Sending " + loginRequest.id + " with order " + loginRequest.order + "...");
+		sendRequest(loginRequest);
+		System.out.println("Successfully sent, waiting for response...");
+		
+		RequestObject response = getResponse();
+		
+		System.out.println("Response received: " + response.id + " with order: " + response.order);
+		String message = (String) response.param;
+		
+		if(message.equals("success"))
+		{
+			login = true;
+		}
+		System.out.println(message);
+		return login;
 	}
 	
-	public void close()
+	//=========================================================================
+	// Send the sign-up details to the Server
+	//=========================================================================
+	public final boolean signUp(User user)
 	{
-		RequestObject disconnect = new RequestObject("DISCONNECT",null, order);
-		try {
+		boolean signUp = false;
+		
+		RequestObject signUpRequest = new RequestObject("REQUEST_SIGNUP", (Object) user, order);
+		System.out.println("Sending " + signUpRequest.id + " with order " + signUpRequest.order + "...");
+		sendRequest(signUpRequest);
+		System.out.println("Successfully sent, waiting for response...");
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received: " + response.id + " with order: " + response.order);
+		String message = (String) response.param;
+		
+		if(message.equals("success"))
+		{
+			signUp = true;
+		}
+		return signUp;
+	}
+	
+	public final ArrayList<String[]> searchForPresentation(Presentation pres)
+	{
+		RequestObject searchPresentationRequest = new RequestObject("SEARCH_PRES", (Object) pres, order);
+		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received: " + response.id + " wih order: " + response.order);
+		ArrayList<String[]> presentationList = (ArrayList<String[]>) response.param; //suppress warning since we know object has type ArrayList<String[]>
+
+		return presentationList;
+	}
+	
+	public final String ping()
+	{
+		String result = null;
+		RequestObject ping = new RequestObject("PING", null, order);
+		System.out.println("Sending " + ping.id + " with order " + ping.order + "...");
+		sendRequest(ping);
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received: " + response.id + " with order: " + response.order);
+		
+		if(response.id.equals("PONG"))
+		{
+			result = response.id;
+		}
+		return result;
+	}
+	
+	//=========================================================================
+	// Close all network communications
+	//=========================================================================
+	public void stop()
+	{
+		RequestObject disconnect = new RequestObject("DISCONNECT", null, order);
+		try
+		{
 			System.out.println("Closing connections...");
-			sendToServer(disconnect);
+			sendRequest(disconnect);
 			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} 
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
 	
 	//=========================================================================
-	// Method for sending content to the Server
+	// Private class method for sending content to the Server
 	//=========================================================================
-	public final void sendToServer(RequestObject request)
+	private void sendRequest(RequestObject request)
 	{
 		//Open the output stream to the server
-		ObjectOutputStream infoToServer;
+		ObjectOutputStream contentToServer;
 		
-		request.order = this.order;
-		
-		if(request.id.equals("DISCONNECT"))
-		{
-			try 
-			{
-				infoToServer = new ObjectOutputStream(socket.getOutputStream());
-				infoToServer.writeObject(request);
-				infoToServer.flush();
-			}
-			catch (IOException e) 
-			{
-				e.printStackTrace();
-				System.out.println("Exiting ... ");
-				System.exit(0);
-			}
+		try {
+			contentToServer = new ObjectOutputStream(socket.getOutputStream());
+			contentToServer.writeObject(request);
+			contentToServer.flush();
 		}
-		else
-		{
-			try
-			{
-				infoToServer = new ObjectOutputStream(socket.getOutputStream());
-				infoToServer.writeObject(request);
-				infoToServer.flush();
-			}
-			catch (IOException e) 
-			{
-				e.printStackTrace();
-			}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		order = order + 1;
+		order += 1;
 	}
 	
 	//=========================================================================
-	// Method for reading content from the specified socket
+	// Private class method for getting content from the specified socket
 	//=========================================================================
-	public final RequestObject readFromServer()
+	private RequestObject getResponse()
 	{
-		RequestObject content = null;
-		ObjectInputStream infoFromServer;
+		int timeout = 5000;
+		RequestObject response = null;
+		ObjectInputStream contentFromServer;
 		
 		try 
 		{
-			infoFromServer = new ObjectInputStream(socket.getInputStream());
-			content = (RequestObject) infoFromServer.readObject();
+			socket.setSoTimeout(timeout);
+			contentFromServer = new ObjectInputStream(socket.getInputStream());
+			response = (RequestObject) contentFromServer.readObject();
 		}
 		catch (IOException e)
 		{
+			System.out.println("Timeout");
 			e.printStackTrace();
 		}
 		catch (ClassNotFoundException e)
@@ -148,6 +203,6 @@ public class ServerRequestHandler
 			e.printStackTrace();
 		}
 		
-		return content;
+		return response;
 	}
 }
