@@ -16,7 +16,6 @@
   -fx-background-color: #DAD6D4;
   -fx-border-color:  black;
   -fx-border-width: 4
-
 }
 
 .menu-bar .label {
@@ -141,6 +140,31 @@
 	-fx-font: 15 arial;
 	-fx-base: #BAE98A;
 }
+
+/*****************************************************************************/
+
+/* User Menu Scene */
+
+/*****************************************************************************/
+#userScreenLayout{
+	-fx-background-image: url("User_Background.jpg"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;	
+}
+
+#messageUser{
+	-fx-font: 35 arial;
+	-fx-text-color: red;
+}
+
+#scrollPane{
+  -fx-background-color: transparent;
+  /*-fx-background-color: #DAD6D4;*/
+  -fx-border-color:  transparent;
+  -fx-border-width: 5
+}
+
 
 /*****************************************************************************/
 

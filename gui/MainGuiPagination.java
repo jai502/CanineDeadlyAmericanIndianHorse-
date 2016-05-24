@@ -1,8 +1,6 @@
 package gui;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
 
 /*
  * (C) Stammtisch
@@ -10,16 +8,18 @@ import javax.crypto.NoSuchPaddingException;
  * Date of first version: 21/02/16
  * 
  * Last version by: Mathew Gould & Alexander Stassis (Design Team)
- * Date of last update:  25/03/16
+ * Date of last update:  24/05/16
  * Version number: 1
  * 
- * Commit date: 28/03/16
+ * Commit date: 24/05/16
  * Description: Designing the Main GUI Class which will lead to other GUIs
  * This class currently is still in implementation
- * NOTE: Browsing works for specific xml file! Now need to rearrange gui to continue 
- * 		 from login page and sign up page 
+ * NOTE:
  */
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
 import Objects.Presentation;
 import Parsers.XMLParser;
@@ -49,6 +49,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.*;
 import javafx.util.Callback;
+import searchDetails.SearchDetails;
 import server.RequestObject;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
@@ -59,6 +60,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -68,12 +70,12 @@ import javafx.scene.input.MouseEvent;
 
 public class MainGuiPagination extends Application 
 {	
-	private MenuItem exit;
 	/* variables for the primary stage */
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu;
 	private int width = 800;
 	private int height = 600;
+	private MenuItem exit;
 
 	/* variables for addMainGridItems() method */
 	private Button signUp, logIn;
@@ -86,6 +88,7 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword1;
 	private Text messageLogIn, response1;
 	private String sUsernameLogin, sPasswordLogin;
+	private LoginDetails loginDetails = new LoginDetails();
 	//private ArrayList<String> inputData1 = new ArrayList<String>();
 
 	/* variables for addSignupGridItems() method */
@@ -95,10 +98,19 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
 	private String sFirstName, sSurname, sDateOfBirth, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private SignupDetails signupDetails = new SignupDetails();
 	private static String serverHost = "192.168.1.91";
 	private static int serverPort = 26656;
 	private static String id;
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
+
+	/* variables for addUserGridItems() method */
+	private Button btnLogOut, btnSearch, btnReset;
+	private Label uFirstName, uSurName, uUserName;
+	private TextField textFieldTitle, textFieldAuthor, textFieldLanguage;
+	private Text messageLogOut, messageUser, response3;
+	private String title, author, language;
+	private SearchDetails searchDetails = new SearchDetails();
 
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
@@ -148,8 +160,8 @@ public class MainGuiPagination extends Application
 	@Override
 	public void init()
 	{
-		com = new ServerRequestHandler(serverPort, serverHost);
-		com.start();
+		//com = new ServerRequestHandler(serverPort, serverHost);
+		//com.start();
 		System.out.println("Setting up/initialising GUI now");
 	}
 
@@ -164,7 +176,7 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
-		com.close();
+		//com.close();
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
 	}
@@ -176,7 +188,7 @@ public class MainGuiPagination extends Application
 		window = stage;
 
 		// Create menu bar objects ready to add to the Scenes
-		//MenuBar mainMenuBar = menuItems(); // Main Menu
+		MenuBar mainMenuBar = menuItems(); // Main Menu
 		//MenuBar loginMenuBar = menuItems(); // Login Menu
 		//MenuBar signupMenuBar = menuItems(); // Sign Up Menu
 		MenuBar userScreenMenuBar =  menuItems(); // User Screen Menu
@@ -196,7 +208,7 @@ public class MainGuiPagination extends Application
 		GridPane controls1 = addMainGridItems();
 
 		// Add the menu and buttons to the root node
-		//menuLayout.setTop(mainMenuBar);
+		menuLayout.setTop(mainMenuBar);
 		menuLayout.setCenter(controls1);
 
 		// As Default, Display Main Menu at first
@@ -253,8 +265,13 @@ public class MainGuiPagination extends Application
 		// Load style.ccs from same directory to provide the styling for the scenes
 		userScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
+		// ready to add to userScreenMenu scene
+		GridPane userMenu = addUserGridItems();
+		ScrollPane userMenuScroll = addUserScrollItems();
 		// Add menu bar to User screen
 		userScreenLayout.setTop(userScreenMenuBar);
+		userScreenLayout.setLeft(userMenu);
+		userScreenLayout.setRight(userMenuScroll);
 
 		/**************************************************************/
 
@@ -421,7 +438,7 @@ public class MainGuiPagination extends Application
 		//fileMenu.getItems().add(new SeparatorMenuItem());
 		MenuItem settings = new MenuItem("Settings...");
 
-		MenuItem goToPresentation = new MenuItem("Go To Presentation...");
+		//MenuItem goToPresentation = new MenuItem("Go To Presentation...");
 
 		/*	// Go to presentation
 		goToPresentation.setOnAction(new EventHandler<ActionEvent>() 
@@ -457,9 +474,24 @@ public class MainGuiPagination extends Application
 		});
 		 */
 
-		MenuItem goBack = new MenuItem("Go Back...");
+		MenuItem goToUserScreen = new MenuItem("Go To User Screen...");
+
+		// Go to user screen without network comms for testing
+		goToUserScreen.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			public void handle(ActionEvent e) 
+			{
+				tempPres = null;
+				System.out.println("Presentation screen is now cleared");
+				window.setTitle("User Menu");
+				window.setScene(userScreenMenu);
+			}
+
+		});
 
 		// Go back to main menu
+		MenuItem goBack = new MenuItem("Go Back...");
+
 		goBack.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			public void handle(ActionEvent e) 
@@ -473,24 +505,26 @@ public class MainGuiPagination extends Application
 		});
 
 		//fileMenu.getItems().add(new SeparatorMenuItem());
-		exit = new MenuItem("Exit...");
 
 		// Close System
+		exit = new MenuItem("Exit...");
+
 		exit.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			public void handle(ActionEvent t) 
 			{
-				com.close();
+				//com.close();
 				System.exit(0);
 			}
 
 		});
 
 		// Add all File Menu Items to File Bar
-		fileMenu.getItems().addAll(openFile, settings, goToPresentation, goBack, new SeparatorMenuItem(), exit);		
+		fileMenu.getItems().addAll(openFile, settings, goToUserScreen, goBack, new SeparatorMenuItem(), exit);		
 
 		// Community Menu \\
 		Menu communityMenu = new Menu("Community");
+
 
 		// Help Menu \\
 		Menu helpMenu = new Menu("Help");
@@ -790,7 +824,7 @@ public class MainGuiPagination extends Application
 				sPasswordLogin = textFieldPassword1.getText();
 
 				// Create new LoginDetails class
-				LoginDetails loginDetails = new LoginDetails();
+				//LoginDetails loginDetails = new LoginDetails();
 
 				// Check if any of the textfields are null
 				if(sUsernameLogin.equals("") || sPasswordLogin.equals(""))
@@ -962,7 +996,7 @@ public class MainGuiPagination extends Application
 				sPassword = textFieldPassword2.getText();
 				sConfirmPassword = textFieldConfirmPassword.getText();
 
-				SignupDetails signupDetails = new SignupDetails();
+				//				SignupDetails signupDetails = new SignupDetails();
 				//				RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
 				//				Serializer serializer = new Serializer();
 				//				byte[] serializedSignupDetails = null;
@@ -1085,6 +1119,143 @@ public class MainGuiPagination extends Application
 
 		return grid;
 	}
+
+	/* Method for GridPane items for User Screen Menu */
+	public GridPane addUserGridItems(){
+
+		// Create a root node called grid. In this case a grid pane layout 
+		// is used, with vertical and horizontal gaps of 10
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+
+		// Centre the controls in the scene
+		grid.setAlignment(Pos.CENTER);
+
+		// Add padding
+		grid.setPadding(new Insets(25, 25, 25, 25));
+
+		// Create the Default message
+		messageUser = new Text("Explore Presentations");
+		messageUser.setId("messageUser"); // Id for gui_style.css
+		messageUser.setFill(Color.ALICEBLUE);
+		messageUser.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		grid.add(messageUser, 0, 0, 2, 1);
+
+		// Create the labels for Username
+		//uUserName = new Label(loginDetails.getUsername());
+		//		uUserName = new Label("Username here");
+		//		grid.add(uUserName, 0, 1);
+
+		textFieldTitle = new TextField();
+		textFieldTitle.setPromptText("Search by Title");
+		grid.add(textFieldTitle, 1, 1);
+		textFieldAuthor = new TextField();
+		textFieldAuthor.setPromptText("Seacrh by Author");
+		grid.add(textFieldAuthor, 1, 2);
+		textFieldLanguage = new TextField();
+		textFieldLanguage.setPromptText("Search by Language");
+		grid.add(textFieldLanguage, 1, 3);
+
+
+		// Creating a Button for Registering and going back to main menu
+		btnLogOut = new Button("Log Out");
+		btnLogOut.setId("btnLogOut");
+		btnSearch = new Button("Search");
+		btnSearch.setId("btnSearch");
+		btnReset = new Button("Reset Search");
+		btnReset.setId("btnReset");
+
+		// Creating a HBox area to add the buttons to
+		HBox hbArea = new HBox(10);
+		hbArea.setAlignment(Pos.BOTTOM_RIGHT);
+		hbArea.getChildren().addAll(btnSearch, btnReset, btnLogOut);
+
+		// Adding hbArea with the button in it to the rootNode
+		grid.add(hbArea, 1, 9);
+
+		// Add a response after pressing the button
+		response3 = new Text();
+		grid.add(response3, 1, 4);
+
+		// Event handler for btnLogout
+		btnLogOut.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				//com.close();
+				textFieldName.clear();
+				textFieldPassword1.clear();
+				window.setTitle("Main Menu");
+				window.setScene(mainMenu);
+			}
+		});
+
+		// Event handler for btnSearch
+		btnSearch.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				title = textFieldTitle.getText();
+				author = textFieldAuthor.getText();
+				language = textFieldLanguage.getText();
+
+				// Set the username and password fields in local SignUpDetails class
+				searchDetails.setTitle(title);
+				searchDetails.setAuthor(author);
+				searchDetails.setLanguage(language);
+
+
+				/***** Client/Server Communication *****/
+
+				//				ServerRequestHandler com = new ServerRequestHandler(serverPort, serverHost);
+				//				com.start();
+				//
+				//				RequestObject searchRequest = new RequestObject(id, searchDetails, 0);
+				//				com.sendToServer(searchRequest);
+				//
+				//				RequestObject info = com.contentFromServer;
+				//				String content = info.id; //Tells you about the content
+				/**************************************/
+
+				response3.setText("Searching for results");
+				response3.setFill(Color.MEDIUMPURPLE);
+			}
+
+		}); 
+
+		// Event handler for btnReset
+		btnReset.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				textFieldTitle.clear();
+				textFieldAuthor.clear();
+				textFieldLanguage.clear();
+			}
+		});
+
+		return grid;
+	}
+
+	/* Method for GridPane items for User Screen Menu */
+	public ScrollPane addUserScrollItems(){
+
+		// Create a root node called grid. In this case a grid pane layout 
+
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setPrefWidth(400);
+		scrollPane.setPrefHeight(400);
+		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+		scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
+		scrollPane.setId("scrollPane");
+
+		return scrollPane;
+	}
+
 
 }
 
