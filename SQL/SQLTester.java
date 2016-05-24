@@ -16,6 +16,7 @@ package SQL;
 
 import java.sql.*;
 import java.util.ArrayList;
+import com.*;
 
 import com.Presentation;
 
@@ -83,7 +84,7 @@ public class SQLTester
   	}
 		*/
 		
-		/*
+		
 		//===========================================================================
 		//Add a user to the user database
 		String userDatabase = "useraccounts";
@@ -96,9 +97,10 @@ public class SQLTester
 		user1.setEmail("myemail@email.com");
 		user1.setPassword("A secret word");
 		user1.setDob("1800-01-01");
+		boolean result = QueryUsers.checkUser(userCon, userTable, user1);
+		System.out.println("Result of check was: " + result);
+		//QueryUsers.addUser(userCon, userTable, user1); //Add user to the SQL user account table
 		
-		QueryUsers.addUser(userCon, userTable, user1); //Add user to the SQL user account table
-		*/
 		
 		/*
 		//===========================================================================

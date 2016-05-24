@@ -23,7 +23,7 @@ public class ClientTest {
 		//String remoteHost = "2.102.60.24";
 		//int remotePort = 26656;
 		
-		String serverHost = "192.168.1.91";
+		String serverHost = "FuckThePWS.ddns.net";
 		int serverPort = 26656;
 		
 		//Local host for local connection
@@ -48,8 +48,8 @@ public class ClientTest {
 			case "login":
 				//Create a user to login
 				User user1 = new User();
-				user1.setUsername("nope");
-				user1.setPassword("nope");
+				user1.setUsername("Tangents4Life");
+				user1.setPassword("A secret word");
 				
 				boolean loginResponse = com.loginToServer(user1);
 				System.out.println("Login returns: " + loginResponse);
