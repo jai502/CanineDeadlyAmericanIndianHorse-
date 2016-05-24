@@ -50,7 +50,7 @@ import javafx.geometry.Pos;
 import javafx.stage.*;
 import javafx.util.Callback;
 import searchDetails.SearchDetails;
-import server.RequestObject;
+import com.RequestObject;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;

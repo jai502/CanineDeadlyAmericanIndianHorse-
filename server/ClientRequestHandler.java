@@ -1,10 +1,15 @@
 package server;
 
 
+// java imports
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+
+// our imports
+import com.*;
 
 
 public class ClientRequestHandler implements Runnable {
@@ -12,19 +17,17 @@ public class ClientRequestHandler implements Runnable {
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
 	boolean done = false;			    // main loop complete
-	int requestNumber;
-	
+	int order;
 	
 	
 	// constructor for client request handler
 	public ClientRequestHandler(Socket thisSocket, int thisInstance){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
-		requestNumber = 0;
 	}
 	
 	
-	
+	// client request handler thread code
 	@Override
 	public void run() {
 		// Thread local variables
@@ -38,39 +41,45 @@ public class ClientRequestHandler implements Runnable {
 			try {
 				currentRequest = getRequest(clientSocket);
 			} catch(IOException e) {
-				System.out.printf("[ERROR]-%d Client disconnected unusually \n", handlerInstance);
+				System.out.printf("[H-%d][ERR] Exception on socket recieve \n", handlerInstance);
 				e.printStackTrace();
+				done = true;
 				break;
 			}
 			
+			// take order number for current request
+			order = currentRequest.order;
+			System.out.printf("[H-%d] Recieved: %s\n", handlerInstance, currentRequest.id);
+			
 			switch(currentRequest.id.toString()) {
 				case "PING":		// ping command
-					sendResponse(clientSocket, "PONG", null);
-					break;
-					
-				case "CREATE_ACCOUNT":
-					break;
-					
-				case "REQUEST_LOGIN":
+					sendResponse(new RequestObject("PONG", null, order));
 					break;
 
 				case "DISCONNECT":	// disconnect request
 					done = true;	// exit handler loop
 					break;
+					
+				case "REQUEST_LOGIN":
+					User thisUser = (User)currentRequest.param;
+					System.out.printf("Name: %s, Pass: %s\n",
+									  thisUser.getUsername(),
+									  thisUser.getPassword());
+					sendResponse(new RequestObject("RESPONSE_OK", new String("success"), order));
+					break;
 				
 				default:			// unrecognised request
-					sendResponse(clientSocket, "RESPONSE_UNKNOWN", null);
+					sendResponse(new RequestObject("RESPONSE_UNKNOWN", new String(currentRequest.id.toString()), order));
 					// print to console stream
 					break;
 			}
 		}
 		
 		// disconnect socket
-		System.out.printf("[INFO]-%d Exiting service thread \n", handlerInstance);
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
-			System.out.printf("[ERROR]-%d Exception on socket close \n", handlerInstance);
+			System.out.printf("[H-%d][ERR] Exception on socket close \n", handlerInstance);
 			e.printStackTrace();
 		}
 	}
@@ -84,10 +93,9 @@ public class ClientRequestHandler implements Runnable {
 		try {
 			inputFromClient = new ObjectInputStream(threadSocket.getInputStream());
 			thisRequest = (RequestObject)inputFromClient.readObject();
-			System.out.printf("[INFO]-%d Request recieved: %s\n", handlerInstance, thisRequest.id);
 			return thisRequest;
 		} catch (ClassNotFoundException e) {
-			System.out.printf("[ERROR]-%d Request is of wrong format\n", handlerInstance);
+			System.out.printf("[H-%d][ERR] Request is of wrong format\n", handlerInstance);
 			e.printStackTrace();			
 		}
 		return null;
@@ -96,18 +104,44 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// method for sending a response to the client
-	private void sendResponse(Socket socket, String id, Object param) {
+	public void sendResponse(RequestObject thisRequest) {
 		// instantiate request object
-		System.out.printf("[INFO]-%d Sending response: %s\n", handlerInstance, id);
-		RequestObject thisRequest = new RequestObject(id, param, requestNumber);
-		requestNumber++;
 		try {
-			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 			outputStream.writeObject(thisRequest);
 			outputStream.flush();
 		} catch(IOException e) {
-			System.out.printf("[ERROR]-%d Failed to send respond (IOException)", handlerInstance);
+			System.out.printf("[H-%d][ERR] Failed to send respond (IOException)", handlerInstance);
 			e.printStackTrace();
 		} 
 	}
+
+
+	
+	// return this handler instance
+	public int getNum() {return handlerInstance;}
+	
+	
+	// get ip address associated with this client request handler
+	public String getIp(){return clientSocket.getRemoteSocketAddress().toString();}
+	
+	
+	// get thread number associated with this request handler
+	public int getReqCount(){return order;}
+	
+
+	// get info string
+	public String getInfoString(){
+		return String.format(
+			"Handler: %d, ip: %s, reqs: %d, running: %b",
+			getNum(),
+			getIp(),
+			getReqCount(),
+			!done
+		);
+	}
+	
+
+	// returns true if request handler is running
+	public boolean isDone() {return done;}
 }

@@ -15,6 +15,8 @@ package SQL;
 
 import java.sql.*;
 
+import com.*;
+
 public class SQLTools 
 {
   //============================================================================

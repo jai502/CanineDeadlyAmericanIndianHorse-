@@ -15,6 +15,7 @@ import java.io.Serializable;
  * Description: Class which stores the data from the Login Page
  */
 
+
 public class LoginDetails implements Serializable
 {
 	private static final long serialVersionUID = 1L;

@@ -15,7 +15,9 @@ package SQL;
 
 import java.sql.*;
 import java.util.ArrayList;
-import SQL.Presentation;
+
+import com.*;
+
 import SQL.SQLTools;
 
 public class QueryPresentations
