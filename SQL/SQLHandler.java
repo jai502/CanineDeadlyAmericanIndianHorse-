@@ -24,8 +24,8 @@ import com.User;
 
 public class SQLHandler 
 {
-	private String server = "stammtischsql.ddns.net";
-	private int port = 3306;
+	private String host;
+	private int port;
 	
 	private String presentationDatabase = "presentations";
 	private String presTable = "testpresentations";
@@ -37,10 +37,18 @@ public class SQLHandler
 	private String userTrackingDatabase = "usertracking";
 	private String userTrackingTable = "_tracking";
 	
-	//Connect to the SQL databases available on the SQL server
-	private Connection userCon = SQLServer.connect(server, port, userDatabase);
-	private Connection presCon = SQLServer.connect(server, port, presentationDatabase);
-	private Connection userTrackingCon = SQLServer.connect(server, port, userTrackingDatabase);
+	private Connection userCon, presCon, userTrackingCon;
+	
+	public SQLHandler(String SQLHost, int SQLPort)
+	{
+		this.port = SQLPort;
+		this.host = SQLHost;
+		
+		//Connect to the SQL databases available on the SQL server
+		this.presCon = SQLServer.connect(host, port, presentationDatabase);
+		this.userCon = SQLServer.connect(host, port, userDatabase);
+		this.userTrackingCon = SQLServer.connect(host, port, userTrackingDatabase);
+	}
 	
 	//======================================================================================================================
 	// Method for adding a presentation with associated comments database
