@@ -22,10 +22,12 @@ import java.util.Scanner;
 
 class Command {
 	private String name;
+	private int paramCount;
 	
 	// constructor
-	protected Command(String name){
+	protected Command(String name, int paramCount){
 		this.name = name;
+		this.paramCount = paramCount;
 	}
 	
 	// get name of command
@@ -36,5 +38,10 @@ class Command {
 	// command execute memory
 	public void execute(Scanner sc){
 		
+	}
+	
+	// returns number of parameters the command takes
+	public int getParamCount(){
+		return paramCount;
 	}
 }
