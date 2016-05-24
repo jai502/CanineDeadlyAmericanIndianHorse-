@@ -35,23 +35,9 @@ public class StammtischServer {
 	public ServerSocket sSocket;
 	
 	// SQL connection stuff
-	// address and port
 	int sqlPort = 3306;
 	String sqlServer = "stammtischsql.ddns.net";
-	
-	// database identifiers
-	String userTrackingDB = "usertracking";
-	String presDB = "presentations";	
-	String userDB = "useraccounts";
-	
-	// table identifiers
-	String presTable = "testpresentations";	
-	String userTable = "users";
-	
-	// sql connections
-	Connection userCon;
-	Connection presCon;
-	Connection userTrackingCon;
+	SQLHandler sqlInterface;
 
 	// client request handlers
 	static ArrayList<Response> responses;
@@ -69,17 +55,8 @@ public class StammtischServer {
 		// Indicate that server is starting
 		System.out.printf("Starting server on port %d\n", port);
 		
-		// connect to users database
-		System.out.printf("Connecting to users database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, userDB);
-		
-		// connect to presentation database
-		System.out.printf("Connecting to presentation database on port: %d\n", sqlPort);
-		presCon = SQLServer.connect(sqlServer, sqlPort, presDB);
-
-		// connect to user 
-		System.out.printf("Connecting to user tracking database on port: %d\n", sqlPort);
-		userTrackingCon = SQLServer.connect(sqlServer, sqlPort, userTrackingDB);
+		// connect to SQL servers
+		sqlInterface = new SQLHandler(sqlServer, sqlPort);
 
 		// initialise client request handler list
 		handlers = new ArrayList<ClientRequestHandler>();
@@ -108,7 +85,7 @@ public class StammtischServer {
 		
 		// response to a ping
 		responses.add(new Response("PING"){
-			@Override public void respond(ClientRequestHandler handler,  RequestObject thisRequest){
+			@Override public void respond(ClientRequestHandler handler){
 				RequestObject response = new RequestObject("PONG", null, handler.getOrder());
 				handler.sendResponse(response);
 			}
@@ -116,21 +93,46 @@ public class StammtischServer {
 		
 		// response to a disconnect request
 		responses.add(new Response("DISCONNECT"){
-			@Override public void respond(ClientRequestHandler handler, RequestObject thisRequest){
+			@Override public void respond(ClientRequestHandler handler){
 				handler.stop();
 			}
 		});
 	
 		// respond to login request
 		responses.add(new Response("REQUEST_LOGIN"){
-			@Override public void respond(ClientRequestHandler handler, RequestObject thisRequest){
-				User thisUser = (User)thisRequest.param;
+			@Override public void respond(ClientRequestHandler handler){
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// request object to respond with
+				RequestObject response;
+				User thisUser = null;
+				
+				// get the user object
+				try {
+					thisUser = (User)thisRequest.param;
+				} catch (Exception e){
+					response = new RequestObject("ERROR", new String("Malformed request object! Expected parameter of type 'user'\n"), handler.getOrder());
+					e.printStackTrace();
+					return;
+				}
+				
+				// print out username and password
 				System.out.printf("Name: %s, Pass: %s\n",
 								  thisUser.getUsername(),
 								  thisUser.getPassword());
+				
+				// check that user exists 
+				if(SQLHandler.checkLoginDetails(thisUser)){
+					response = new RequestObject("OK", new String("success"), handler.getOrder());
+					handler.sendResponse(response);
+				} else {
+					response = new RequestObject("OK", new String("login_successful!"), handler.getOrder());
+					handler.sendResponse(response);
+				}
 			}
 		});
-	
 	}
 	
 	
@@ -155,7 +157,8 @@ public class StammtischServer {
 						new ClientRequestHandler(
 							sSocket.accept(),
 							nextInstance,
-							responses
+							responses,
+							sqlInterface
 						);
 					
 					// add handler to handler list

@@ -587,7 +587,7 @@ public class SQLHandler
 			// Create new JDBC statement
 			command = userCon.createStatement();
 			// Execute SQL SELECT FROM command
-			data = command.executeQuery("SELECT id, username FROM " + userTable
+			data = command.executeQuery("SELECT id, username, password FROM " + userTable
 											+ " WHERE username = "
 											+ "(" + SQLTools.testNull(user.getUsername()) + ")"
 											+ " AND password = "
