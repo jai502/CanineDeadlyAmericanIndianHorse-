@@ -7,7 +7,7 @@
 * Date of last update: 23/05/2016
 * Version number: 1.0
 * 
-* Commit date:
+* Commit date: 25/05/16
 * Description: JUnit test for SendEmail class
 */
 
