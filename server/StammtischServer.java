@@ -107,29 +107,69 @@ public class StammtischServer {
 				
 				// request object to respond with
 				RequestObject response;
-				User thisUser = null;
 				
 				// get the user object
-				try {
-					thisUser = (User)thisRequest.param;
-				} catch (Exception e){
-					response = new RequestObject("ERROR", new String("Malformed request object! Expected parameter of type 'user'\n"), handler.getOrder());
-					e.printStackTrace();
-					return;
-				}
-				
-				// print out username and password
-				System.out.printf("Name: %s, Pass: %s\n",
-								  thisUser.getUsername(),
-								  thisUser.getPassword());
+				User thisUser = (User)thisRequest.param;
+				handler.setUser(thisUser);
 				
 				// check that user exists 
 				if(SQLHandler.checkLoginDetails(thisUser)){
-					response = new RequestObject("OK", new String("success"), handler.getOrder());
+					response = new RequestObject(
+						"RESPONSE_OK", 
+						new String("success"), 
+						handler.getOrder()
+					);
 					handler.sendResponse(response);
 				} else {
-					response = new RequestObject("OK", new String("login_successful!"), handler.getOrder());
+					response = new RequestObject(
+						"RESPONSE_OK", 
+						new String("login_failed"), 
+						handler.getOrder()
+					);
 					handler.sendResponse(response);
+				}
+			}
+		});
+		
+		// respond to signup request
+		responses.add(new Response(""){
+			@Override public void respond(ClientRequestHandler handler){
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// request object to respond with
+				RequestObject response;
+				
+				// request object for response
+				User thisUser = (User)thisRequest.param;
+				
+				// check that user doesn't already exist
+				if(SQLHandler.checkUser(thisUser)){		// if user already exists respond with error
+					response = new RequestObject(
+						"RESPONSE_FAIL", 
+						new String("username already in use!"), 
+						handler.getOrder()
+					);
+				} else { 	// add user to users database
+					// check that user is valid for signup
+					if(thisUser.validForSignup()){
+						// add user to the database
+						SQLHandler.addUser(thisUser);
+						
+						// respond to client
+						response = new RequestObject(
+							"RESPONSE_OK",
+							null,
+							handler.getOrder()
+						);						
+					} else {
+						response = new RequestObject(
+							"RESPONSE_FAIL",
+							null,
+							handler.getOrder()
+						);
+					}
 				}
 			}
 		});

@@ -15,7 +15,9 @@ import SQL.*;
 
 
 public class ClientRequestHandler implements Runnable {
+	private ArrayList<String> preLoginReqs;
 	private RequestObject currentRequest;
+	private User user;
 	private SQLHandler sql;
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
@@ -33,6 +35,16 @@ public class ClientRequestHandler implements Runnable {
 		handlerInstance = thisInstance;  // instance number
 		this.responses = responses;
 		this.sql = sql;
+		
+		// create list of allowable pre-login requests
+		preLoginReqs = new ArrayList<String>();
+		preLoginReqs.clear();
+		
+		// allowable pre-login requests
+		preLoginReqs.add(new String("PING"));
+		preLoginReqs.add(new String("DISCONNECT"));
+		preLoginReqs.add(new String("REQUEST_LOGIN"));
+		preLoginReqs.add(new String("REQUEST_SIGNUP"));
 	}
 	
 	
@@ -62,11 +74,17 @@ public class ClientRequestHandler implements Runnable {
 			System.out.printf("[H-%d] Got request %s\n", handlerInstance, currentRequest.id);
 			
 			if(currentResponse != null){
-				// respond to request
-				currentResponse.respond(this);
+				// if the user has not logged in, log them in
+				if((user != null) || reqAllowed(currentRequest.id)){
+					// respond to request
+					currentResponse.respond(this);
+				} else {
+					sendResponse(new RequestObject("NOT_LOGGED_IN", new String(""), order));
+				}
+					
 			} else {
 				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", currentRequest.id);
-				sendResponse(new RequestObject("RESPONSE_ERROR", new String(currentRequest.id.toString()), order));
+				sendResponse(new RequestObject("RESPONSE_ERROR", currentRequest.id, order));
 			}
 		}
 		
@@ -80,6 +98,19 @@ public class ClientRequestHandler implements Runnable {
 		
 		// indicate that thread is no longer running
 		threadDone = true;
+	}
+	
+	
+	
+	// method returns true of string matches any allowable pre-login requests
+	private boolean reqAllowed(String req){
+		// loop through all allowable pre-login requests
+		for(int i = 0; i < preLoginReqs.size(); i++)
+			if(preLoginReqs.get(i).equals(req))
+				return true;
+		
+		// if a matching allowed request string is not found, return false
+		return false;
 	}
 	
 	
@@ -168,4 +199,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	// getter for this handlers SQL interface
 	public SQLHandler getSQLHandler() {return sql;}
+	
+	// setter for logging in a user
+	public void setUser(User user) {this.user = user;}
 }
