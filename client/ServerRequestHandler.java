@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import com.*;
 
 //=========================================================================
@@ -27,7 +28,7 @@ public class ServerRequestHandler
 {
 	private int port;
 	private String host;
-	private static int order = 0;
+	private static int order = 1;
 	
 	public static Socket socket;
 	public RequestObject contentFromServer;
@@ -76,23 +77,34 @@ public class ServerRequestHandler
 		
 		RequestObject response = getResponse();
 		
-		System.out.println("Response received: " + response.id + " with order: " + response.order);
-		String message = (String) response.param;
-		
-		if(message.equals("success"))
+		switch(response.id)
 		{
+		case "RESPONSE_OK":
 			login = true;
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Login failed: " + (String) response.param);
+			login = false;
+			break;
+		case "RESPONSE_UNKNOWN":
+			System.out.println("Login failed: Server didn't recognise request");
+			login = false;
+			break;
+		default:
+			System.out.println("Login failed: (Response " + response.id + " Unknown)");
+			login = false;
+			break;
 		}
-		System.out.println(message);
+
 		return login;
 	}
 	
 	//=========================================================================
 	// Send the sign-up details to the Server
 	//=========================================================================
-	public final boolean signUp(User user)
+	public final String signUp(User user)
 	{
-		boolean signUp = false;
+		String signUp = "Sign Up Failed";
 		
 		RequestObject signUpRequest = new RequestObject("REQUEST_SIGNUP", (Object) user, order);
 		System.out.println("Sending " + signUpRequest.id + " with order " + signUpRequest.order + "...");
@@ -100,14 +112,39 @@ public class ServerRequestHandler
 		System.out.println("Successfully sent, waiting for response...");
 		
 		RequestObject response = getResponse();
-		System.out.println("Response received: " + response.id + " with order: " + response.order);
-		String message = (String) response.param;
 		
-		if(message.equals("success"))
+		switch(response.id)
 		{
-			signUp = true;
+		case "RESPONSE_OK":
+			signUp = null;
+			break;
+		case "RESPONSE_FAIL":
+			signUp = (String) response.param;
+			System.out.println(signUp);
+			break;
+		case "RESPONSE_UNKNOWN":
+			signUp = "Server didn't recognise request";
+			System.out.println(signUp);
+			break;
+		default:
+			signUp = "(Internal Server Error: " + response.id;
+			System.out.println(signUp);
+			break;
 		}
+		
 		return signUp;
+	}
+	
+	public final ArrayList<String[]> searchForPresentation(Presentation pres)
+	{
+		RequestObject searchPresentationRequest = new RequestObject("SEARCH_PRES", (Object) pres, order);
+		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received: " + response.id + " wih order: " + response.order);
+		ArrayList<String[]> presentationList = (ArrayList<String[]>) response.param; //suppress warning since we know object has type ArrayList<String[]>
+
+		return presentationList;
 	}
 	
 	public final String ping()
