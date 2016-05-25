@@ -25,7 +25,9 @@ public class SQLTester
 	
 	public static void main(String[] args)
 	{
-		SQLHandler sqlHandler = new SQLHandler();
+		String SQLHost = "stammtischsql.ddns.net";
+		int SQLPort = 3306;
+		SQLHandler sqlHandler = new SQLHandler(SQLHost, SQLPort);
 		
 		/*
 		//===========================================================================

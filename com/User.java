@@ -86,4 +86,16 @@ public class User implements Serializable
 		this.dob = dob;
 	} 
 
+	/**
+	 * @param check that user object has all the fields neccessary for signup
+	 */
+	public boolean validForSignup()
+	{
+		if(this.dob == null) return false;
+		if(this.username == null) return false;
+		if(this.password == null) return false;
+		if(this.email == null) return false;
+		
+		return true;
+	}
 }

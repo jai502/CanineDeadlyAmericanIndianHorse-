@@ -17,6 +17,7 @@ package server;
 
 // our imports
 import SQL.*;
+import com.*;
 
 
 // java imports
@@ -34,25 +35,12 @@ public class StammtischServer {
 	public ServerSocket sSocket;
 	
 	// SQL connection stuff
-	// address and port
 	int sqlPort = 3306;
 	String sqlServer = "stammtischsql.ddns.net";
-	
-	// database identifiers
-	String userTrackingDB = "usertracking";
-	String presDB = "presentations";	
-	String userDB = "useraccounts";
-	
-	// table identifiers
-	String presTable = "testpresentations";	
-	String userTable = "users";
-	
-	// sql connections
-	Connection userCon;
-	Connection presCon;
-	Connection userTrackingCon;
+	SQLHandler sqlInterface;
 
 	// client request handlers
+	static ArrayList<Response> responses;
 	static ArrayList<Command> commands; 
 	static ArrayList<ClientRequestHandler> handlers;
 	static ArrayList<ClientRequestHandler> boundHandlers;
@@ -67,17 +55,8 @@ public class StammtischServer {
 		// Indicate that server is starting
 		System.out.printf("Starting server on port %d\n", port);
 		
-		// connect to users database
-		System.out.printf("Connecting to users database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, userDB);
-		
-		// connect to presentation database
-		System.out.printf("Connecting to presentation database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, presDB);
-
-		// connect to user 
-		System.out.printf("Connecting to user tracking database on port: %d\n", sqlPort);
-		userCon = SQLServer.connect(sqlServer, sqlPort, userTrackingDB);
+		// connect to SQL servers
+		sqlInterface = new SQLHandler(sqlServer, sqlPort);
 
 		// initialise client request handler list
 		handlers = new ArrayList<ClientRequestHandler>();
@@ -87,12 +66,113 @@ public class StammtischServer {
 		boundHandlers = new ArrayList<ClientRequestHandler>();
 		boundHandlers.clear();
 		
-		// set up commands
+		// set up commands and responses
 		setUpCommands();
+		setUpRequests();
 		
 		// Initialise connection listener
 		System.out.printf("Starting connection listener \n");
 		connectionListener.start();
+	}
+	
+	
+	
+	// sets up responses
+	public static void setUpRequests(){
+		// set up blank request array list
+		responses = new ArrayList<Response>();
+		responses.clear();
+		
+		// response to a ping
+		responses.add(new Response("PING"){
+			@Override public void respond(ClientRequestHandler handler){
+				RequestObject response = new RequestObject("PONG", null, handler.getOrder());
+				handler.sendResponse(response);
+			}
+		});
+		
+		// response to a disconnect request
+		responses.add(new Response("DISCONNECT"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.stop();
+			}
+		});
+	
+		// respond to login request
+		responses.add(new Response("REQUEST_LOGIN"){
+			@Override public void respond(ClientRequestHandler handler){
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// request object to respond with
+				RequestObject response;
+				
+				// get the user object
+				User thisUser = (User)thisRequest.param;
+				handler.setUser(thisUser);
+				
+				// check that user exists 
+				if(SQLHandler.checkLoginDetails(thisUser)){
+					response = new RequestObject(
+						"RESPONSE_OK", 
+						new String("success"), 
+						handler.getOrder()
+					);
+					handler.sendResponse(response);
+				} else {
+					response = new RequestObject(
+						"RESPONSE_OK", 
+						new String("login_failed"), 
+						handler.getOrder()
+					);
+					handler.sendResponse(response);
+				}
+			}
+		});
+		
+		// respond to signup request
+		responses.add(new Response(""){
+			@Override public void respond(ClientRequestHandler handler){
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// request object to respond with
+				RequestObject response;
+				
+				// request object for response
+				User thisUser = (User)thisRequest.param;
+				
+				// check that user doesn't already exist
+				if(SQLHandler.checkUser(thisUser)){		// if user already exists respond with error
+					response = new RequestObject(
+						"RESPONSE_FAIL", 
+						new String("username already in use!"), 
+						handler.getOrder()
+					);
+				} else { 	// add user to users database
+					// check that user is valid for signup
+					if(thisUser.validForSignup()){
+						// add user to the database
+						SQLHandler.addUser(thisUser);
+						
+						// respond to client
+						response = new RequestObject(
+							"RESPONSE_OK",
+							null,
+							handler.getOrder()
+						);						
+					} else {
+						response = new RequestObject(
+							"RESPONSE_FAIL",
+							null,
+							handler.getOrder()
+						);
+					}
+				}
+			}
+		});
 	}
 	
 	
@@ -112,9 +192,20 @@ public class StammtischServer {
 			
 			while(true) {
 				try {
-					// wait for client connection
-					handlers.add(new ClientRequestHandler(sSocket.accept(), nextInstance));		// create client handler object
-					Thread thread = new Thread(handlers.get(handlers.size()-1));					// start client request handler in its own thread
+					// wait for client connection & make handler
+					ClientRequestHandler thisHandler = 
+						new ClientRequestHandler(
+							sSocket.accept(),
+							nextInstance,
+							responses,
+							sqlInterface
+						);
+					
+					// add handler to handler list
+					handlers.add(thisHandler);
+					
+					// start request handler thread
+					Thread thread = new Thread(handlers.get(handlers.size()-1));					
 					System.out.printf("[INFO] Client connected, starting handler thread %d \n", nextInstance);
 					nextInstance++;
 					thread.start();
@@ -124,30 +215,6 @@ public class StammtischServer {
 			}
 		}
 	};
-	
-	
-	
-	// Remove client handlers that are no longer connected
-	// returns the number of client request handlers removed
-	public static int pruneHandlerLists(){
-		ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
-		
-		inactiveHandlers.clear();
-		
-		// loop through all request handlers, determine which of them are inactive
-		for(int i = 0; i < handlers.size(); i++)
-			if (handlers.get(i).isDone()) 
-				inactiveHandlers.add(handlers.get(i));
-		
-		// remove all inactive request handlers from the handler list
-		for(int i = 0; i < inactiveHandlers.size(); i++){
-			boundHandlers.remove(inactiveHandlers.get(i));
-			handlers.remove(inactiveHandlers.get(i));
-		}
-		
-		// return number of pruned handlers
-		return inactiveHandlers.size();
-	}
 	
 	
 	
@@ -167,8 +234,8 @@ public class StammtischServer {
 	
 	
 	// method parses an integer from input string
-	public static Integer parseCommandInt(String p1, int min, int max){
-		Integer p1int = 0;
+	public static Integer parseAsInt(String p1, int min, int max){
+		Integer p1int = new Integer(0);
 		
 		// try to parse the command parameter
 		try{
@@ -178,9 +245,9 @@ public class StammtischServer {
 			return null;
 		}
 		
-		// if the number is negative, client cannot be bound
+		// if the number is not in expected range
 		if ((p1int < min) || (p1int > max)){
-			System.out.printf("[ERR] '%d' invalid integer, out of range.\n", p1int);
+			System.out.printf("[ERR] '%d' out of range.\n", p1int);
 			return null;
 		}
 		
@@ -188,68 +255,26 @@ public class StammtischServer {
 		return p1int;
 	}
 	
-	
-	
-	// bind a client, bound clients print to the stream
-	public static void bindHandler(Scanner commandScanner){
-		// command parameter (client to bind)
-		String p1 = commandScanner.next();
-		
-		// attempt to parse command input
-		Integer p1int = parseCommandInt(p1, 0, handlers.size());
-		if(p1int == null) return;
-		
-		// check that client with this number actually exists
-		if(p1int > handlers.size()){
-			System.out.printf("[ERR] '%d' - no such handler.\n", p1int);			
-			return;
-		}
-		
-		// your parse succeeded! add handler to bound handlers list
-		if(!boundHandlers.contains(handlers.get(p1int)))
-			boundHandlers.add(handlers.get(p1int));
-		System.out.printf("Handler '%d' added to bound handlers.\n", p1int);	
-	}
-	
-	
-	
-	// unbind specified handler
-	public static void unbindHandler(Scanner commandScanner){
-		// command parameter (client to bind)
-		String p1 = commandScanner.next();
-		
-		// attempt to parse command input
-		Integer p1int = parseCommandInt(p1, 0, boundHandlers.size());
-		
-		// check that client with this number actually exists
-		if(p1int > handlers.size()){
-			System.out.printf("[ERR] '%d' - no such handler.\n", p1int);			
-			return;
-		}
-		
-		// your parse succeeded! add handler to bound handlers list
-		boundHandlers.remove(p1int);
-		System.out.printf("Handler '%d' added to bound handlers.\n", p1int);	
-	}
-	
-	
-	
-	// unbind all handlers
-	static void unbindAllHandlers(){
-		System.out.printf("Unbound %d client request handlers\n", boundHandlers.size());
-		boundHandlers.clear();
-	}
-	
-	
-	
-	// bind all handlers
-	static void bindAllHandlers(){
-		boundHandlers.clear();
-		for(int i = 0; i < handlers.size(); i++)
-			boundHandlers.add(handlers.get(i));
-	}
-	
 
+	
+	// gets command parameters an arraylist of strings
+	public static ArrayList<String> getParams(Scanner scanner){
+		// list of command parameters
+		ArrayList<String> params = new ArrayList<String>();
+		params.clear();
+		
+		// loop, get all strings from scanner
+		while(scanner.hasNext())
+			params.add(scanner.next());
+		
+		// close the scanner
+		scanner.close();
+		
+		// return parameter list
+		return params;
+	}
+	
+	
 	
 	// sets up commands
 	public static void setUpCommands(){
@@ -258,11 +283,140 @@ public class StammtischServer {
 		commands.clear();
 		
 		// stop command
-		commands.add(new Command("stop"){
+		commands.add(new Command("stop", 0){
 			@Override public void execute(Scanner cs){
 				// some code here
 				System.out.printf("Stopping stammtisch server.\n");
 				done = true;
+			}
+		});
+		
+		// list handlers command
+		commands.add(new Command("lh", 0){
+			@Override public void execute(Scanner cs){
+				System.out.printf("%d running request handlers:\n", handlers.size());
+				printHandlerList(handlers);
+			}
+		});
+	
+		// list bound handlers
+		commands.add(new Command("lbh", 0){
+			@Override public void execute(Scanner cs){
+				System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
+				printHandlerList(boundHandlers); 
+			}
+		});		
+			
+		// bind all handlers
+		commands.add(new Command("bindAll", 0){
+			@Override public void execute(Scanner cs){
+				boundHandlers.clear();
+				for(int i = 0; i < handlers.size(); i++){
+					boundHandlers.add(handlers.get(i));
+				}
+				System.out.printf("bound %d handlers\n", boundHandlers.size());
+			}
+		});	
+		
+		// unbind all handlers
+		commands.add(new Command("unbindall", 0){
+			@Override public void execute(Scanner cs){
+				System.out.printf("Unbound %d client request handlers\n", boundHandlers.size());
+				boundHandlers.clear();
+			}
+		});
+		
+		// bind a handler
+		commands.add(new Command("bind", 1){
+			@Override public void execute(Scanner cs){
+				// get command parameters
+				ArrayList<String> params = getParams(cs);
+				
+				// check that there are enough parameters
+				if(params.size() < this.getParamCount()){
+					System.out.printf(
+						"[ERR] '%s' expects at least %d parameters\n", 
+						this.toString(), this.getParamCount()
+					);
+					return;
+				}
+				
+				// parse first parameter as an integer
+				Integer p1 = parseAsInt(params.get(0), 0, handlers.size());
+				if(p1 == null) return;
+				
+				// check that there are handlers to bind
+				if(!handlers.isEmpty()){					
+					// your parse succeeded! add handler to bound handlers list
+					if(!boundHandlers.contains(handlers.get(p1))){
+						boundHandlers.add(handlers.get(p1));
+						System.out.printf("Handler '%d' added to bound handlers.\n", p1);	
+					}
+				} else {
+					System.out.printf("[ERR] No handlers exist!\n");
+				}	
+			}
+		});	
+		
+		// unbind handler
+		commands.add(new Command("unbind", 1){
+			@Override public void execute(Scanner cs){
+				// get command parameters
+				ArrayList<String> params = getParams(cs);
+
+				// check that there are enough parameters
+				if(params.size() < this.getParamCount()){
+					System.out.printf(
+						"[ERR] '%s' expects at least %d parameters\n", 
+						this.toString(), this.getParamCount()
+					);
+					return;
+				}
+				
+				// attempt to parse command input
+				Integer p1 = parseAsInt(params.get(0), 0, boundHandlers.size());
+				if(p1 == null) return;
+				
+				// your parse succeeded! add handler to bound handlers list
+				if(!boundHandlers.isEmpty()){
+					boundHandlers.remove(p1);
+					System.out.printf("Handler '%d' added to bound handlers.\n", p1);
+				} else {
+					System.out.printf("[ERR] No bound handlers!\n");
+				}
+			}
+		});		
+		
+		// remove inactive handlers
+		commands.add(new Command("Prune", 0){
+			@Override public void execute(Scanner cs){
+				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
+				inactiveHandlers.clear();
+				
+				// loop through all request handlers, determine which of them are inactive
+				for(int i = 0; i < handlers.size(); i++)
+					if (handlers.get(i).isDone()) 
+						inactiveHandlers.add(handlers.get(i));
+				
+				// remove all inactive request handlers from the handler list
+				for(int i = 0; i < inactiveHandlers.size(); i++){
+					boundHandlers.remove(inactiveHandlers.get(i));
+					handlers.remove(inactiveHandlers.get(i));
+				}
+				
+				// print number of pruned handlers
+				System.out.printf("Removed %d handlers\n", inactiveHandlers.size());
+			}
+		});
+	
+		// disconnect all bound handlers
+		commands.add(new Command("kick", 0){
+			@Override public void execute(Scanner scanner){
+				// loop though all handlers and disconnect them
+				System.out.printf("Forcefully disconnected %d handlers\n", boundHandlers.size());
+				for(int i = 0; i < boundHandlers.size(); i++){
+					boundHandlers.get(i).stop();
+				}
 			}
 		});
 	}
@@ -280,6 +434,18 @@ public class StammtischServer {
 	
 	
 	
+	// method runs a command
+	public static void runCommand(String line){
+		Scanner lineScanner = new Scanner(line);			// create a scanner associated with this line
+		String commandID = lineScanner.next();				// get command ID
+		Command thisCommand = searchCommands(commandID);	// get the command associated with this ID
+		
+		if (thisCommand != null) thisCommand.execute(lineScanner);
+		else System.out.printf("[ERR] '%s' not recognised as command\n", commandID);
+	}
+	
+	
+	
 	// Main method for launching server
 	public static void main(String[] args) {
 		// do command-line argument parsing here
@@ -288,60 +454,20 @@ public class StammtischServer {
 		new StammtischServer(defaultPort);
 		
 		// "scanner" object for reading from command line (javawtf?)
-		Scanner commandScanner = new Scanner(System.in);	
-		String command = new String();
-		Command currentCommand = null;
+		String line = null;
+		Scanner lineScanner = new Scanner(System.in);
 		
 		// command handling loop
 		while(!done) {
-			command = commandScanner.next();
-			currentCommand = searchCommands(command);
+			// get console input
+			line = lineScanner.nextLine();
 			
-			// run command
-			if (currentCommand != null){
-				currentCommand.execute(commandScanner);
-			}else{
-				System.out.printf("[ERR] '%s' not recognised as command\n", command);
-			}
-				
-			
-			// handle command input
-			switch(command) {
-				// list currently running handlers
-				case "lh": 
-					System.out.printf("%d running request handlers:\n", handlers.size());
-					printHandlerList(handlers); 
-					break;	
-				
-				// list all currently bound handlers
-				case "lbh": 
-					System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
-					printHandlerList(boundHandlers); 
-					break;
-				
-				// bind all handlers
-				case "bindAll": bindAllHandlers(); break;
-					
-				// unbind all handlers
-				case "unbindAll": unbindAllHandlers(); break;
-				
-				// bind handler
-				case "bind": bindHandler(commandScanner); break; 
-				
-				// unbind handler
-				case "unbind": unbindHandler(commandScanner); break;
-					
-				// remove inactive handlers
-				case "prune": pruneHandlerLists(); break;
-				
-				// unrecognised command
-				default:
-					System.out.printf("[ERR] Unrecognised command! '%s'.\n", command);
-					break;
-			}
+			// Parse and run the command
+			runCommand(line);
 		}
-		// close command scanner
-		commandScanner.close();
+		
+		// close line scanner
+		lineScanner.close();
 		
 		// shut down server & all worker threads
 		System.exit(0);

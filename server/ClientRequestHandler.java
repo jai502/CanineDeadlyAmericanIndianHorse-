@@ -6,35 +6,54 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 
 // our imports
 import com.*;
+import SQL.*;
 
 
 public class ClientRequestHandler implements Runnable {
-	
+	private ArrayList<String> preLoginReqs;
+	private RequestObject currentRequest;
+	private User user;
+	private SQLHandler sql;
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
 	boolean done = false;			    // main loop complete
+	boolean threadDone = false;			// thread is still running
 	int order;
+	
+	// list of request handling objects
+	ArrayList<Response> responses;
 	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
+		this.responses = responses;
+		this.sql = sql;
+		
+		// create list of allowable pre-login requests
+		preLoginReqs = new ArrayList<String>();
+		preLoginReqs.clear();
+		
+		// allowable pre-login requests
+		preLoginReqs.add(new String("PING"));
+		preLoginReqs.add(new String("DISCONNECT"));
+		preLoginReqs.add(new String("REQUEST_LOGIN"));
+		preLoginReqs.add(new String("REQUEST_SIGNUP"));
 	}
+	
 	
 	
 	// client request handler thread code
 	@Override
 	public void run() {
-		// Thread local variables
-		RequestObject currentRequest = null;
-		
 		// test file for transmission
-		// String testFile = new String("M:/w2k/My Pictures/norgate.gif");
+		//String testFile = new String("M:/w2k/My Pictures/norgate.gif");
 		
 		while (!done) {
 			// wait for request from client
@@ -49,29 +68,23 @@ public class ClientRequestHandler implements Runnable {
 			
 			// take order number for current request
 			order = currentRequest.order;
-			System.out.printf("[H-%d] Recieved: %s\n", handlerInstance, currentRequest.id);
 			
-			switch(currentRequest.id.toString()) {
-				case "PING":		// ping command
-					sendResponse(new RequestObject("PONG", null, order));
-					break;
-
-				case "DISCONNECT":	// disconnect request
-					done = true;	// exit handler loop
-					break;
+			// search for response in response list
+			Response currentResponse = searchResponses(currentRequest.id);
+			System.out.printf("[H-%d] Got request %s\n", handlerInstance, currentRequest.id);
+			
+			if(currentResponse != null){
+				// if the user has not logged in, log them in
+				if((user != null) || reqAllowed(currentRequest.id)){
+					// respond to request
+					currentResponse.respond(this);
+				} else {
+					sendResponse(new RequestObject("NOT_LOGGED_IN", new String(""), order));
+				}
 					
-				case "REQUEST_LOGIN":
-					User thisUser = (User)currentRequest.param;
-					System.out.printf("Name: %s, Pass: %s\n",
-									  thisUser.getUsername(),
-									  thisUser.getPassword());
-					sendResponse(new RequestObject("RESPONSE_OK", new String("success"), order));
-					break;
-				
-				default:			// unrecognised request
-					sendResponse(new RequestObject("RESPONSE_UNKNOWN", new String(currentRequest.id.toString()), order));
-					// print to console stream
-					break;
+			} else {
+				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", currentRequest.id);
+				sendResponse(new RequestObject("RESPONSE_ERROR", currentRequest.id, order));
 			}
 		}
 		
@@ -82,6 +95,22 @@ public class ClientRequestHandler implements Runnable {
 			System.out.printf("[H-%d][ERR] Exception on socket close \n", handlerInstance);
 			e.printStackTrace();
 		}
+		
+		// indicate that thread is no longer running
+		threadDone = true;
+	}
+	
+	
+	
+	// method returns true of string matches any allowable pre-login requests
+	private boolean reqAllowed(String req){
+		// loop through all allowable pre-login requests
+		for(int i = 0; i < preLoginReqs.size(); i++)
+			if(preLoginReqs.get(i).equals(req))
+				return true;
+		
+		// if a matching allowed request string is not found, return false
+		return false;
 	}
 	
 	
@@ -111,25 +140,26 @@ public class ClientRequestHandler implements Runnable {
 			outputStream.writeObject(thisRequest);
 			outputStream.flush();
 		} catch(IOException e) {
-			System.out.printf("[H-%d][ERR] Failed to send respond (IOException)", handlerInstance);
+			System.out.printf("[H-%d][ERR] Failed to send response (IOException)", handlerInstance);
 			e.printStackTrace();
 		} 
 	}
+	
+	
+	
+	// searches for request in response list
+	public Response searchResponses(String requestId){
+		// loop through all responses, look for appropriate ID
+		for(int i = 0; i < responses.size(); i++)
+			if (requestId.equals(responses.get(i).getRequestId()))
+				return responses.get(i);
+		
+		// if response isn't found, return null
+		return null;
+	}
+	
 
-
 	
-	// return this handler instance
-	public int getNum() {return handlerInstance;}
-	
-	
-	// get ip address associated with this client request handler
-	public String getIp(){return clientSocket.getRemoteSocketAddress().toString();}
-	
-	
-	// get thread number associated with this request handler
-	public int getReqCount(){return order;}
-	
-
 	// get info string
 	public String getInfoString(){
 		return String.format(
@@ -137,11 +167,39 @@ public class ClientRequestHandler implements Runnable {
 			getNum(),
 			getIp(),
 			getReqCount(),
-			!done
+			!threadDone
 		);
 	}
 	
+	
+	
+	// return this handler instance number
+	public int getNum() {return handlerInstance;}
+	
+	// get ip address associated with this client request handler
+	public String getIp(){return clientSocket.getRemoteSocketAddress().toString();}
+	
+	// get thread number associated with this request handler
+	public int getReqCount(){return order;}
 
+	// function to stop the handler
+	public void stop(){done = true;}
+	
 	// returns true if request handler is running
-	public boolean isDone() {return done;}
+	public boolean isDone() {return threadDone;}
+	
+	// returns the socket to the caller (not used very often)
+	public Socket getSocket() {return clientSocket;} 
+	
+	// returns current request number
+	public int getOrder() {return order;}
+	
+	// getter for current request object
+	public RequestObject getCurrentRequest() {return currentRequest;}
+	
+	// getter for this handlers SQL interface
+	public SQLHandler getSQLHandler() {return sql;}
+	
+	// setter for logging in a user
+	public void setUser(User user) {this.user = user;}
 }
