@@ -23,7 +23,7 @@ public class ClientTest {
 		//String remoteHost = "2.102.60.24";
 		//int remotePort = 26656;
 		
-		String serverHost = "192.168.1.91";
+		String serverHost = "192.168.1.94";
 		int serverPort = 26656;
 		
 		//Local host for local connection
@@ -62,7 +62,7 @@ public class ClientTest {
 				user2.setEmail("newbie@gmail.com");
 				user2.setDob("1990-02-12");
 				
-				boolean signupResponse = com.signUp(user2);
+				String signupResponse = com.signUp(user2);
 				System.out.println("Signup returns: " + signupResponse);
 				break;
 			case "show":
