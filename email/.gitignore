@@ -5,3 +5,6 @@
 /EmailInit$1.class
 /TestEmail.class
 /TestEmai.class
+/SendEmailTest.class
+/Interceptor.class
+/Interceptor$SendEmailTest.class
