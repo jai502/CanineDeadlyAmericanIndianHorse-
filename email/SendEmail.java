@@ -3,12 +3,13 @@
 * First version created by: D.Dreyfus
 * Date of first version: 06.05.2016
 * 
-* Last version by: J.Bones
-* Date of last update: 09.05.2016
-* Version number: 1.2
+* Last version by: J.White
+* Date of last update: 23.05.2016
+* Version number: 1.2.1
 * 
-* Commit date: 09.05.2016
+* Commit date: 
 * Description: Module to allow for sending of Emails upon user registration
+* boolean return added in version 1.2.1 for ease of testing
  */
 
 package email;
@@ -27,21 +28,25 @@ import javax.swing.JOptionPane;
 
 public class SendEmail 
 {
-
-    public static void send(String to, String sub,String msg, final String user_email, final String password) 
+	//inputs:to,subject,message,sender,sender password
+    public static boolean send(String to, String sub,String msg, final String user_email, final String password) 
     {
+    	boolean emailSent; 
+    	//added for ease of testing
+    	//not ideal as testing shouldn't change source code
+    	
         Properties properties = new Properties();
-        String host = "smtp.gmail.com";
-        int port = 587;
+        String host = "smtp.gmail.com";		//define host
+        int port = 587;		//define port
 
-      //Set up the system for sending email
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.socketFactory.port", port);
-        properties.put("mail.smtp.sender.address", user_email);
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.debug", "true");
-        properties.put("mail.smtp.EnableSSL.enable","true");
+        //Set up the system for sending email
+        properties.put("mail.smtp.starttls.enable", "true");	//allows encryption/use of plain text
+        properties.put("mail.smtp.host", host);		//set host
+        properties.put("mail.smtp.socketFactory.port", port);	//set port
+        properties.put("mail.smtp.sender.address", user_email);	//sets sender email as input
+        properties.put("mail.smtp.auth", "true");		//authentication
+        properties.put("mail.smtp.debug", "true");		//debugging
+        properties.put("mail.smtp.EnableSSL.enable","true");	//connects to ssl server
 
         //Code here was taken from
         //Reference http://stackoverflow.com/questions/386083/must-issue-a-starttls-command-first-sending-email-with-java-and-google-apps
@@ -50,16 +55,21 @@ public class SendEmail
         properties.setProperty("mail.smtp.port", "465");
         properties.setProperty("mail.smtp.socketFactory.port", "465");
         
-        Authenticator authenticator = new Authenticator() {
-          public PasswordAuthentication getPasswordAuthentication(){
+        //Authentication of sender details
+        Authenticator authenticator = new Authenticator() 
+        {
+          public PasswordAuthentication getPasswordAuthentication()
+          {
               return new PasswordAuthentication(user_email, password);
           }
-      };
+        };
+        //check PasswordAuthentication holds correct values
 
-      //Get the default session stuff
-      Session session = Session.getDefaultInstance(properties, authenticator);
-      Message message = new MimeMessage(session);
+        //Get the default session stuff
+        Session session = Session.getDefaultInstance(properties, authenticator);
+        Message message = new MimeMessage(session);
 
+        //Set email contents
         try 
         {
             message.setFrom(new InternetAddress(user_email));
@@ -72,12 +82,17 @@ public class SendEmail
             //Send the message
             Transport.send(message);
             System.out.println("Email Sent!");
-        } catch (MessagingException e) 
-        {
-            JOptionPane.showMessageDialog(null,"Something happened!");
             
+            emailSent = true;
+        } 
+        
+        catch (MessagingException e) 
+        {
+        	emailSent = false;
+            JOptionPane.showMessageDialog(null,"Something happened!");
             throw new RuntimeException(e);
         }
         
+        return emailSent;
     }
 }
