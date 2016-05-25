@@ -51,6 +51,8 @@ import javafx.stage.*;
 import javafx.util.Callback;
 import searchDetails.SearchDetails;
 import com.RequestObject;
+import com.User;
+
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -88,7 +90,7 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword1;
 	private Text messageLogIn, response1;
 	private String sUsernameLogin, sPasswordLogin;
-	private LoginDetails loginDetails = new LoginDetails();
+	private User user = new User();
 	//private ArrayList<String> inputData1 = new ArrayList<String>();
 
 	/* variables for addSignupGridItems() method */
@@ -176,7 +178,7 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
-		//com.close();
+		com.stop();
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
 	}
@@ -513,7 +515,7 @@ public class MainGuiPagination extends Application
 		{
 			public void handle(ActionEvent t) 
 			{
-				//com.close();
+				com.stop();
 				System.exit(0);
 			}
 
@@ -832,36 +834,24 @@ public class MainGuiPagination extends Application
 					response1.setText("Textfields are empty!");
 					response1.setFill(Color.RED);
 				}	
+
 				// Store the data and send to mysql database to check validity
 				else 
 				{
 					// Set the username and password fields in local LoginDetails class
-					loginDetails.setUsername(sUsernameLogin);
-					loginDetails.setPassword(sPasswordLogin);
+					user.setUsername(sUsernameLogin);
+					user.setPassword(sPasswordLogin);
 
-					//					String x = (String) loginDetails.getUsername();
-					//					String y = (String) loginDetails.getPassword();
-					//					
-					//					System.out.println("Username is: " + x);
-					//					System.out.println("Password is: " + y);
-
-					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
 					response1.setText("Logging in, please wait");
 					response1.setFill(Color.BLACK);
 
 
 					/***** Client/Server Communication *****/
-					com.loginToServer(loginDetails);
+					boolean loginSuccessful = com.loginToServer(user);
+					System.out.println("User login was: " + loginSuccessful);
+					/**************************************/
 
-					System.out.println("On next line");
-
-					//Response from server
-					RequestObject info = com.readFromServer();
-
-					System.out.println("Response from server has ID: " + info.id);
-
-
-					if(info.id.equals("LOGIN_SUCCESSFUL")){
+					if(loginSuccessful == true){
 						window.setTitle("User Menu Screen");
 						window.setScene(userScreenMenu);
 					}
@@ -875,7 +865,6 @@ public class MainGuiPagination extends Application
 						textFieldPassword1.clear();
 					}			
 
-					/**************************************/
 				}								
 			}
 		}); 
@@ -907,49 +896,30 @@ public class MainGuiPagination extends Application
 
 		// Create the labels for First Name, Surname Name, email,
 		// username and password, etc..and adding to the rootNode
-		firstName = new Label("First Name: ");
-		grid.add(firstName, 0, 1);
-		surName = new Label("Surname: ");
-		grid.add(surName, 0, 2);
-		dateOfBirth = new Label("Date of Birth: ");
-		grid.add(dateOfBirth, 0, 3);
-		email = new Label("Email: ");
-		grid.add(email, 0, 4);
-		confirmEmail = new Label("Confirm Email: ");
-		grid.add(confirmEmail, 0, 5);
+
 		userName2 = new Label("Username: ");
-		grid.add(userName2, 0, 6);
+		grid.add(userName2, 0, 1);
 		passWord2 = new Label("Password: ");
-		grid.add(passWord2, 0, 7);
-		confirmPassword = new Label("Confirm Password: ");
-		grid.add(confirmPassword, 0, 8);
+		grid.add(passWord2, 0, 2);
+		email = new Label("Email: ");
+		grid.add(email, 0, 3);
+		dateOfBirth = new Label("Date of Birth: ");
+		grid.add(dateOfBirth, 0, 4);
 
 		// Create the textfields for First Name, Surname Name, email,
 		// username and password, etc..and adding to the rootNode
-		textFieldFirstName = new TextField();
-		textFieldFirstName.setPromptText("Enter First Name");
-		grid.add(textFieldFirstName, 1, 1);
-		textFieldSurname = new TextField();
-		textFieldSurname.setPromptText("Enter Surame");
-		grid.add(textFieldSurname, 1, 2);
-		textFieldDateOfBirth = new TextField();
-		textFieldDateOfBirth.setPromptText("Enter Date of Birth");
-		grid.add(textFieldDateOfBirth, 1, 3);
-		textFieldEmail = new TextField();
-		textFieldEmail.setPromptText("Enter valid Email address");
-		grid.add(textFieldEmail, 1, 4);
-		textFieldConfirmEmail = new TextField();
-		textFieldConfirmEmail.setPromptText("Confirm Email address");
-		grid.add(textFieldConfirmEmail, 1, 5);
 		textFieldUsername = new TextField();
 		textFieldUsername.setPromptText("Enter Username");
-		grid.add(textFieldUsername, 1, 6);
+		grid.add(textFieldUsername, 1, 1);
 		textFieldPassword2 = new PasswordField();
 		textFieldPassword2.setPromptText("Enter password of your choice");
-		grid.add(textFieldPassword2, 1, 7);
-		textFieldConfirmPassword = new PasswordField();
-		textFieldConfirmPassword.setPromptText("Confirm password");
-		grid.add(textFieldConfirmPassword, 1, 8);
+		grid.add(textFieldPassword2, 1, 2);
+		textFieldEmail = new TextField();
+		textFieldEmail.setPromptText("Enter valid Email address");
+		grid.add(textFieldEmail, 1, 3);
+		textFieldDateOfBirth = new TextField();
+		textFieldDateOfBirth.setPromptText("Enter Date of Birth");
+		grid.add(textFieldDateOfBirth, 1, 4);
 
 		// Creating a Button for Registering and going back to main menu
 		btnRegister = new Button("Register");
@@ -987,134 +957,67 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				sFirstName = textFieldFirstName.getText();
-				sSurname = textFieldSurname.getText();
 				sDateOfBirth = textFieldDateOfBirth.getText();
 				sEmail = textFieldEmail.getText();
-				sConfirmEmail = textFieldConfirmEmail.getText();
 				sUsername = textFieldUsername.getText();
 				sPassword = textFieldPassword2.getText();
-				sConfirmPassword = textFieldConfirmPassword.getText();
-
-				//				SignupDetails signupDetails = new SignupDetails();
-				//				RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
-				//				Serializer serializer = new Serializer();
-				//				byte[] serializedSignupDetails = null;
-				//				byte[] encryptedData = null;
 
 				// Check if any of the textfields are null
-				if(sFirstName.equals("") || sSurname.equals("") || sDateOfBirth.equals("") || sEmail.equals("") || sConfirmEmail.equals("") 
-						|| sUsername.equals("") || sPassword.equals("") || sConfirmPassword.equals(""))
+				if(sDateOfBirth.equals("") || sEmail.equals("") || sUsername.equals("") || sPassword.equals(""))
 				{	
 					response2.setText("Textfields are empty!");
 					response2.setFill(Color.RED);
 				}	
-				// Check if input is valid and store the data to send to mysql
-				else if(sEmail.equals(sConfirmEmail) && sPassword.equals(sConfirmPassword))
-				{
-					//					// Create key generation for encryption and decryption
-					//					try {
-					//						rsaEncryptDecrypt.createKeys();
-					//					} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
-					//						// TODO Auto-generated catch block
-					//						e1.printStackTrace();
-					//					}
-
-					// Set the username and password fields in local SignUpDetails class
-					signupDetails.setFirstName(sFirstName);
-					signupDetails.setSurname(sSurname);	
-					signupDetails.setDateOfBirth(sDateOfBirth);
-					signupDetails.setEmail(sEmail);
-					signupDetails.setConfirmEmail(sConfirmEmail);
-					signupDetails.setUsername(sUsername);
-					signupDetails.setPassword(sPassword);
-					signupDetails.setConfirmPassword(sConfirmPassword);
-
-					// Before Encryption
-					//String a = (String) signupDetails.getFirstName();
-					System.out.println("Test Object is: " + signupDetails);
-
-					//					// Serialize signUpDetails
-					//					try {
-					//						serializedSignupDetails = Serializer.serialize(signupDetails);
-					//					} catch (IOException e1) {
-					//						// TODO Auto-generated catch block
-					//						e1.printStackTrace();
-					//					}
-					//					
-					//					System.out.println("Serialized test object: " + serializedSignupDetails);
-					//					
-					//					try {
-					//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
-					//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-					//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
-					//						// TODO Auto-generated catch block
-					//						e1.printStackTrace();
-					//					}
-					//					
-					//					// After Encryption
-					//					//String b = (String) signupDetails.getFirstName();
-					//					System.out.println("Encrypted and Serialized Data is: " + encryptedData);
-
-					/***** Client/Server Communication *****/
-
-					ServerRequestHandler com = new ServerRequestHandler(serverPort, serverHost);
-					com.start();
-
-					RequestObject signUpRequest = new RequestObject(id, signupDetails, 0);
-					com.sendToServer(signUpRequest);
-
-					RequestObject info = com.contentFromServer;
-					String content = info.id; //Tells you about the content
-
-					//window.setTitle("User Screen Menu");
-					//window.setScene(userScreenMenu);
-
-					/**************************************/
-
-					//					System.out.println("Now for the Decrypting!");
-
-					//					try {
-					//						encryptedData = RSAEncryptDecrypt.rsaEncrypt(serializedSignupDetails);
-					//					} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-					//							| IllegalBlockSizeException | BadPaddingException | IOException e1) {
-					//						// TODO Auto-generated catch block
-					//						e1.printStackTrace();
-					//					}
-
-					//					String a = (String) signupDetails.getFirstName();
-					//					String b = (String) signupDetails.getSurname();
-					//					String c = (String) signupDetails.getEmail();
-					//					String d = (String) signupDetails.getConfirmEmail();
-					//					String ee = (String) signupDetails.getUsername();
-					//					String f = (String) signupDetails.getPassword();
-					//					String g = (String) signupDetails.getConfirmPassword();
-					//					
-					//					System.out.println("Firstname is: " + a);
-					//					System.out.println("Surname is: " + b);
-					//					System.out.println("Email is: " + c);
-					//					System.out.println("ConfirmEmail is: " + d);
-					//					System.out.println("Username is: " + ee);
-					//					System.out.println("Password is: " + f);
-					//					System.out.println("ConfirmPassword is: " + g);
-
-
-
-					//System.out.println(inputData.get(0) + ", " + inputData.get(1));
-					response2.setText("Registering with us, please wait");
-					response2.setFill(Color.BLACK);
-				}
-				// Some input did not match, clear textfelds and try again
 				else
 				{
-					response2.setText("Error in input, please try again!");
-					response2.setFill(Color.RED);
-					textFieldEmail.clear();
-					textFieldConfirmEmail.clear();
+					// Set the username and password fields in local SignUpDetails class
+					user.setUsername(sUsername);
+					user.setPassword(sPassword);
+					user.setEmail(sEmail);
+					user.setDob(sDateOfBirth);
+				}
+
+				/**** Client/Server Communication *****/
+				String signUpSuccessful = com.signUp(user);
+				/**************************************/
+				if(signUpSuccessful == null)
+				{
+					window.setTitle("User Menu Screen");
+					window.setScene(userScreenMenu);
+				}
+				else
+				{
+					System.out.println(signUpSuccessful);
+					window.setTitle("Sign Up Screen");
+					window.setScene(signUpMenu);
+					response1.setText("Error in input, please try again!");
+					response1.setFill(Color.RED);
+					textFieldUsername.clear();
 					textFieldPassword2.clear();
-					textFieldConfirmPassword.clear();
-				}				
+					textFieldDateOfBirth.clear();
+					textFieldEmail.clear();
+				}			
+
+
+				//window.setTitle("User Screen Menu");
+				//window.setScene(userScreenMenu);
+
+				//System.out.println(inputData.get(0) + ", " + inputData.get(1));
+				response2.setText("Registering with us, please wait");
+				response2.setFill(Color.BLACK);
 			}
+
+			//			// Some input did not match, clear textfelds and try again
+			//			else
+			//			{
+			//				response2.setText("Error in input, please try again!");
+			//				response2.setFill(Color.RED);
+			//				textFieldEmail.clear();
+			//				textFieldConfirmEmail.clear();
+			//				textFieldPassword2.clear();
+			//				textFieldConfirmPassword.clear();
+			//			}				
+
 		}); 
 
 		return grid;
@@ -1141,11 +1044,6 @@ public class MainGuiPagination extends Application
 		messageUser.setFill(Color.ALICEBLUE);
 		messageUser.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(messageUser, 0, 0, 2, 1);
-
-		// Create the labels for Username
-		//uUserName = new Label(loginDetails.getUsername());
-		//		uUserName = new Label("Username here");
-		//		grid.add(uUserName, 0, 1);
 
 		textFieldTitle = new TextField();
 		textFieldTitle.setPromptText("Search by Title");
@@ -1184,7 +1082,7 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				//com.close();
+				com.stop();
 				textFieldName.clear();
 				textFieldPassword1.clear();
 				window.setTitle("Main Menu");
@@ -1252,6 +1150,35 @@ public class MainGuiPagination extends Application
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 		scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
 		scrollPane.setId("scrollPane");
+
+		VBox vbox = new VBox();
+		vbox.setPadding(new Insets(10));
+		vbox.setSpacing(10);
+
+		Image image1 = new Image("gui/Finland.png");
+		Image image2 = new Image("gui/France.png");
+		Image image3 = new Image("gui/Germany.png");
+		Image image4 = new Image("gui/Portugal.png");
+		Image image5 = new Image("gui/Greece.png");
+
+		ImageView imageView1 = new ImageView(image1);
+		ImageView imageView2 = new ImageView(image2);
+		ImageView imageView3 = new ImageView(image3);
+		ImageView imageView4 = new ImageView(image4);
+		ImageView imageView5 = new ImageView(image5);
+
+		HBox hbox1 = new HBox(10);
+		hbox1.getChildren().add(imageView1);
+		HBox hbox2 = new HBox(10);
+		hbox2.getChildren().add(imageView2);
+		HBox hbox3 = new HBox(10);
+		hbox3.getChildren().add(imageView3);
+		HBox hbox4 = new HBox(10);
+		hbox4.getChildren().addAll(imageView4, imageView5);
+
+		vbox.getChildren().addAll(hbox1, hbox2, hbox3, hbox4);
+
+		scrollPane.setContent(vbox);
 
 		return scrollPane;
 	}
