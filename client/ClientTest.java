@@ -23,7 +23,7 @@ public class ClientTest {
 		//String remoteHost = "2.102.60.24";
 		//int remotePort = 26656;
 		
-		String serverHost = "FuckThePWS.ddns.net";
+		String serverHost = "192.168.1.91";
 		int serverPort = 26656;
 		
 		//Local host for local connection
