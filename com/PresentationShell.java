@@ -21,6 +21,7 @@ public class PresentationShell implements Serializable
 	private static final long serialVersionUID = 1L;
 	
 	private String title, language, author, tagOne, tagTwo, tagThree, tagFour, tagFive;
+	private Integer id, rating;
 	
 	/**
 	 * @return the title
@@ -28,6 +29,22 @@ public class PresentationShell implements Serializable
 	public String getTitle() 
 	{
 		return title;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getRating() {
+		return rating;
+	}
+
+	public void setRating(Integer votes) {
+		this.rating = votes;
 	}
 
 	/**

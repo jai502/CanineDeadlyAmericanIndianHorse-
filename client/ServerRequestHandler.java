@@ -166,6 +166,30 @@ public class ServerRequestHandler
 		return presentationList;
 	}
 	
+	public final void getPresentation(PresentationShell pres)
+	{
+		RequestObject getPresentation = new RequestObject("REQUEST_PRES", (Object) pres, order);
+		System.out.println("Sending " + getPresentation.id + " with order " + getPresentation.order + "...");
+		sendRequest(getPresentation);
+		RequestObject response = getResponse();
+		
+		switch(response.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Server response: " + (String) response.param);
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Return failed: " + (String) response.param);
+			break;
+		case "RESPONSE_UNKNOWN":
+			System.out.println("Server didn't recognise request");
+			break;
+		default:
+			System.out.println("Internal Server Error: " + response.id);
+			break;
+		}	
+	}
+	
 	public final String ping()
 	{
 		String result = null;

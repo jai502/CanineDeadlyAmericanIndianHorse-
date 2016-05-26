@@ -21,6 +21,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
+
+import org.omg.CORBA.SystemException;
+
 import Objects.Presentation;
 import Parsers.XMLParser;
 import SQL.SQLHandler;
@@ -40,6 +43,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 //import javafx.beans.InvalidationListener;
 //import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -80,10 +85,12 @@ public class MainGuiPagination extends Application
 	private BorderPane userScreenLayout;
 	private User user = new User();
 	private PresentationShell presentationShell = new PresentationShell();
+	private PresentationShell presentationLoad;
 	//final ListView<String[]> listView = new ListView<String[]>();
 	private final ListView<String> searchView = new ListView<String>();
 	private ObservableList<String> observableList;
 	private ArrayList<String> searchList = new ArrayList<String>();
+	private ArrayList<String> idList = new ArrayList<String>();
 	private boolean logout = true;
 
 	private String SQLHost = "stammtischsql.ddns.net";
@@ -126,17 +133,19 @@ public class MainGuiPagination extends Application
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for addUserGridItems() method */
-	private Button btnLogOut, btnSearch, btnReset;
+	private Button btnLogOut, btnSearch, btnReset, btnLoadPres;
 	private Label uFirstName, uSurName, uUserName;
 	private TextField textFieldTitle, textFieldAuthor, textFieldLanguage;
 	private Text messageLogOut, messageUser, response3;
 	private String title, author, language;
+	private int presentationIndex, presentationIndex2;
+	private String presentationID;
 	private SearchDetails searchDetails = new SearchDetails();
+	ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
 
 	/* variables for the Scroll Pane */
 	private ScrollPane scrollPane = new ScrollPane();
-	
-	
+
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
 	private String filename1, filename2, filename3, xmlPathname, parsingFileName;
@@ -203,7 +212,7 @@ public class MainGuiPagination extends Application
 	{
 		if(logout == false)
 		{
-		com.stop();
+			com.stop();
 		}
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
@@ -544,7 +553,7 @@ public class MainGuiPagination extends Application
 			{
 				if(logout == false)
 				{
-				com.stop();
+					com.stop();
 				}
 				System.exit(0);
 			}
@@ -1103,11 +1112,13 @@ public class MainGuiPagination extends Application
 		btnSearch.setId("btnSearch");
 		btnReset = new Button("Reset Search");
 		btnReset.setId("btnReset");
+		btnLoadPres = new Button("Load Presentation");
+		btnReset.setId("btnLoadPres");
 
 		// Creating a HBox area to add the buttons to
 		HBox hbArea = new HBox(10);
 		hbArea.setAlignment(Pos.BOTTOM_RIGHT);
-		hbArea.getChildren().addAll(btnSearch, btnReset, btnLogOut);
+		hbArea.getChildren().addAll(btnSearch, btnReset, btnLoadPres, btnLogOut);
 
 		// Adding hbArea with the button in it to the rootNode
 		grid.add(hbArea, 1, 9);
@@ -1146,41 +1157,51 @@ public class MainGuiPagination extends Application
 				presentationShell.setAuthor(author);
 				presentationShell.setLanguage(language);
 
-				ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
-				
+
+
 				/************* Client/Server Communication ***************/
 				searchResults = com.searchForPresentation(presentationShell);
 				/*********************************************************/
 				//ArrayList<String> searchList = new ArrayList<String>();
 				searchList.clear();
+				idList.clear();
 				int x = 0;
-				
+
 				for (int i = 0; i < searchResults.size(); i++)
 				{
 					for(x = 0; x < searchResults.get(i).length; x++)
 					{
 						if (x == 0)
 						{
-							searchList.add(searchResults.get(i)[x]);
+							idList.add(searchResults.get(i)[x]);
 						}
-						else
+						else if (x == 1)
+						{
+							searchList.add("Title: " + searchResults.get(i)[x] + "\n");
+						}
+						else if (x == 2)
 						{	
-							searchList.add(searchList.get(i) + " : " + searchResults.get(i)[x]);
+							searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x]+ "\n");
+							searchList.remove(i);
+						}
+						else if (x == 3)
+						{
+							searchList.add(searchList.get(i) + "Language: " + searchResults.get(i)[x]);
 							searchList.remove(i);
 						}
 					}
 				}
-				
-//				userScreenLayout.setRight(searchDetails());
+
+				//				userScreenLayout.setRight(searchDetails());
 				System.out.println(searchList);
-				
+
 				observableList = FXCollections.observableList(searchList);
-				
-				
+
+
 				for(int i = 0; i<searchResults.size(); i++)
 				{
 					System.out.print("Presentation " + (i+1) + " is: ");
-					for (int j = 0; j < 3; j++)
+					for (int j = 0; j < 4; j++)
 					{
 						switch(j)
 						{
@@ -1194,17 +1215,41 @@ public class MainGuiPagination extends Application
 						case 2:
 							System.out.println(" (" + searchResults.get(i)[j] + ") ");
 							break;
+						case 3:
+							System.out.println(" (" + searchResults.get(i)[j] + ") ");
+							break;
 						}
 					}
 				}
 				response3.setText("Searching for results");
 				response3.setFill(Color.MEDIUMPURPLE);
-		        searchView.setVisible(true);
+				searchView.setVisible(true);
 				userScreenLayout.setRight(searchDetails());
 			}
-			
+
 
 		}); 
+
+		// Event handler for btnLoadPres
+		btnLoadPres.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				presentationIndex = searchView.getSelectionModel().getSelectedIndex();
+				presentationID = idList.get(presentationIndex);
+				System.out.println("Presentation ID is: " + presentationID);
+				presentationLoad = new PresentationShell();
+				presentationLoad.setId(Integer.parseInt(searchResults.get(presentationIndex)[0]));
+				presentationLoad.setTitle(searchResults.get(presentationIndex)[1]);
+				presentationLoad.setAuthor(searchResults.get(presentationIndex)[2]);
+				presentationLoad.setLanguage(searchResults.get(presentationIndex)[3]);
+
+				/************* Client/Server Communication ***************/
+				com.getPresentation(presentationLoad);
+				/*********************************************************/
+			}
+		});
 
 		// Event handler for btnReset
 		btnReset.setOnAction(new EventHandler<ActionEvent>() 
@@ -1216,54 +1261,92 @@ public class MainGuiPagination extends Application
 				textFieldAuthor.clear();
 				textFieldLanguage.clear();
 				searchList.clear();
+				idList.clear();
 				userScreenLayout.setRight(searchDetails());
-		        searchView.setVisible(false);
+				searchView.setVisible(false);
 			}
 		});
 
 		return grid;
 	}
 
-	/* Method for GridPane items for User Screen Menu */
-	public ScrollPane addUserScrollItems(){
-
-		// Create a root node called grid. In this case a grid pane layout 
-		scrollPane.setPrefWidth(400);
-		scrollPane.setPrefHeight(400);
-		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-		scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
-		scrollPane.setId("scrollPane");
-		
-		//ObservableList<String> ol = FXCollections.observableArrayList(stringList);
-		
-		final ListView<String> listView = new ListView<String>();
-//        listView.setItems(FXCollections.observableArrayList(
-//                "Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6",
-//                "Row 7", "Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
-//                "Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19", "Row 20"
-//        ));
-		
-		//listView.setItems(observableList);
-		//listView.setItems(ol);
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        scrollPane.setContent(listView);
-		
-		return scrollPane;
-	}
-	
 	public Group searchDetails()
 	{
 		Group listGroup = new Group();
 		searchView.setId("listView");
+		searchView.setPrefHeight(userScreenLayout.getHeight());
+		searchView.setPrefWidth(userScreenLayout.getWidth()/2);
 		System.out.println(observableList);
+
+//		searchView.getSelectionModel()..addListener(new ChangeListener<String>() {
+//		    @Override
+//		    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+//		    	presentationIndex2 = searchView.getSelectionModel().getSelectedIndex();
+//				presentationID = idList.get(presentationIndex);
+//		    }
+//		});
 		
-		//ObservableList<String> ol = FXCollections.observableArrayList(stringList);
-		
-		//listView.setItems(observableList);
-		searchView.setItems(observableList);	
-		searchView.getSelectionModel().getSelectedIndex();
-        searchView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listGroup.getChildren().add(searchView);
+		final StringProperty hoveredItem = new SimpleStringProperty(null);
+
+		searchView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+			@Override
+			public ListCell<String> call(ListView<String> listView) {
+				final ListCell<String> listCell = new ListCell<String>() {
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (empty) {
+							setText(null);
+						} else {
+							setText(item);
+						}
+					}
+				};
+
+				// Either of the following works:
+				// register mouse listeners:
+				listCell.setOnMouseEntered(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						hoveredItem.set(listCell.getItem());
+					}
+				});
+				listCell.setOnMouseExited(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						hoveredItem.set(null);
+					}
+				});
+
+				// or register a change listener with the hover property
+				listCell.hoverProperty().addListener(new ChangeListener<Boolean>() {
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable,
+							Boolean oldValue, Boolean newValue) {
+						if (newValue) {
+							hoveredItem.set(listCell.getItem());
+							/* mouse hover */
+							presentationIndex2 = searchView.getSelectionModel().getSelectedIndex();
+							System.out.println(presentationIndex2);
+							Tooltip t = new Tooltip("Rating: " + searchResults.get(presentationIndex2)[4]);
+							t.getStyleClass().add("ttip");
+							listCell.setTooltip(t);
+						} else {
+							hoveredItem.set(null);
+						}
+					}
+				});
+				
+
+				return listCell;
+			}
+		});
+
+		searchView.setItems(observableList);
+
+		//searchView.getSelectionModel().getSelectedIndex();
+		searchView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listGroup.getChildren().add(searchView);
 		return listGroup;
 	}
 
