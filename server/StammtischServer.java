@@ -167,12 +167,11 @@ public class StammtischServer {
 			}
 		});
 		
-		// 
+		// request download of presentation
 		responses.add(new Response("REQUEST_PRES"){
 			@Override public void respond(ClientRequestHandler handler){
 				// get current request and SQL handler
 				RequestObject thisRequest = handler.getCurrentRequest();
-				SQLHandler SQLHandler = handler.getSQLHandler();
 				PresentationShell presentation = null;
 				
 				// get presentation shell object
@@ -185,7 +184,58 @@ public class StammtischServer {
 				}
 				
 				// get ID of the presentation that the client wants
-				Integer presId = presentation.get
+				Integer presId = presentation.getId();
+				
+				// return string
+				String returnString = 
+						"ID: " +
+						presId.toString() +
+						"|auth: " +
+						presentation.getAuthor() +
+						"|lang: " +
+						presentation.getLanguage() +
+						"|rating: " +
+						presentation.getRating() +
+						"|title: " +
+						presentation.getTitle();
+				
+				// notify client that presentation ID has been received
+				handler.respondOk(returnString);
+			}
+		});
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_UPLOAD"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.respondFail(new String("not implemented!"));
+			}
+		});		
+
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_SET_VOTE"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_GET_VOTE"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_SET_COMMENT"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_GET_COMMENT"){
+			@Override public void respond(ClientRequestHandler handler){
+				handler.respondFail(new String("not implemented!"));
 			}
 		});
 	}
