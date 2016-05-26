@@ -150,11 +150,8 @@ public class StammtischServer {
 				SQLHandler SQLHandler = handler.getSQLHandler();
 				PresentationShell presentation = null;
 				
-				// results of the search
-				ArrayList<String[]> searchResults = null;
-				
 				// get the presentation object to respond with
-				try{
+				try {
 					presentation = (PresentationShell)thisRequest.param;
 				} catch (Exception e){
 					handler.respondFail("malformed request");
@@ -163,10 +160,32 @@ public class StammtischServer {
 				}
 				
 				// query the presentation database
-				searchResults = SQLHandler.searchPresentation(presentation);
+				ArrayList<String[]> searchResults = SQLHandler.searchPresentation(presentation);
 				
 				// generate request object
 				handler.respondOk(searchResults);
+			}
+		});
+		
+		// 
+		responses.add(new Response("REQUEST_PRES"){
+			@Override public void respond(ClientRequestHandler handler){
+				// get current request and SQL handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				
+				// get presentation shell object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					handler.respondFail("malformed request");
+					e.printStackTrace();
+					return;
+				}
+				
+				// get ID of the presentation that the client wants
+				Integer presId = presentation.get
 			}
 		});
 	}
