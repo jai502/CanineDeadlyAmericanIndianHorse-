@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class Zipper{
 
@@ -121,5 +124,87 @@ public class Zipper{
 			toDelete.delete();
 			System.out.println("Deleted file: 			"+toDelete.getAbsolutePath());
 		}
+	}
+	
+	public void zip(String sourceFolder, String destinationFile) throws Exception
+	{
+		ZipOutputStream zipStream = null;
+		FileOutputStream fileStream = null;
+
+		fileStream = new FileOutputStream(destinationFile);
+		zipStream = new ZipOutputStream(fileStream);
+
+		zipFolder("", sourceFolder, zipStream);
+		zipStream.flush();
+		zipStream.close();
+	}
+
+	public void zipFile(String filePath, String sourceFile, ZipOutputStream zipStream) throws Exception 
+	{
+		File folder = new File(sourceFile);
+		if (folder.isDirectory()) 
+		{
+			zipFolder(filePath, sourceFile, zipStream);
+		}
+		else 
+		{
+			byte[] buffer = new byte[1024];
+			int write;
+			FileInputStream fileStream = new FileInputStream(sourceFile);
+			zipStream.putNextEntry(new ZipEntry(filePath + File.separator + folder.getName()));
+			
+			while ((write = fileStream.read(buffer)) > 0)
+			{
+				zipStream.write(buffer, 0, write);
+			}
+		}
+	}
+
+	private void zipFolder(String filePath, String sourceFolder,ZipOutputStream zipStream) throws Exception 
+	{
+		File folder = new File(sourceFolder);
+
+		for (String fileName : folder.list()) 
+		{
+			if (filePath.equals("")) 
+			{
+				zipFile(folder.getName(), sourceFolder + File.separator + fileName, zipStream);
+			}
+			else
+			{
+				zipFile(filePath + File.separator + folder.getName(), sourceFolder + "/"
+						+ fileName, zipStream);
+			}
+		}
+	}
+
+	public static void copyFile(File sourceFile, File destFile) throws IOException 
+	{
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		try
+		{
+			inputStream = new FileInputStream(sourceFile);
+			outputStream = new FileOutputStream(destFile);
+
+			byte[] buffer = new byte[1024];
+			int bytesToRead;
+
+			while ((bytesToRead = inputStream.read(buffer)) > 0) 
+			{
+				outputStream.write(buffer, 0, bytesToRead);
+			}
+		} 
+		finally 
+		{
+			inputStream.close();
+			outputStream.close();
+		}
+	}
+	
+	public void makeFolder(String folderName)
+	{
+		File folder = new File(folderName);
+		folder.mkdir();
 	}
 }

@@ -3,7 +3,7 @@ package zipping;
 public class ZipTest{
     public static void main(String[] args) {
         String zipFile= "zipping/presentation.pws";
-        String destination= "Unzipped Files/";
+        String destination= "temp/";
         Zipper unzipper = new Zipper();
         unzipper.deleteFolder(destination);
         try {
