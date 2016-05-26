@@ -60,7 +60,7 @@ public class SQLTester
 		//===========================================================================
 		//Search the presentations table for a specific presentation
 		//===========================================================================
-		Presentation pres = new Presentation();
+		PresentationShell pres = new PresentationShell();
 		pres.setTitle("presentation");
 		
 		ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
@@ -74,13 +74,16 @@ public class SQLTester
       {
       	switch(j)
       	{
-	      	case 0:
+      		case 0:
+      			System.out.print(searchResults.get(i)[j] + " ");
+      			break;
+	      	case 1:
 	      		System.out.print(" '" + searchResults.get(i)[j] + "' ");
 	      		break;
-	      	case 1:
+	      	case 2:
 	      		System.out.print("by " + searchResults.get(i)[j] + " ");
 	      		break;
-	      	case 2:
+	      	case 3:
 	      		System.out.println(" (" + searchResults.get(i)[j] + ") ");
 	      		break;
       	}
