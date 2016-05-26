@@ -31,9 +31,8 @@ public class SendEmail
 	//inputs:to,subject,message,sender,sender password
     public static boolean send(String to, String sub,String msg, final String user_email, final String password) 
     {
-    	boolean emailSent; 
+    	boolean emailSent = false; 
     	//added for ease of testing
-    	//not ideal as testing shouldn't change source code
     	
         Properties properties = new Properties();
         String host = "smtp.gmail.com";		//define host
@@ -88,11 +87,9 @@ public class SendEmail
         
         catch (MessagingException e) 
         {
-        	emailSent = false;
             JOptionPane.showMessageDialog(null,"Something happened!");
             throw new RuntimeException(e);
         }
-        
         return emailSent;
     }
 }

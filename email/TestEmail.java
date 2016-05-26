@@ -18,7 +18,7 @@ public class TestEmail
 
 	public static void main(String[] args) 
 	{
-		String to = "jww521@york.ac.uk"; //User email to be placed here
+		String to = "jww521york.ac.uk"; //User email to be placed here
 		String subject = "Welcome to Stammtisch!";
 		
 		//Method of retrieval of user data is required here
@@ -33,6 +33,6 @@ public class TestEmail
 		String sender = "swengstammtisch@gmail.com";
 		String senderPassword = "SWengTeam1";
 		
-		SendEmail.send(to, subject, message, sender, senderPassword);
+		boolean email = SendEmail.send(to, subject, message, sender, senderPassword);
 	}
 }
