@@ -15,12 +15,14 @@
 package com;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public class User implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	private String username, password, email, dob;
+	private String username, password, email;
+	private LocalDate dob;
 
 	/**
 	 * @return the username
@@ -73,15 +75,15 @@ public class User implements Serializable
 	/**
 	 * @return the dob
 	 */
-	public String getDob()
+	public LocalDate getDob()
 	{
 		return dob;
 	}
 
 	/**
-	 * @param dob the dob to set
+	 * @param sDateOfBirth the dob to set
 	 */
-	public void setDob(String dob)
+	public void setDob(LocalDate dob)
 	{
 		this.dob = dob;
 	} 

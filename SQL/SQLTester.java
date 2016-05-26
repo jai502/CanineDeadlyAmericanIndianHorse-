@@ -18,7 +18,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import com.*;
 
-import com.Presentation;
+import com.PresentationShell;
 
 public class SQLTester 
 {

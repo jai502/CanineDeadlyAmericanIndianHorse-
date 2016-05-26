@@ -35,7 +35,7 @@ public class QueryUsers {
 			command.setString(1, user.getUsername());
 			command.setString(2, user.getPassword());
 			command.setString(3, user.getEmail());
-			command.setString(4, user.getDob());
+			command.setString(4, user.getDob().toString());
 			
 			int row = command.executeUpdate();
 			System.out.println("User successfully added to SQL table with code: " + row);
@@ -166,7 +166,7 @@ public class QueryUsers {
 	//======================================================================================================================
 	// Method for creation of table with presentation and user tracking details
 	//======================================================================================================================
-	public static void userFirstAccess(Connection userDetailsCon, Connection presCon, User user, Presentation pres)
+	public static void userFirstAccess(Connection userDetailsCon, Connection presCon, User user, PresentationShell pres)
 	{
 		Statement command = null;
 		int presID = SQLTools.checkPresID(presCon, pres); //Check for presentation and return presentation ID
@@ -203,7 +203,7 @@ public class QueryUsers {
   //======================================================================================================================
 	// Method for updating user rating of the specified presentation
 	//======================================================================================================================
-	public static void setUserRating(Connection userDetailsCon, Connection presCon, User user, Presentation pres, int userRating){
+	public static void setUserRating(Connection userDetailsCon, Connection presCon, User user, PresentationShell pres, int userRating){
 		String userTrackingTable = user.getUsername() + "_tracking";
 		String presentationsTable = "testpresentations";
 		Statement userCommand = null;

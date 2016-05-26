@@ -16,7 +16,7 @@ package com;
 
 import java.io.Serializable;
 
-public class Presentation implements Serializable
+public class PresentationShell implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	

@@ -23,6 +23,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.imageio.ImageIO;
 import Objects.Presentation;
 import Parsers.XMLParser;
+import SQL.SQLHandler;
 import client.ServerRequestHandler;
 import encryptionRSA.RSAEncryptDecrypt;
 import encryptionRSA.Serializer;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +44,8 @@ import javafx.application.*;
 //import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -52,6 +56,7 @@ import javafx.util.Callback;
 import searchDetails.SearchDetails;
 import com.RequestObject;
 import com.User;
+import com.PresentationShell;
 
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
@@ -72,6 +77,19 @@ import javafx.scene.input.MouseEvent;
 
 public class MainGuiPagination extends Application 
 {	
+	private BorderPane userScreenLayout;
+	private User user = new User();
+	private PresentationShell presentationShell = new PresentationShell();
+	//final ListView<String[]> listView = new ListView<String[]>();
+	private final ListView<String> searchView = new ListView<String>();
+	private ObservableList<String> observableList;
+	private ArrayList<String> searchList = new ArrayList<String>();
+	private boolean logout = true;
+
+	private String SQLHost = "stammtischsql.ddns.net";
+	private int SQLPort = 3306;
+	private SQLHandler sqlHandler = new SQLHandler(SQLHost, SQLPort);
+
 	/* variables for the primary stage */
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu;
@@ -90,7 +108,7 @@ public class MainGuiPagination extends Application
 	private PasswordField textFieldPassword1;
 	private Text messageLogIn, response1;
 	private String sUsernameLogin, sPasswordLogin;
-	private User user = new User();
+
 	//private ArrayList<String> inputData1 = new ArrayList<String>();
 
 	/* variables for addSignupGridItems() method */
@@ -99,9 +117,10 @@ public class MainGuiPagination extends Application
 	private TextField textFieldFirstName, textFieldSurname, textFieldDateOfBirth, textFieldEmail, textFieldConfirmEmail, textFieldUsername;
 	private PasswordField textFieldPassword2, textFieldConfirmPassword;
 	private Text messageSignUp, response2;
-	private String sFirstName, sSurname, sDateOfBirth, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private String sFirstName, sSurname, sEmail, sConfirmEmail, sUsername, sPassword, sConfirmPassword;
+	private LocalDate sDateOfBirth;
 	private SignupDetails signupDetails = new SignupDetails();
-	private static String serverHost = "192.168.1.91";
+	private static String serverHost = "fuckthepws.ddns.net";
 	private static int serverPort = 26656;
 	private static String id;
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
@@ -114,6 +133,10 @@ public class MainGuiPagination extends Application
 	private String title, author, language;
 	private SearchDetails searchDetails = new SearchDetails();
 
+	/* variables for the Scroll Pane */
+	private ScrollPane scrollPane = new ScrollPane();
+	
+	
 	/* variables for presentation scene */
 	private SlideHandler sh = new SlideHandler();
 	private String filename1, filename2, filename3, xmlPathname, parsingFileName;
@@ -162,8 +185,8 @@ public class MainGuiPagination extends Application
 	@Override
 	public void init()
 	{
-		//com = new ServerRequestHandler(serverPort, serverHost);
-		//com.start();
+		com = new ServerRequestHandler(serverPort, serverHost);
+		com.start();
 		System.out.println("Setting up/initialising GUI now");
 	}
 
@@ -178,7 +201,10 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
+		if(logout == false)
+		{
 		com.stop();
+		}
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
 	}
@@ -260,7 +286,7 @@ public class MainGuiPagination extends Application
 
 		/******************* User Screen ******************************/
 		// Create a root node called loginLayout which uses BorderPane
-		BorderPane userScreenLayout = new BorderPane();
+		userScreenLayout = new BorderPane();
 		userScreenLayout.setId("userScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
 		userScreenMenu = new Scene(userScreenLayout, width, height, Color.BLACK);
@@ -269,11 +295,12 @@ public class MainGuiPagination extends Application
 
 		// ready to add to userScreenMenu scene
 		GridPane userMenu = addUserGridItems();
-		ScrollPane userMenuScroll = addUserScrollItems();
+		//ScrollPane userMenuScroll = addUserScrollItems();
+		Group searchResults = searchDetails();
 		// Add menu bar to User screen
 		userScreenLayout.setTop(userScreenMenuBar);
 		userScreenLayout.setLeft(userMenu);
-		userScreenLayout.setRight(userMenuScroll);
+		//userScreenLayout.setRight(searchDetails());
 
 		/**************************************************************/
 
@@ -515,7 +542,10 @@ public class MainGuiPagination extends Application
 		{
 			public void handle(ActionEvent t) 
 			{
+				if(logout == false)
+				{
 				com.stop();
+				}
 				System.exit(0);
 			}
 
@@ -852,6 +882,7 @@ public class MainGuiPagination extends Application
 					/**************************************/
 
 					if(loginSuccessful == true){
+						logout = false;
 						window.setTitle("User Menu Screen");
 						window.setScene(userScreenMenu);
 					}
@@ -859,6 +890,7 @@ public class MainGuiPagination extends Application
 					{
 						window.setTitle("Login Screen");
 						window.setScene(logInMenu);
+						logout = true;
 						response1.setText("Error in input, please try again!");
 						response1.setFill(Color.RED);
 						textFieldUsername.clear();
@@ -917,9 +949,16 @@ public class MainGuiPagination extends Application
 		textFieldEmail = new TextField();
 		textFieldEmail.setPromptText("Enter valid Email address");
 		grid.add(textFieldEmail, 1, 3);
-		textFieldDateOfBirth = new TextField();
-		textFieldDateOfBirth.setPromptText("Enter Date of Birth");
-		grid.add(textFieldDateOfBirth, 1, 4);
+
+		final DatePicker datePicker = new DatePicker(LocalDate.now());
+		datePicker.setOnAction(event -> {
+			sDateOfBirth = datePicker.getValue();
+			System.out.println("Selected date: " + sDateOfBirth);
+		});
+
+		//textFieldDateOfBirth = new TextField();
+		//textFieldDateOfBirth.setPromptText("Enter Date of Birth");
+		grid.add(datePicker, 1, 4);
 
 		// Creating a Button for Registering and going back to main menu
 		btnRegister = new Button("Register");
@@ -957,7 +996,6 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				sDateOfBirth = textFieldDateOfBirth.getText();
 				sEmail = textFieldEmail.getText();
 				sUsername = textFieldUsername.getText();
 				sPassword = textFieldPassword2.getText();
@@ -982,19 +1020,21 @@ public class MainGuiPagination extends Application
 				/**************************************/
 				if(signUpSuccessful == null)
 				{
+					System.out.println("Signup was successful");
+					logout = false;
 					window.setTitle("User Menu Screen");
 					window.setScene(userScreenMenu);
 				}
 				else
 				{
 					System.out.println(signUpSuccessful);
+					logout = true;
 					window.setTitle("Sign Up Screen");
 					window.setScene(signUpMenu);
 					response1.setText("Error in input, please try again!");
 					response1.setFill(Color.RED);
 					textFieldUsername.clear();
 					textFieldPassword2.clear();
-					textFieldDateOfBirth.clear();
 					textFieldEmail.clear();
 				}			
 
@@ -1082,6 +1122,7 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
+				logout = true;
 				com.stop();
 				textFieldName.clear();
 				textFieldPassword1.clear();
@@ -1101,26 +1142,67 @@ public class MainGuiPagination extends Application
 				language = textFieldLanguage.getText();
 
 				// Set the username and password fields in local SignUpDetails class
-				searchDetails.setTitle(title);
-				searchDetails.setAuthor(author);
-				searchDetails.setLanguage(language);
+				presentationShell.setTitle(title);
+				presentationShell.setAuthor(author);
+				presentationShell.setLanguage(language);
 
-
-				/***** Client/Server Communication *****/
-
-				//				ServerRequestHandler com = new ServerRequestHandler(serverPort, serverHost);
-				//				com.start();
-				//
-				//				RequestObject searchRequest = new RequestObject(id, searchDetails, 0);
-				//				com.sendToServer(searchRequest);
-				//
-				//				RequestObject info = com.contentFromServer;
-				//				String content = info.id; //Tells you about the content
-				/**************************************/
-
+				ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
+				
+				/************* Client/Server Communication ***************/
+				searchResults = com.searchForPresentation(presentationShell);
+				/*********************************************************/
+				//ArrayList<String> searchList = new ArrayList<String>();
+				searchList.clear();
+				int x = 0;
+				
+				for (int i = 0; i < searchResults.size(); i++)
+				{
+					for(x = 0; x < searchResults.get(i).length; x++)
+					{
+						if (x == 0)
+						{
+							searchList.add(searchResults.get(i)[x]);
+						}
+						else
+						{	
+							searchList.add(searchList.get(i) + " : " + searchResults.get(i)[x]);
+							searchList.remove(i);
+						}
+					}
+				}
+				
+//				userScreenLayout.setRight(searchDetails());
+				System.out.println(searchList);
+				
+				observableList = FXCollections.observableList(searchList);
+				
+				
+				for(int i = 0; i<searchResults.size(); i++)
+				{
+					System.out.print("Presentation " + (i+1) + " is: ");
+					for (int j = 0; j < 3; j++)
+					{
+						switch(j)
+						{
+						case 0:
+							System.out.print(" '" + searchResults.get(i)[j] + "' ");
+							//listView.setItems(searchResults.get(i)[j]);
+							break;
+						case 1:
+							System.out.print("by " + searchResults.get(i)[j] + " ");
+							break;
+						case 2:
+							System.out.println(" (" + searchResults.get(i)[j] + ") ");
+							break;
+						}
+					}
+				}
 				response3.setText("Searching for results");
 				response3.setFill(Color.MEDIUMPURPLE);
+		        searchView.setVisible(true);
+				userScreenLayout.setRight(searchDetails());
 			}
+			
 
 		}); 
 
@@ -1133,6 +1215,9 @@ public class MainGuiPagination extends Application
 				textFieldTitle.clear();
 				textFieldAuthor.clear();
 				textFieldLanguage.clear();
+				searchList.clear();
+				userScreenLayout.setRight(searchDetails());
+		        searchView.setVisible(false);
 			}
 		});
 
@@ -1143,46 +1228,44 @@ public class MainGuiPagination extends Application
 	public ScrollPane addUserScrollItems(){
 
 		// Create a root node called grid. In this case a grid pane layout 
-
-		ScrollPane scrollPane = new ScrollPane();
 		scrollPane.setPrefWidth(400);
 		scrollPane.setPrefHeight(400);
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 		scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
 		scrollPane.setId("scrollPane");
-
-		VBox vbox = new VBox();
-		vbox.setPadding(new Insets(10));
-		vbox.setSpacing(10);
-
-		Image image1 = new Image("gui/Finland.png");
-		Image image2 = new Image("gui/France.png");
-		Image image3 = new Image("gui/Germany.png");
-		Image image4 = new Image("gui/Portugal.png");
-		Image image5 = new Image("gui/Greece.png");
-
-		ImageView imageView1 = new ImageView(image1);
-		ImageView imageView2 = new ImageView(image2);
-		ImageView imageView3 = new ImageView(image3);
-		ImageView imageView4 = new ImageView(image4);
-		ImageView imageView5 = new ImageView(image5);
-
-		HBox hbox1 = new HBox(10);
-		hbox1.getChildren().add(imageView1);
-		HBox hbox2 = new HBox(10);
-		hbox2.getChildren().add(imageView2);
-		HBox hbox3 = new HBox(10);
-		hbox3.getChildren().add(imageView3);
-		HBox hbox4 = new HBox(10);
-		hbox4.getChildren().addAll(imageView4, imageView5);
-
-		vbox.getChildren().addAll(hbox1, hbox2, hbox3, hbox4);
-
-		scrollPane.setContent(vbox);
-
+		
+		//ObservableList<String> ol = FXCollections.observableArrayList(stringList);
+		
+		final ListView<String> listView = new ListView<String>();
+//        listView.setItems(FXCollections.observableArrayList(
+//                "Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6",
+//                "Row 7", "Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
+//                "Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19", "Row 20"
+//        ));
+		
+		//listView.setItems(observableList);
+		//listView.setItems(ol);
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        scrollPane.setContent(listView);
+		
 		return scrollPane;
 	}
-
+	
+	public Group searchDetails()
+	{
+		Group listGroup = new Group();
+		searchView.setId("listView");
+		System.out.println(observableList);
+		
+		//ObservableList<String> ol = FXCollections.observableArrayList(stringList);
+		
+		//listView.setItems(observableList);
+		searchView.setItems(observableList);	
+		searchView.getSelectionModel().getSelectedIndex();
+        searchView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listGroup.getChildren().add(searchView);
+		return listGroup;
+	}
 
 }
 

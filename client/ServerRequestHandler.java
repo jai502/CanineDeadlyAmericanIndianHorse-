@@ -135,14 +135,33 @@ public class ServerRequestHandler
 		return signUp;
 	}
 	
-	public final ArrayList<String[]> searchForPresentation(Presentation pres)
+	@SuppressWarnings("unchecked")
+	public final ArrayList<String[]> searchForPresentation(PresentationShell pres)
 	{
-		RequestObject searchPresentationRequest = new RequestObject("SEARCH_PRES", (Object) pres, order);
-		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");
+		ArrayList<String[]> presentationList;
 		
+		RequestObject searchPresentationRequest = new RequestObject("REQUEST_SEARCH", (Object) pres, order);
+		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");
+		sendRequest(searchPresentationRequest);
 		RequestObject response = getResponse();
-		System.out.println("Response received: " + response.id + " wih order: " + response.order);
-		ArrayList<String[]> presentationList = (ArrayList<String[]>) response.param; //suppress warning since we know object has type ArrayList<String[]>
+		
+		switch(response.id)
+		{
+		case "RESPONSE_OK":
+			break;
+		case "RESPONSE_FAIL":
+			presentationList = null;
+			System.out.println("Search failed: " + response.id);
+			break;
+		case "RESPONSE_UNKNOWN":
+			presentationList = null;
+			System.out.println("Server didn't recognise request");
+			break;
+		default:
+			System.out.println("Internal Server Error: " + response.id);
+			break;
+		}
+		presentationList = (ArrayList<String[]>) response.param; //suppress warning since we know object has type ArrayList<String[]>
 
 		return presentationList;
 	}
