@@ -83,7 +83,7 @@ public class ClientRequestHandler implements Runnable {
 				}
 			} else {
 				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", handlerInstance, currentRequest.id);
-				sendResponse(new RequestObject("RESPONSE_UNKNOWN", currentRequest.id, order));
+				respondUnknown("Request: '" + currentRequest.id + "' not recognised");
 			}
 		}
 		
@@ -172,6 +172,21 @@ public class ClientRequestHandler implements Runnable {
 		
 		// send response
 		sendResponse(thisRequest);		
+	}
+	
+	
+	
+	// send REQUEST_UNKNOWN acknowledgement
+	public void respondUnknown(String reason){
+		// request object to return
+		RequestObject thisRequest = new RequestObject(
+			"RESPONSE_UNKNOWN",
+			reason,
+			order
+		);
+		
+		// send response
+		sendResponse(thisRequest);			
 	}
 	
 	

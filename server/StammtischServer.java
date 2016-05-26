@@ -12,13 +12,12 @@
 * Load bearing server for stammtisch application
 */
 
-
 package server;
+
 
 // our imports
 import SQL.*;
 import com.*;
-
 
 // java imports
 import java.io.IOException;
@@ -163,7 +162,6 @@ public class StammtischServer {
 					return;
 				}
 				
-				
 				// query the presentation database
 				searchResults = SQLHandler.searchPresentation(presentation);
 				
@@ -221,7 +219,7 @@ public class StammtischServer {
 		// if no clients are connected, indicate this
 		if(handler.size() == 0){
 			System.out.printf("No handlers in list!\n");
-		}else{ 
+		} else { 
 			// print out info for all clients
 			for (int i = 0; i < handler.size(); i++) {
 				System.out.printf("%d) %s\n",i ,handler.get(i).getInfoString());
@@ -236,9 +234,9 @@ public class StammtischServer {
 		Integer p1int = new Integer(0);
 		
 		// try to parse the command parameter
-		try{
+		try {
 			p1int = Integer.parseInt(p1);
-		}catch (NumberFormatException e){
+		} catch (NumberFormatException e){
 			System.out.printf("[ERR] '%s' invalid, expected integer.\n", p1);
 			return null;
 		}
@@ -289,9 +287,25 @@ public class StammtischServer {
 			}
 		});
 		
-		// list handlers command
+		// list handlers
 		commands.add(new Command("lh", 0){
 			@Override public void execute(Scanner cs){
+				// prune the handler list
+				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
+				inactiveHandlers.clear();
+				
+				// loop through all request handlers, determine which of them are inactive
+				for(int i = 0; i < handlers.size(); i++)
+					if (handlers.get(i).isDone()) 
+						inactiveHandlers.add(handlers.get(i));
+				
+				// remove all inactive request handlers from the handler list
+				for(int i = 0; i < inactiveHandlers.size(); i++){
+					boundHandlers.remove(inactiveHandlers.get(i));
+					handlers.remove(inactiveHandlers.get(i));
+				}
+				
+				// print out handler list
 				System.out.printf("%d running request handlers:\n", handlers.size());
 				printHandlerList(handlers);
 			}
@@ -300,6 +314,22 @@ public class StammtischServer {
 		// list bound handlers
 		commands.add(new Command("lbh", 0){
 			@Override public void execute(Scanner cs){
+				// prune the handler list
+				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
+				inactiveHandlers.clear();
+				
+				// loop through all request handlers, determine which of them are inactive
+				for(int i = 0; i < handlers.size(); i++)
+					if (handlers.get(i).isDone()) 
+						inactiveHandlers.add(handlers.get(i));
+				
+				// remove all inactive request handlers from the handler list
+				for(int i = 0; i < inactiveHandlers.size(); i++){
+					boundHandlers.remove(inactiveHandlers.get(i));
+					handlers.remove(inactiveHandlers.get(i));
+				}
+				
+				// print out handler list
 				System.out.printf("%d bound client request handlers:\n", boundHandlers.size());
 				printHandlerList(boundHandlers); 
 			}
@@ -388,6 +418,7 @@ public class StammtischServer {
 		// remove inactive handlers
 		commands.add(new Command("Prune", 0){
 			@Override public void execute(Scanner cs){
+				// list of inactive handlers
 				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
 				inactiveHandlers.clear();
 				
@@ -414,6 +445,7 @@ public class StammtischServer {
 				System.out.printf("Forcefully disconnected %d handlers\n", boundHandlers.size());
 				for(int i = 0; i < boundHandlers.size(); i++){
 					boundHandlers.get(i).stop();
+					boundHandlers.get(i).setUser(null);
 				}
 			}
 		});
