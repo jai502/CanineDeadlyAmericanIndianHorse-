@@ -43,7 +43,7 @@ public class SQLTools
   //============================================================================
 	//Method for obtaining the ID of a presentation on the SQL presentation table
 	//============================================================================
-	public static Integer checkPresID(Connection con, Presentation pres)
+	public static Integer checkPresID(Connection con, PresentationShell pres)
 	{
 		Statement command = null; //SQL command
 		Integer presID = new Integer(0);//The presentation ID number

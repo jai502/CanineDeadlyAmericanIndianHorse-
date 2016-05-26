@@ -16,9 +16,6 @@
 package server;
 
 
-import com.*;
-
-
 class Response {
 	private String requestId;
 	

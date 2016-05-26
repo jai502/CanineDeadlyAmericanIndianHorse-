@@ -111,7 +111,7 @@ public class ServerRequestHandler
 		return signUp;
 	}
 	
-	public final ArrayList<String[]> searchForPresentation(Presentation pres)
+	public final ArrayList<String[]> searchForPresentation(PresentationShell pres)
 	{
 		RequestObject searchPresentationRequest = new RequestObject("SEARCH_PRES", (Object) pres, order);
 		System.out.println("Sending " + searchPresentationRequest.id + " with order " + searchPresentationRequest.order + "...");

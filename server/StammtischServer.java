@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.sql.*;
 
 
 public class StammtischServer {
@@ -85,9 +84,8 @@ public class StammtischServer {
 		
 		// response to a ping
 		responses.add(new Response("PING"){
-			@Override public void respond(ClientRequestHandler handler){
-				RequestObject response = new RequestObject("PONG", null, handler.getOrder());
-				handler.sendResponse(response);
+			@Override public void respond(ClientRequestHandler handler){ 
+				handler.sendResponse(new RequestObject("PONG", null, handler.getOrder()));
 			}
 		});
 		
@@ -105,72 +103,72 @@ public class StammtischServer {
 				RequestObject thisRequest = handler.getCurrentRequest();
 				SQLHandler SQLHandler = handler.getSQLHandler();
 				
-				// request object to respond with
-				RequestObject response;
-				
 				// get the user object
 				User thisUser = (User)thisRequest.param;
-				handler.setUser(thisUser);
 				
 				// check that user exists 
 				if(SQLHandler.checkLoginDetails(thisUser)){
-					response = new RequestObject(
-						"RESPONSE_OK", 
-						new String("success"), 
-						handler.getOrder()
-					);
-					handler.sendResponse(response);
-				} else {
-					response = new RequestObject(
-						"RESPONSE_OK", 
-						new String("login_failed"), 
-						handler.getOrder()
-					);
-					handler.sendResponse(response);
+					handler.setUser(thisUser);	// set handler user to this user
+					handler.respondOk(null);
 				}
+				
+				// invalid login, respond with failure message
+				else handler.respondFail("invalid login");
 			}
 		});
 		
 		// respond to signup request
-		responses.add(new Response(""){
+		responses.add(new Response("REQUEST_SIGNUP"){
 			@Override public void respond(ClientRequestHandler handler){
 				// get required objects from calling handler
 				RequestObject thisRequest = handler.getCurrentRequest();
 				SQLHandler SQLHandler = handler.getSQLHandler();
 				
-				// request object to respond with
-				RequestObject response;
-				
 				// request object for response
 				User thisUser = (User)thisRequest.param;
 				
 				// check that user doesn't already exist
-				if(SQLHandler.checkUser(thisUser)){		// if user already exists respond with error
-					response = new RequestObject(
-						"RESPONSE_FAIL", 
-						new String("username already in use!"), 
-						handler.getOrder()
-					);
-				} else { 	// add user to users database
-					// check that user is valid for signup
-					if(thisUser.validForSignup()){
-						// add user to the database
-						SQLHandler.addUser(thisUser);
-						
-						// respond to client
-						response = new RequestObject(
-							"RESPONSE_OK",
-							null,
-							handler.getOrder()
-						);						
-					} else {
-						response = new RequestObject(
-							"RESPONSE_FAIL",
-							null,
-							handler.getOrder()
-						);
-					}
+				if(SQLHandler.checkUser(thisUser)) 
+					handler.respondFail(new String("username already in use!"));
+				
+				// check that user object is valid for signup
+				else if(!thisUser.validForSignup()) 
+					handler.respondFail(new String("invalid signup information"));
+				
+				// Success! add user to the database & notify client
+				else{
+					SQLHandler.addUser(thisUser);
+					handler.respondOk(null);
 				}
+			}
+		});
+		
+		// search request handler
+		responses.add(new Response("REQUEST_SEARCH"){
+			@Override public void respond(ClientRequestHandler handler){
+				// get current request and sql handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				
+				// results of the search
+				ArrayList<String[]> searchResults = null;
+				
+				// get the presentation object to respond with
+				try{
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e){
+					handler.respondFail("malformed request");
+					e.printStackTrace();
+					return;
+				}
+				
+				
+				// query the presentation database
+				searchResults = SQLHandler.searchPresentation(presentation);
+				
+				// generate request object
+				handler.respondOk(searchResults);
 			}
 		});
 	}

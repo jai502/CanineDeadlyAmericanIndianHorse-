@@ -60,7 +60,7 @@ public class ClientTest {
 				user2.setUsername("NewUser");
 				user2.setPassword("AllNewHere");
 				user2.setEmail("newbie@gmail.com");
-				user2.setDob("1990-02-12");
+				//user2.setDob("1990-02-12");
 				
 				boolean signupResponse = com.signUp(user2);
 				System.out.println("Signup returns: " + signupResponse);

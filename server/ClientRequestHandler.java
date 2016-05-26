@@ -79,12 +79,11 @@ public class ClientRequestHandler implements Runnable {
 					// respond to request
 					currentResponse.respond(this);
 				} else {
-					sendResponse(new RequestObject("NOT_LOGGED_IN", new String(""), order));
+					sendResponse(new RequestObject("RESPONSE_FAIL", new String("login first you little shit"), order));
 				}
-					
 			} else {
-				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", currentRequest.id);
-				sendResponse(new RequestObject("RESPONSE_ERROR", currentRequest.id, order));
+				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", handlerInstance, currentRequest.id);
+				sendResponse(new RequestObject("RESPONSE_UNKNOWN", currentRequest.id, order));
 			}
 		}
 		
@@ -143,6 +142,36 @@ public class ClientRequestHandler implements Runnable {
 			System.out.printf("[H-%d][ERR] Failed to send response (IOException)", handlerInstance);
 			e.printStackTrace();
 		} 
+	}
+	
+	
+	
+	// send OK acknowledgement response
+	public void respondOk(Object param){
+		// request object to return
+		RequestObject thisRequest = new RequestObject(
+			"RESPONSE_OK",
+			param,
+			order
+		);
+		
+		// send response
+		sendResponse(thisRequest);
+	}
+	
+	
+	
+	// send FAIL acknowledgement response
+	public void respondFail(Object param){
+		// request object to return
+		RequestObject thisRequest = new RequestObject(
+			"RESPONSE_FAIL",
+			param,
+			order
+		);
+		
+		// send response
+		sendResponse(thisRequest);		
 	}
 	
 	

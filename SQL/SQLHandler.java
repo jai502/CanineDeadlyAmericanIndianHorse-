@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import com.Presentation;
+import com.PresentationShell;
 import com.User;
 
 public class SQLHandler 
@@ -53,7 +53,7 @@ public class SQLHandler
 	//======================================================================================================================
 	// Method for adding a presentation with associated comments database
 	//======================================================================================================================
-	public final void addPresentation(Presentation pres)
+	public final void addPresentation(PresentationShell pres)
 	{
 		PreparedStatement command = null;
 		//Set rating to a new presentation as 0
@@ -179,7 +179,7 @@ public class SQLHandler
 	//======================================================================================================================
 	// Method for searching the SQL presentation database
 	//======================================================================================================================
-	public final ArrayList<String[]> searchPresentation(Presentation pres)
+	public final ArrayList<String[]> searchPresentation(PresentationShell pres)
 	{		
 		//Note - this is susceptible to malicious attacks - ensure that semicolons are checked first in the input data!
 		Statement command = null;
@@ -239,7 +239,7 @@ public class SQLHandler
 	//======================================================================================================================
 	// Method for creating comments table linked to specified presentation
 	//======================================================================================================================
-	public final void createLinkedComments(Presentation pres)
+	public final void createLinkedComments(PresentationShell pres)
 	{
 		Statement command = null;
 		String sqlComments = "CREATE TABLE " + pres.getTitle() + "_comments ("
@@ -410,7 +410,7 @@ public class SQLHandler
 			command.setString(1, user.getUsername());
 			command.setString(2, user.getPassword());
 			command.setString(3, user.getEmail());
-			command.setString(4, user.getDob());
+			command.setString(4, user.getDob().toString());
 			
 			int row = command.executeUpdate();
 			System.out.println("User successfully added to SQL table with code: " + row);
@@ -629,7 +629,7 @@ public class SQLHandler
 	//======================================================================================================================
 	// Method for creation of table with presentation and user tracking details upon first access of a presentation
 	//======================================================================================================================
-	public final void userFirstAccess(User user, Presentation pres)
+	public final void userFirstAccess(User user, PresentationShell pres)
 	{
 		Statement command = null;
 		int presID = SQLTools.checkPresID(presCon, pres);
@@ -665,7 +665,7 @@ public class SQLHandler
 	//======================================================================================================================
 	// Method for updating user rating of the specified presentation
 	//======================================================================================================================
-	public final void setUserRating(User user, Presentation pres, int userRating)
+	public final void setUserRating(User user, PresentationShell pres, int userRating)
 	{
 		Statement userCommand = null;
 		Statement presCommand = null;
