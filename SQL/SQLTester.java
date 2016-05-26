@@ -56,7 +56,7 @@ public class SQLTester
 		sqlHandler.deletePresentation(pres.getTitle(), pres.getAuthor());
 		*/
 		
-		/*
+		
 		//===========================================================================
 		//Search the presentations table for a specific presentation
 		//===========================================================================
@@ -70,7 +70,7 @@ public class SQLTester
 		for(int i = 0; i<searchResults.size(); i++)
 		{
       System.out.print("Presentation " + (i+1) + " is: ");
-      for (int j = 0; j < 3; j++)
+      for (int j = 0; j < 5; j++)
       {
       	switch(j)
       	{
@@ -84,12 +84,15 @@ public class SQLTester
 	      		System.out.print("by " + searchResults.get(i)[j] + " ");
 	      		break;
 	      	case 3:
-	      		System.out.println(" (" + searchResults.get(i)[j] + ") ");
+	      		System.out.print(" (" + searchResults.get(i)[j] + ") ");
+	      		break;
+	      	case 4:
+	      		System.out.println(" Rating: " + searchResults.get(i)[j] );
 	      		break;
       	}
       }
   	}
-		*/
+		
 		
 		/*
 		//===========================================================================

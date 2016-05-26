@@ -184,7 +184,7 @@ public class SQLHandler
 		//Note - this is susceptible to malicious attacks - ensure that semicolons are checked first in the input data!
 		Statement command = null;
 		
-		String sqlSearch = "SELECT id, title, author, languagetype FROM " + presTable
+		String sqlSearch = "SELECT id, title, author, languagetype, totalrating FROM " + presTable
 				+ " WHERE title = COALESCE(" + SQLTools.testNull(pres.getTitle()) + ", title)"
 				+ " OR author = COALESCE(" + SQLTools.testNull(pres.getAuthor()) + ", author)"
 				+ " OR languagetype = COALESCE(" + SQLTools.testNull(pres.getLanguage()) + ", languagetype)"
@@ -205,11 +205,12 @@ public class SQLHandler
 			
 			while(data.next())
 			{
-				String[] searchResult = new String[4];
+				String[] searchResult = new String[5];
 				searchResult[0] = String.valueOf(data.getInt("id"));
 				searchResult[1] = data.getString("title");
 				searchResult[2] = data.getString("author");
 				searchResult[3] = data.getString("languagetype");
+				searchResult[4] = String.valueOf(data.getInt("totalrating"));
 				searchResults.add(index, searchResult);
 				
 				index++;
