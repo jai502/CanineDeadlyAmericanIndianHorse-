@@ -1,3 +1,16 @@
+/*
+* (C) Stammtisch
+* First version created by: Joseph Ingleby
+* Date of first version: 2nd May 2016
+* 
+* Last version by: Joseph Ingleby
+* Date of last update: 27th May 2016
+* Version number: 2.0
+* 
+* Commit date: 27thMay 2016
+* Description: This class has functions to compress, decompress,delete  and copy files.
+*/
+
 package zipping;
 
 import java.io.BufferedOutputStream;
@@ -126,26 +139,36 @@ public class Zipper{
 		}
 	}
 	
+	//a method to compress a folder to a destination folder
 	public void zip(String sourceFolder, String destinationFile) throws Exception
 	{
+		//two streams for reading the files and compressing
 		ZipOutputStream zipStream = null;
 		FileOutputStream fileStream = null;
 
+		//assign values
 		fileStream = new FileOutputStream(destinationFile);
 		zipStream = new ZipOutputStream(fileStream);
 
+		//call the zipFolder function
 		zipFolder("", sourceFolder, zipStream);
 		zipStream.flush();
 		zipStream.close();
 	}
 
+	//a method to zip individual files
 	public void zipFile(String filePath, String sourceFile, ZipOutputStream zipStream) throws Exception 
 	{
+		//create a file to manipulate and assign it
 		File folder = new File(sourceFile);
+		
+		//if the file is a folder, use the zipfolder method
 		if (folder.isDirectory()) 
 		{
 			zipFolder(filePath, sourceFile, zipStream);
 		}
+		
+		//else create a buffer, fill it from the filestream and write it to the zip file
 		else 
 		{
 			byte[] buffer = new byte[1024];
@@ -160,10 +183,11 @@ public class Zipper{
 		}
 	}
 
+	//a method to zip a folder
 	private void zipFolder(String filePath, String sourceFolder,ZipOutputStream zipStream) throws Exception 
 	{
 		File folder = new File(sourceFolder);
-
+		//loop through the folder and call the zip file method for all files found. This will run recursively
 		for (String fileName : folder.list()) 
 		{
 			if (filePath.equals("")) 
@@ -172,12 +196,13 @@ public class Zipper{
 			}
 			else
 			{
-				zipFile(filePath + File.separator + folder.getName(), sourceFolder + "/"
+				zipFile(filePath + File.separator + folder.getName(), sourceFolder + File.separator
 						+ fileName, zipStream);
 			}
 		}
 	}
 
+	//a method to copy a file using two streams.
 	public static void copyFile(String source, String dest) throws IOException 
 	{
 		File sourceFile = new File(source);
@@ -185,6 +210,8 @@ public class Zipper{
 		
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
+		
+		//fill a buffer from the input stream and write it to the output file 
 		try
 		{
 			inputStream = new FileInputStream(sourceFile);
@@ -205,6 +232,7 @@ public class Zipper{
 		}
 	}
 	
+	//a simple method to create a folder
 	public void makeFolder(String folderName)
 	{
 		File folder = new File(folderName);
