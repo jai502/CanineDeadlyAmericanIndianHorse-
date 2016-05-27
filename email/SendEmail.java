@@ -1,16 +1,16 @@
 /**
 * (C) Stammtisch
 * First version created by: D.Dreyfus
-* Date of first version: 06.05.2016
+* Date of first version: 06/05/2016
 * 
 * Last version by: J.White
-* Date of last update: 23.05.2016
-* Version number: 1.2.1
+* Date of last update: 27/05/2016
+* Version number: 1.3
 * 
-* Commit date: 
+* Commit date: 27/05/2016
 * Description: Module to allow for sending of Emails upon user registration
-* boolean return added in version 1.2.1 for ease of testing
- */
+* and now avoids throwing exception when invalid email is sent due to use of EmailChecker
+*/
 
 package email;
 
@@ -24,25 +24,25 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.swing.JOptionPane;
 
 public class SendEmail 
 {
 	//inputs:to,subject,message,sender,sender password
-    public static boolean send(String to, String sub,String msg, final String user_email, final String password) 
+    public static void send(String to, String sub,String msg, final String from, final String password) 
     {
-    	boolean emailSent = false; 
-    	//added for ease of testing
-    	
+    	//definition of variables
         Properties properties = new Properties();
-        String host = "smtp.gmail.com";		//define host
-        int port = 587;		//define port
-
+        String host = "smtp.gmail.com";
+        int port = 587;
+        //use EmailChecker class to check for presence of @ and . in strings
+        boolean userEmail = EmailChecker.checker(to);
+        boolean senderEmail = EmailChecker.checker(from);
+        
         //Set up the system for sending email
         properties.put("mail.smtp.starttls.enable", "true");	//allows encryption/use of plain text
         properties.put("mail.smtp.host", host);		//set host
         properties.put("mail.smtp.socketFactory.port", port);	//set port
-        properties.put("mail.smtp.sender.address", user_email);	//sets sender email as input
+        properties.put("mail.smtp.sender.address", from);	//sets sender email as input
         properties.put("mail.smtp.auth", "true");		//authentication
         properties.put("mail.smtp.debug", "true");		//debugging
         properties.put("mail.smtp.EnableSSL.enable","true");	//connects to ssl server
@@ -59,7 +59,7 @@ public class SendEmail
         {
           public PasswordAuthentication getPasswordAuthentication()
           {
-              return new PasswordAuthentication(user_email, password);
+              return new PasswordAuthentication(from, password);
           }
         };
         //check PasswordAuthentication holds correct values
@@ -68,28 +68,33 @@ public class SendEmail
         Session session = Session.getDefaultInstance(properties, authenticator);
         Message message = new MimeMessage(session);
 
-        //Set email contents
-        try 
+        //If emails contain correct characters, messaging try catch is allowed
+        //if characters aren't present try catch is avoided and therefore no exception is thrown
+        if (userEmail && senderEmail == true)
         {
-            message.setFrom(new InternetAddress(user_email));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject("Welcome to Stammtisch!");
+        	//Set email contents
+        	try 
+            {
+        		message.setFrom(new InternetAddress(from));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+                message.setSubject("Welcome to Stammtisch!");
+                
+                //Create the email content using HTML
+                message.setContent(msg, "text/html");
+                
+                //Send the message
+                Transport.send(message);
+                System.out.println("Email Sent!");
+            } 
             
-            //Create the email content using HTML
-            message.setContent(msg, "text/html");
-            
-            //Send the message
-            Transport.send(message);
-            System.out.println("Email Sent!");
-            
-            emailSent = true;
-        } 
-        
-        catch (MessagingException e) 
-        {
-            JOptionPane.showMessageDialog(null,"Something happened!");
-            throw new RuntimeException(e);
+        	//avoided unless error that can't be recognized by EmailChecker occurs
+            catch (MessagingException e) 
+            {
+                System.out.println("Something happened!");
+                throw new RuntimeException(e);
+            }
         }
-        return emailSent;
+        //if invalid email email doesn't send
+        else System.out.println("Unable to send");
     }
 }

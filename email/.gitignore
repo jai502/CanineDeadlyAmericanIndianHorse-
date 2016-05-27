@@ -8,3 +8,5 @@
 /SendEmailTest.class
 /Interceptor.class
 /Interceptor$SendEmailTest.class
+/EmailChecker.class
+/EmailCheckerTest.class
