@@ -43,8 +43,8 @@ public class TextMain extends Application {
 
 			//Message to be displayed by the application for testing purposes
 			String message = "I am some <b>bold</b> and <i>italic</i> text and " +
-					"some more <b>of that bold</b> and <i>of that italic</i> text. "+
-					"This is a test for <b>PWS</b> testing <i>Good job</i>.";
+					"some more of that <b>bold</b> and of that <i>italic</i> text. "+
+					"This is a test for PWS testing <i>Good job.</i>";
 
 			//Declare the variables in order to test TextHandler functionality
 			String fontFamily = "serif";
