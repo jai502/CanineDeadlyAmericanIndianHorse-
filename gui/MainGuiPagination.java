@@ -88,6 +88,7 @@ public class MainGuiPagination extends Application
 	private PresentationShell presentationLoad;
 	//final ListView<String[]> listView = new ListView<String[]>();
 	private final ListView<String> searchView = new ListView<String>();
+	private final ListView<String> commentsView = new ListView<String>();
 	private ObservableList<String> observableList;
 	private ArrayList<String> searchList = new ArrayList<String>();
 	private ArrayList<String> idList = new ArrayList<String>();
@@ -99,7 +100,7 @@ public class MainGuiPagination extends Application
 
 	/* variables for the primary stage */
 	private Stage window;
-	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu;
+	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu;
 	private int width = 800;
 	private int height = 600;
 	private MenuItem exit;
@@ -138,10 +139,17 @@ public class MainGuiPagination extends Application
 	private TextField textFieldTitle, textFieldAuthor, textFieldLanguage;
 	private Text messageLogOut, messageUser, response3;
 	private String title, author, language;
-	private int presentationIndex, presentationIndex2;
+	private int presentationIndex, toolTipIndex;
 	private String presentationID;
 	private SearchDetails searchDetails = new SearchDetails();
 	ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
+
+	/* variables for the createPresentationMenu */
+	private BorderPane createPresentationScreenLayout;
+	private Button btnNext, btnCreate, btnOpenVideoDty;
+	private Label videoLanguage, videoTranslation, startTime, endTime;
+	private TextField startTimeField, endTimeField;
+	private TextArea videoLanguageText, videoTranslationText;
 
 	/* variables for the Scroll Pane */
 	private ScrollPane scrollPane = new ScrollPane();
@@ -229,6 +237,7 @@ public class MainGuiPagination extends Application
 		//MenuBar loginMenuBar = menuItems(); // Login Menu
 		//MenuBar signupMenuBar = menuItems(); // Sign Up Menu
 		MenuBar userScreenMenuBar =  menuItems(); // User Screen Menu
+		MenuBar presentationCreateMenuBar = menuItems(); // Presentation Menu
 		MenuBar presentationMenuBar = menuItems(); // Presentation Menu
 
 		/******************** Main Menu Screen ************************/
@@ -310,6 +319,24 @@ public class MainGuiPagination extends Application
 		userScreenLayout.setTop(userScreenMenuBar);
 		userScreenLayout.setLeft(userMenu);
 		//userScreenLayout.setRight(searchDetails());
+
+		/**************************************************************/
+
+		/******************* Create Presentation Screen ***************/
+		// Create a root node called loginLayout which uses BorderPane
+		createPresentationScreenLayout = new BorderPane();
+		createPresentationScreenLayout.setId("createPresentationScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
+		// Add the root node to the scene
+		createPresentationMenu = new Scene(createPresentationScreenLayout, width, height, Color.BLACK);
+		// Load style.ccs from same directory to provide the styling for the scenes
+		createPresentationScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+		//
+		//		// ready to add to userScreenMenu scene
+		GridPane createMenu = addCreatePresentationGridItems();
+		//		//Group searchResults = searchDetails();
+		//		// Add menu bar to User screen
+		createPresentationScreenLayout.setTop(presentationCreateMenuBar);
+		createPresentationScreenLayout.setCenter(createMenu);
 
 		/**************************************************************/
 
@@ -448,30 +475,6 @@ public class MainGuiPagination extends Application
 
 		// File Menu \\
 		Menu fileMenu = new Menu("File");
-		MenuItem openFile = new MenuItem("Open...");
-
-		// Event handler for Browsing A File
-		openFile.setOnAction(new EventHandler<ActionEvent>() 
-		{
-			@Override
-			public void handle(ActionEvent e) {
-				System.out.println("Please select a file to open...");
-
-				// Set extension filters
-				FileChooser.ExtensionFilter extFilterXML = new FileChooser.ExtensionFilter("PWS files (*.XML)", "*.XML");
-				FileChooser.ExtensionFilter extFilterxml = new FileChooser.ExtensionFilter("pws files (*.xml)", "*.xml");
-
-				// Add extension files to the file chooser
-				browseFiles.getExtensionFilters().addAll(extFilterxml, extFilterXML);
-
-				// Assign a File object as the file chooser - open the system dialogue
-				selectedFile = browseFiles.showOpenDialog(window);
-
-				// Open the PWS selected xml file and change the scene to presentation scene
-				// with a pagination layout
-				openSelectedFile(selectedFile);
-			}
-		});
 
 		//fileMenu.getItems().add(new SeparatorMenuItem());
 		MenuItem settings = new MenuItem("Settings...");
@@ -561,17 +564,59 @@ public class MainGuiPagination extends Application
 		});
 
 		// Add all File Menu Items to File Bar
-		fileMenu.getItems().addAll(openFile, settings, goToUserScreen, goBack, new SeparatorMenuItem(), exit);		
+		fileMenu.getItems().addAll(settings, goToUserScreen, goBack, new SeparatorMenuItem(), exit);		
 
-		// Community Menu \\
-		Menu communityMenu = new Menu("Community");
+		// Presentation Menu \\
+		Menu presentationMenu = new Menu("Presentation");
 
+		MenuItem openFile = new MenuItem("Open...");
+
+		// Event handler for Browsing A File
+		openFile.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) {
+				System.out.println("Please select a file to open...");
+
+				// Set extension filters
+				FileChooser.ExtensionFilter extFilterXML = new FileChooser.ExtensionFilter("PWS files (*.XML)", "*.XML");
+				FileChooser.ExtensionFilter extFilterxml = new FileChooser.ExtensionFilter("pws files (*.xml)", "*.xml");
+
+				// Add extension files to the file chooser
+				browseFiles.getExtensionFilters().addAll(extFilterxml, extFilterXML);
+
+				// Assign a File object as the file chooser - open the system dialogue
+				selectedFile = browseFiles.showOpenDialog(window);
+
+				// Open the PWS selected xml file and change the scene to presentation scene
+				// with a pagination layout
+				openSelectedFile(selectedFile);
+			}
+		});
+
+
+		MenuItem createPresentation = new MenuItem("Create Presentation...");
+
+		// Event handler for Browsing A File
+		createPresentation.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) {
+				System.out.println("Please create a presentation...");
+				tempPres = null;
+				window.setTitle("Create Presentation Menu");
+				window.setScene(createPresentationMenu);				
+			}
+		});
+
+		// Add all File Menu Items to File Bar
+		presentationMenu.getItems().addAll(openFile, new SeparatorMenuItem(), createPresentation);		
 
 		// Help Menu \\
 		Menu helpMenu = new Menu("Help");
 
 		// Add All Menu Bar Items to the actual Menu Bar
-		menuBar.getMenus().addAll(fileMenu, communityMenu, helpMenu);
+		menuBar.getMenus().addAll(fileMenu, presentationMenu, helpMenu);
 
 		return menuBar;
 	}
@@ -658,7 +703,7 @@ public class MainGuiPagination extends Application
 			public Node call(Integer pageIndex) {
 				try {
 					//TODO
-					return sh.getSlideStack(tempPres, pageIndex, width-100, height, presentationMenu);
+					return sh.getSlideStack(tempPres, pageIndex, width-100, height-100, presentationMenu);
 				} catch (IOException e) {
 					return null;
 				}
@@ -1278,14 +1323,6 @@ public class MainGuiPagination extends Application
 		searchView.setPrefWidth(userScreenLayout.getWidth()/2);
 		System.out.println(observableList);
 
-//		searchView.getSelectionModel()..addListener(new ChangeListener<String>() {
-//		    @Override
-//		    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//		    	presentationIndex2 = searchView.getSelectionModel().getSelectedIndex();
-//				presentationID = idList.get(presentationIndex);
-//		    }
-//		});
-		
 		final StringProperty hoveredItem = new SimpleStringProperty(null);
 
 		searchView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
@@ -1303,21 +1340,6 @@ public class MainGuiPagination extends Application
 					}
 				};
 
-				// Either of the following works:
-				// register mouse listeners:
-				listCell.setOnMouseEntered(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						hoveredItem.set(listCell.getItem());
-					}
-				});
-				listCell.setOnMouseExited(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						hoveredItem.set(null);
-					}
-				});
-
 				// or register a change listener with the hover property
 				listCell.hoverProperty().addListener(new ChangeListener<Boolean>() {
 					@Override
@@ -1325,18 +1347,20 @@ public class MainGuiPagination extends Application
 							Boolean oldValue, Boolean newValue) {
 						if (newValue) {
 							hoveredItem.set(listCell.getItem());
-							/* mouse hover */
-							presentationIndex2 = searchView.getSelectionModel().getSelectedIndex();
-							System.out.println(presentationIndex2);
-							Tooltip t = new Tooltip("Rating: " + searchResults.get(presentationIndex2)[4]);
-							t.getStyleClass().add("ttip");
-							listCell.setTooltip(t);
+							toolTipIndex = listCell.getIndex();
+							if (toolTipIndex<searchResults.size())
+							{
+								Tooltip t = new Tooltip("Rating: " + searchResults.get(toolTipIndex)[4]);
+								t.getStyleClass().add("ttip");
+								listCell.setTooltip(t);
+							}
+
 						} else {
 							hoveredItem.set(null);
 						}
 					}
 				});
-				
+
 
 				return listCell;
 			}
@@ -1347,6 +1371,166 @@ public class MainGuiPagination extends Application
 		//searchView.getSelectionModel().getSelectedIndex();
 		searchView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listGroup.getChildren().add(searchView);
+		return listGroup;
+	}
+
+	/* Method for GridPane items for User Screen Menu */
+	public GridPane addCreatePresentationGridItems(){
+
+		// Create a root node called grid. In this case a grid pane layout 
+		// is used, with vertical and horizontal gaps of 10
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+
+		// Centre the controls in the scene
+		grid.setAlignment(Pos.CENTER);
+
+		// Add padding
+		grid.setPadding(new Insets(25, 25, 25, 25));
+
+		// Create the Default message
+		videoLanguage = new Label("Video Language");
+		videoLanguage.setId("videoLanguage"); // Id for gui_style.css
+		//videoLanguage.setFill(Color.ALICEBLUE);
+		videoLanguage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		grid.add(videoLanguage, 0, 0, 3, 1);
+
+		videoLanguageText = new TextArea();
+		videoLanguageText.setPrefSize(400, 250);
+		grid.add(videoLanguageText, 0, 1);
+
+		startTime = new Label("Start Time:");
+		//grid.add(startTime, 0, 2);
+		endTime = new Label("End Time:");
+		//grid.add(endTime, 2, 2);
+
+		startTimeField = new TextField();
+		//grid.add(startTimeField, 1, 2);
+		endTimeField = new TextField();
+		//grid.add(endTimeField, 3, 2);
+
+		videoTranslation = new Label("Video Translation");
+		videoTranslation.setId("videoLanguage"); // Id for gui_style.css
+		//videoLanguage.setFill(Color.ALICEBLUE);
+		videoTranslation.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		//grid.add(videoTranslation, 0,3, 3, 1);
+
+		videoTranslationText = new TextArea();
+		videoTranslationText.setPrefSize(400, 250);
+		grid.add(videoTranslationText, 0, 4);
+
+		btnNext = new Button("Next");
+		//grid.add(btnNext, 0, 5);
+		btnOpenVideoDty = new Button("Add Media");
+		//grid.add(btnOpenVideoDty, 1, 5);
+		btnCreate = new Button("Create");
+		//grid.add(btnCreate, 2, 5);
+
+		// Creating a HBox area to add the labels and textfields
+		HBox hbText = new HBox(10);
+		hbText.setAlignment(Pos.BOTTOM_RIGHT);
+		hbText.getChildren().addAll(startTime, startTimeField, endTime, endTimeField);
+
+		// Creating a HBox area to add the labels and textfields
+		HBox hbButtons = new HBox(10);
+		hbButtons.setAlignment(Pos.BOTTOM_LEFT);
+		hbButtons.getChildren().addAll(btnNext, btnOpenVideoDty, btnCreate);
+
+		grid.add(hbText, 0, 2);
+		grid.add(hbButtons, 0, 5);
+
+
+		// Event handler for btnNext
+		btnNext.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				// More stuff here for saving!!!!!!!!!!
+				videoLanguageText.getText();
+				videoTranslationText.getText();
+				startTimeField.getText();
+				endTimeField.getText();
+
+				System.out.println("Your video text is: " + videoLanguageText.getText());
+				System.out.println("Your translation text is: " + videoTranslationText.getText());
+				System.out.println("Start time is: " + startTimeField.getText());
+				System.out.println("End time is: " + endTimeField.getText());
+
+				// Clear for next input
+				videoLanguageText.clear();
+				videoTranslationText.clear();
+				startTimeField.clear();
+				endTimeField.clear();
+
+				window.setTitle("Create Presentation Menu");
+				window.setScene(createPresentationMenu);
+			}
+		});
+		//
+		//		btnOpenVideoDty.setOnAction(new EventHandler<ActionEvent>() 
+		//		{
+		//			@Override
+		//			public void handle(ActionEvent e) 
+		//			{
+		//				//				// More stuff here for saving!!!!!!!!!!
+		//				//				videoLanguageText.getText();
+		//				//				videoTranslationText.getText();
+		//				//				startTimeField.getText();
+		//				//				endTimeField.getText();
+		//				//								
+		//				//				// Clear for next input
+		//				//				videoLanguageText.clear();
+		//				//				videoTranslationText.clear();
+		//				//				startTimeField.clear();
+		//				//				endTimeField.clear();
+		//				//				
+		//				//				window.setTitle("Create Presentation Menu");
+		//				//				window.setScene(createPresentationMenu);
+		//			}
+		//		});
+		//
+		//		// Event handler for btnCreate
+		//		btnCreate.setOnAction(new EventHandler<ActionEvent>() 
+		//		{
+		//			@Override
+		//			public void handle(ActionEvent e) 
+		//			{
+		//				//				title = textFieldTitle.getText();
+		//				//				author = textFieldAuthor.getText();
+		//				//				language = textFieldLanguage.getText();
+		//				//
+		//				//				// Set the username and password fields in local SignUpDetails class
+		//				//				presentationShell.setTitle(title);
+		//				//				presentationShell.setAuthor(author);
+		//				//				presentationShell.setLanguage(language);
+		//				//
+		//				//				response3.setText("Searching for results");
+		//				//				response3.setFill(Color.MEDIUMPURPLE);
+		//				//				searchView.setVisible(true);
+		//				//				userScreenLayout.setRight(searchDetails());
+		//			}
+		//		}); 
+
+		return grid;
+	}
+	
+	public Group commentsDetails()
+	{
+		Group listGroup = new Group();
+		commentsView.setId("listView");
+		commentsView.setPrefHeight(userScreenLayout.getHeight());
+		searchView.setPrefWidth(userScreenLayout.getWidth()/2);
+		//System.out.println(observableList);
+
+		
+
+		commentsView.setItems(observableList);
+
+		//searchView.getSelectionModel().getSelectedIndex();
+		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listGroup.getChildren().add(commentsView);
 		return listGroup;
 	}
 

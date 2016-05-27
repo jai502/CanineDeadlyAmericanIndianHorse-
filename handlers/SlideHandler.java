@@ -35,7 +35,7 @@ public class SlideHandler {
 		double reducedWidth = (myWidth-5);
 		int width = (int) Math.floor(reducedWidth);
 		int height =(int) Math.floor(reducedHeight);
-		System.out.println("\nSlides in presentation according to handler: " +presentation.getSlides().size());
+		System.out.println("\nSlides in presentation according to handler: " + presentation.getSlides().size());
 			StackPane slidePane = new StackPane();
 			
 			// Adding a TimeLine
@@ -139,7 +139,7 @@ public class SlideHandler {
         	}
 			for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++)
         	{
-				MediaFx videoPlayer = new MediaFx (presentation.getSlides().get(i).getVideoList().get(x));
+				MediaFx videoPlayer = new MediaFx (presentation.getSlides().get(i).getVideoList().get(x), 0.5, 0.5);
 				AnchorPane anchor = new AnchorPane();
 				Group group = new Group();
 				anchor.getChildren().add(group);

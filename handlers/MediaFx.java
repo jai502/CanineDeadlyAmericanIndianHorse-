@@ -100,13 +100,13 @@ public class MediaFx {
 	 * @param targetLoc If the object is an intractable, this will contain the slideID to skip to. 
 	 * Otherwise this will be null.
 	 */
-	public MediaFx(VideoItem videoToHandle) {
+	public MediaFx(VideoItem videoToHandle, double width, double height) {
 		this.startTime = videoToHandle.getStartTime();
 		this.duration = videoToHandle.getDuration();
 		this.x = videoToHandle.getxStart();
 		this.y = videoToHandle.getyStart();
-		this.width = videoToHandle.getWidth();
-		this.height = videoToHandle.getHeight();
+		this.width = width;
+		this.height = height;
 		this.sourceFile = videoToHandle.getSourceFile();
 		this.loop = videoToHandle.isLoop();
 		
