@@ -4,10 +4,10 @@
  * Date of first version: 24/05/2016
  * 
  * Last version by: Jonathan Bones & Peter Mills
- * Date of last update: 24/05/2016
- * Version number: 1.0
+ * Date of last update: 27/05/2016
+ * Version number: 1.1
  * 
- * Commit date: 24/05/2016
+ * Commit date: 27/05/2016
  * Description: Refactor of SQL classes into single handler class
  */
 
@@ -184,7 +184,7 @@ public class SQLHandler
 		//Note - this is susceptible to malicious attacks - ensure that semicolons are checked first in the input data!
 		Statement command = null;
 		
-		String sqlSearch = "SELECT id, title, author, languagetype, totalrating FROM " + presTable
+		String sqlSearch = "SELECT title, author, languagetype FROM " + presTable
 				+ " WHERE title = COALESCE(" + SQLTools.testNull(pres.getTitle()) + ", title)"
 				+ " OR author = COALESCE(" + SQLTools.testNull(pres.getAuthor()) + ", author)"
 				+ " OR languagetype = COALESCE(" + SQLTools.testNull(pres.getLanguage()) + ", languagetype)"
@@ -205,12 +205,10 @@ public class SQLHandler
 			
 			while(data.next())
 			{
-				String[] searchResult = new String[5];
-				searchResult[0] = String.valueOf(data.getInt("id"));
-				searchResult[1] = data.getString("title");
-				searchResult[2] = data.getString("author");
-				searchResult[3] = data.getString("languagetype");
-				searchResult[4] = String.valueOf(data.getInt("totalrating"));
+				String[] searchResult = new String[3];
+				searchResult[0] = data.getString("title");
+				searchResult[1] = data.getString("author");
+				searchResult[2] = data.getString("languagetype");
 				searchResults.add(index, searchResult);
 				
 				index++;
@@ -413,7 +411,7 @@ public class SQLHandler
 			command.setString(2, user.getPassword());
 			command.setString(3, user.getEmail());
 			command.setString(4, user.getDob().toString());
-			
+	
 			int row = command.executeUpdate();
 			System.out.println("User successfully added to SQL table with code: " + row);
 			
@@ -635,13 +633,36 @@ public class SQLHandler
 	{
 		Statement command = null;
 		int presID = SQLTools.checkPresID(presCon, pres);
-		
+		ResultSet data;
+		String checkSqlFirstAccess = "SELECT presentationname FROM " + user.getUsername() + userTrackingTable
+				+ " WHERE presentationid = " + presID
+				+ " AND presentationname = '" + pres.getTitle() + "'";
 		String sqlFirstAccess = "INSERT INTO " + user.getUsername() + userTrackingTable
 				+ " (presentationid, presentationname, userrating,userprogress)"
 				+ " VALUES (" + presID + ", '" + pres.getTitle() + "', 0, 0)" ;
+				
 		try {
 			command = userTrackingCon.createStatement();
-			command.executeUpdate(sqlFirstAccess);
+			
+			data = command.executeQuery(checkSqlFirstAccess);
+			
+			// Get number of rows in result set
+			data.last(); 
+			int numRows = data.getRow();
+			System.out.println(numRows);
+			
+			// If number of rows is 0, then the presentation has not been previously accessed by the user
+			if(numRows == 0)
+			{
+				// Add presentation to user tracking table
+				System.out.println("Updating tracking table");
+				command.executeUpdate(sqlFirstAccess);
+				System.out.println("Updated user: " + user.getUsername() + " for presentation: " + pres.getTitle());
+			}
+			else
+			{
+				System.out.println("User has already accessed this presentation");
+			}
 		}
 		catch (SQLException e) 
 		{
@@ -650,18 +671,17 @@ public class SQLHandler
 		finally 
 		{
 			if (command != null)
-      {
-      	try
-      	{
-      		command.close();
-      	} 
-      	catch (SQLException e) 
-      	{
-      		e.printStackTrace();
-      	} 
-      }
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					e.printStackTrace();
+				} 
+			}
 		}	
-		System.out.println("Updated user: " + user.getUsername() + " for presentation: " + pres.getTitle());
 	}
 	
 	//======================================================================================================================

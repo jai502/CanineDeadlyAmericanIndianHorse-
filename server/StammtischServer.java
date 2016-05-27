@@ -148,7 +148,7 @@ public class StammtischServer {
 				}
 				
 				// log user out of server
-				System.out.printf("[H-%d] User '%s' logged out\n", handler, thisUser.getUsername());
+				System.out.printf("[H-%d] User '%s' logged out\n", handler.getNum(), thisUser.getUsername());
 				handler.setUser(null);
 			}
 		});	
@@ -209,6 +209,7 @@ public class StammtischServer {
 			@Override public void respond(ClientRequestHandler handler){
 				// get current request and SQL handler
 				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
 				PresentationShell presentation = null;
 				
 				// get presentation shell object
@@ -219,6 +220,9 @@ public class StammtischServer {
 					e.printStackTrace();
 					return;
 				}
+				
+				// mark presentation as having being accessed by the user
+				sql.userFirstAccess(handler.getUser(), presentation);
 				
 				// get ID of the presentation that the client wants
 				Integer presId = presentation.getId();
