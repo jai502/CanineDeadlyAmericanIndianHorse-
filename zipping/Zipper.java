@@ -178,8 +178,11 @@ public class Zipper{
 		}
 	}
 
-	public static void copyFile(File sourceFile, File destFile) throws IOException 
+	public static void copyFile(String source, String dest) throws IOException 
 	{
+		File sourceFile = new File(source);
+		File destFile = new File(dest);
+		
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
 		try
