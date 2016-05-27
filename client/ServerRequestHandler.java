@@ -151,7 +151,7 @@ public class ServerRequestHandler
 			break;
 		case "RESPONSE_FAIL":
 			presentationList = null;
-			System.out.println("Search failed: " + response.id);
+			System.out.println("Search failed: " + (String) response.param);
 			break;
 		case "RESPONSE_UNKNOWN":
 			presentationList = null;

@@ -1,4 +1,11 @@
 
+/*
+ * (C) Stammtisch
+ * Created by:  Alexander Stassis & Mathew Gould (Design Team)
+ 
+ * Description: This CSS file is responsible for the look and feel of the system
+ */
+
 /* Default styles for every scenes */
 /*.root{
     -fx-background-image: url("Main_Background.png"), url("logo5.png");
@@ -200,6 +207,34 @@
 #Next, #Previous{
 	-fx-font: 15 arial;
 	-fx-base: #BAE98A;
+}
+
+/*****************************************************************************/
+
+/* Comments Scene */
+
+/*****************************************************************************/
+
+#commentsScreenLayout{
+	-fx-background-image: url("Create_Presentation_Background.jpg"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;	
+}
+
+#messageRating{
+	-fx-font: 35 arial;
+	-fx-text-color: red;
+}
+
+#btnLike{
+	-fx-font: 15 arial;
+	-fx-base: #5092D6;
+}
+
+#btnDislike{
+	-fx-font: 15 arial;
+	-fx-base: #FF1512;
 }
 
 

@@ -24,7 +24,11 @@ import javax.imageio.ImageIO;
 
 import org.omg.CORBA.SystemException;
 
+import Objects.AudioItem;
 import Objects.Presentation;
+import Objects.SlideItem;
+import Objects.TextItem;
+import Objects.VideoItem;
 import Parsers.XMLParser;
 import SQL.SQLHandler;
 import client.ServerRequestHandler;
@@ -82,7 +86,6 @@ import javafx.scene.input.MouseEvent;
 
 public class MainGuiPagination extends Application 
 {	
-	private BorderPane userScreenLayout;
 	private User user = new User();
 	private PresentationShell presentationShell = new PresentationShell();
 	private PresentationShell presentationLoad;
@@ -100,7 +103,7 @@ public class MainGuiPagination extends Application
 
 	/* variables for the primary stage */
 	private Stage window;
-	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu;
+	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu, commentsMenu;
 	private int width = 800;
 	private int height = 600;
 	private MenuItem exit;
@@ -134,6 +137,7 @@ public class MainGuiPagination extends Application
 	//private ArrayList<String> inputData2 = new ArrayList<String>();
 
 	/* variables for addUserGridItems() method */
+	private BorderPane userScreenLayout;
 	private Button btnLogOut, btnSearch, btnReset, btnLoadPres;
 	private Label uFirstName, uSurName, uUserName;
 	private TextField textFieldTitle, textFieldAuthor, textFieldLanguage;
@@ -141,15 +145,24 @@ public class MainGuiPagination extends Application
 	private String title, author, language;
 	private int presentationIndex, toolTipIndex;
 	private String presentationID;
-	private SearchDetails searchDetails = new SearchDetails();
-	ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
+	private ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
 
 	/* variables for the createPresentationMenu */
 	private BorderPane createPresentationScreenLayout;
 	private Button btnNext, btnCreate, btnOpenVideoDty;
-	private Label videoLanguage, videoTranslation, startTime, endTime;
+	private Label mediaLanguage, mediaTranslation, startTime, endTime;
 	private TextField startTimeField, endTimeField;
-	private TextArea videoLanguageText, videoTranslationText;
+	private TextArea mediaLanguageText, mediaTranslationText;
+	private SlideItem xmlSlide = new SlideItem();
+	private FileChooser browseMediaFiles = new FileChooser();
+	private File selectedMediaFile;
+	private String mediaPathname;
+
+	/* variables for the commentsMenu */
+	private BorderPane commentsScreenLayout;
+	private Text messageRating;
+	private Button btnLike, btnDislike;
+	private ArrayList<String[]> commentResults = new ArrayList<String[]>(); 
 
 	/* variables for the Scroll Pane */
 	private ScrollPane scrollPane = new ScrollPane();
@@ -218,10 +231,11 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
-		if(logout == false)
-		{
-			com.stop();
-		}
+		//		if(logout == false)
+		//		{
+		//			com.stop();
+		//		}
+		com.stop();
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
 	}
@@ -232,13 +246,14 @@ public class MainGuiPagination extends Application
 		// Assign window variable as the primary stage
 		window = stage;
 
-		// Create menu bar objects ready to add to the Scenes
+		// Create menu bar objects ready to add to the Scenes - Crashes if trying to add same one
 		MenuBar mainMenuBar = menuItems(); // Main Menu
 		//MenuBar loginMenuBar = menuItems(); // Login Menu
 		//MenuBar signupMenuBar = menuItems(); // Sign Up Menu
 		MenuBar userScreenMenuBar =  menuItems(); // User Screen Menu
 		MenuBar presentationCreateMenuBar = menuItems(); // Presentation Menu
 		MenuBar presentationMenuBar = menuItems(); // Presentation Menu
+		MenuBar commentsMenuBar = menuItems(); // Presentation Menu
 
 		/******************** Main Menu Screen ************************/
 		// Create a root node called menuLayout which uses BorderPane
@@ -375,6 +390,25 @@ public class MainGuiPagination extends Application
 		});
 
 		/*************************************************/
+
+		/******************* Comments Screen ************************/
+		// Create a root node called loginLayout which uses BorderPane
+		commentsScreenLayout = new BorderPane();
+		commentsScreenLayout.setId("commentsScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
+		// Add the root node to the scene
+		commentsMenu = new Scene(commentsScreenLayout, width, height, Color.BLACK);
+		// Load style.ccs from same directory to provide the styling for the scenes
+		commentsScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+
+		GridPane commentsGrid = addCommentScreenGridItems();
+		Group commentsResults = commentsDetails();	
+
+		// Add menu bar to User screen
+		commentsScreenLayout.setTop(commentsMenuBar);
+		commentsScreenLayout.setLeft(commentsGrid);
+		commentsScreenLayout.setRight(commentsResults);
+
+		/**************************************************************/
 
 		// Set all GUI Visibility to true
 		window.show();
@@ -613,10 +647,26 @@ public class MainGuiPagination extends Application
 		presentationMenu.getItems().addAll(openFile, new SeparatorMenuItem(), createPresentation);		
 
 		// Help Menu \\
-		Menu helpMenu = new Menu("Help");
+		Menu comments = new Menu("End and go to Rating");
+
+		// for debugging purposes
+		MenuItem commentsScreen = new MenuItem("Go to comments and rating menu...");
+
+		// Event handler for Browsing A File
+		commentsScreen.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) {
+				tempPres = null;
+				window.setTitle("Comments Menu");
+				window.setScene(commentsMenu);				
+			}
+		});
+
+		comments.getItems().add(commentsScreen);	
 
 		// Add All Menu Bar Items to the actual Menu Bar
-		menuBar.getMenus().addAll(fileMenu, presentationMenu, helpMenu);
+		menuBar.getMenus().addAll(fileMenu, presentationMenu, comments);
 
 		return menuBar;
 	}
@@ -710,6 +760,82 @@ public class MainGuiPagination extends Application
 			}});
 	}
 
+	/* Method for selecting a PWS xml file and if not null, return the string name of the 
+	   xml file and pass it into the parser  */
+	private File openSelectedMediaFile(File mediaFile)
+	{	
+
+		if(mediaFile != null)
+		{	
+			if((mediaFile.getName().endsWith(".mp4")) || (mediaFile.getName().endsWith(".MP4")))
+			{
+				mediaPathname = mediaFile.getAbsolutePath();
+				System.out.println("File selected: " + mediaPathname);
+
+				VideoItem videoItem = new VideoItem();
+
+				videoItem.setSourceFile(mediaPathname);
+
+				videoItem.setxStart(0.5);
+				videoItem.setyStart(0.5);
+
+				/* might not need these 
+						videoItem.setHeight(height);
+						videoItem.setWidth(stackWidth);*/
+
+				videoItem.setLoop(false);
+				videoItem.setStartTime(0);
+
+				xmlSlide.addVideo(videoItem);
+
+
+				// Add the pagination to the presentation scene
+				window.setTitle("Create Presentation Menu");
+				// Change scene to presentationMenu
+				window.setScene(createPresentationMenu);
+
+			}
+
+			if((mediaFile.getName().endsWith(".wav")) || (mediaFile.getName().endsWith(".WAV"))
+					|| (mediaFile.getName().endsWith(".mp3")) || (mediaFile.getName().endsWith(".MP3")))
+			{
+				mediaPathname = mediaFile.getAbsolutePath();
+				System.out.println("File selected: " + mediaPathname);
+
+				AudioItem audioItem = new AudioItem();
+
+				audioItem.setSourceFile(mediaPathname);
+
+				/* might not need these 
+				  	audioItem.setxStart(0.5);
+					audioItem.setyStart(0.5);
+					audioItem.setHeight(height);
+					audioItem.setWidth(stackWidth);
+				 */
+
+				audioItem.setLoop(false);
+				audioItem.setStartTime(0);
+
+				xmlSlide.addAudio(audioItem);
+
+				// Add the pagination to the presentation scene
+				window.setTitle("Create Presentation Menu");
+				// Change scene to presentationMenu
+				window.setScene(createPresentationMenu);
+
+			}
+			else
+			{
+				System.out.println("You have not selected a suitable file!");
+			}
+		}
+		else
+		{
+			System.out.println("File selection cancelled!");
+		}
+
+		return mediaFile;
+	}
 
 	/* Inner Class for allowing the Resizing of Canvas objects */
 	private static class ResizeChangeListener implements ChangeListener<Number> {
@@ -1390,15 +1516,15 @@ public class MainGuiPagination extends Application
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
 		// Create the Default message
-		videoLanguage = new Label("Video Language");
-		videoLanguage.setId("videoLanguage"); // Id for gui_style.css
+		mediaLanguage = new Label("Video Language");
+		mediaLanguage.setId("videoLanguage"); // Id for gui_style.css
 		//videoLanguage.setFill(Color.ALICEBLUE);
-		videoLanguage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		grid.add(videoLanguage, 0, 0, 3, 1);
+		mediaLanguage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		grid.add(mediaLanguage, 0, 0, 3, 1);
 
-		videoLanguageText = new TextArea();
-		videoLanguageText.setPrefSize(400, 250);
-		grid.add(videoLanguageText, 0, 1);
+		mediaLanguageText = new TextArea();
+		mediaLanguageText.setPrefSize(400, 250);
+		grid.add(mediaLanguageText, 0, 1);
 
 		startTime = new Label("Start Time:");
 		//grid.add(startTime, 0, 2);
@@ -1410,15 +1536,15 @@ public class MainGuiPagination extends Application
 		endTimeField = new TextField();
 		//grid.add(endTimeField, 3, 2);
 
-		videoTranslation = new Label("Video Translation");
-		videoTranslation.setId("videoLanguage"); // Id for gui_style.css
+		mediaTranslation = new Label("Video Translation");
+		mediaTranslation.setId("videoLanguage"); // Id for gui_style.css
 		//videoLanguage.setFill(Color.ALICEBLUE);
-		videoTranslation.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		mediaTranslation.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		//grid.add(videoTranslation, 0,3, 3, 1);
 
-		videoTranslationText = new TextArea();
-		videoTranslationText.setPrefSize(400, 250);
-		grid.add(videoTranslationText, 0, 4);
+		mediaTranslationText = new TextArea();
+		mediaTranslationText.setPrefSize(400, 250);
+		grid.add(mediaTranslationText, 0, 4);
 
 		btnNext = new Button("Next");
 		//grid.add(btnNext, 0, 5);
@@ -1448,19 +1574,43 @@ public class MainGuiPagination extends Application
 			public void handle(ActionEvent e) 
 			{
 				// More stuff here for saving!!!!!!!!!!
-				videoLanguageText.getText();
-				videoTranslationText.getText();
+				mediaLanguageText.getText();
+				mediaTranslationText.getText();
 				startTimeField.getText();
 				endTimeField.getText();
 
-				System.out.println("Your video text is: " + videoLanguageText.getText());
-				System.out.println("Your translation text is: " + videoTranslationText.getText());
+				System.out.println("Your video text is: " + mediaLanguageText.getText());
+				System.out.println("Your translation text is: " + mediaTranslationText.getText());
 				System.out.println("Start time is: " + startTimeField.getText());
 				System.out.println("End time is: " + endTimeField.getText());
 
+				TextItem videoText = new TextItem();
+				TextItem transText = new TextItem();
+
+				videoText.setText(mediaLanguageText.getText());
+				transText.setText(mediaTranslationText.getText());
+				videoText.setStartTime(Integer.parseInt(startTimeField.getText())*1000);
+				transText.setStartTime(Integer.parseInt(startTimeField.getText())*1000);
+				videoText.setDuration((Integer.parseInt(endTimeField.getText()) - (Integer.parseInt(startTimeField.getText())))*1000);
+				System.out.println(videoText.getDuration());
+				transText.setDuration((Integer.parseInt(endTimeField.getText()) - (Integer.parseInt(startTimeField.getText())))*1000);
+
+				videoText.setHeight(0.4f);
+				videoText.setWidth(0.5f);
+				videoText.setxStart(0.1f);
+				videoText.setyStart(0.1f);
+
+				transText.setHeight(0.4f);
+				transText.setWidth(0.5f);
+				transText.setxStart(0.1f);
+				transText.setyStart(0.6f);
+
+				xmlSlide.addText(videoText);
+				xmlSlide.addText(transText);				
+
 				// Clear for next input
-				videoLanguageText.clear();
-				videoTranslationText.clear();
+				mediaLanguageText.clear();
+				mediaTranslationText.clear();
 				startTimeField.clear();
 				endTimeField.clear();
 
@@ -1468,7 +1618,7 @@ public class MainGuiPagination extends Application
 				window.setScene(createPresentationMenu);
 			}
 		});
-		//
+
 		//		btnOpenVideoDty.setOnAction(new EventHandler<ActionEvent>() 
 		//		{
 		//			@Override
@@ -1488,45 +1638,139 @@ public class MainGuiPagination extends Application
 		//				//				
 		//				//				window.setTitle("Create Presentation Menu");
 		//				//				window.setScene(createPresentationMenu);
+		//
+		//
 		//			}
 		//		});
+
+		// Event handler for Browsing A File
+		btnOpenVideoDty.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) {
+				System.out.println("Please select a media file to open...");
+
+				// Set extension filters
+				FileChooser.ExtensionFilter extFilterMP4 = new FileChooser.ExtensionFilter("MP4 files (*.MP4)", "*.MP4");
+				FileChooser.ExtensionFilter extFiltermp4 = new FileChooser.ExtensionFilter("mp4 files (*.mp4)", "*.mp4");
+				FileChooser.ExtensionFilter extFilterWAV = new FileChooser.ExtensionFilter("WAV files (*.WAV)", "*.WAV");
+				FileChooser.ExtensionFilter extFilterwav = new FileChooser.ExtensionFilter("wav files (*.wav)", "*.wav");
+				FileChooser.ExtensionFilter extFilterMP3 = new FileChooser.ExtensionFilter("MP3 files (*.MP3)", "*.MP3");
+				FileChooser.ExtensionFilter extFiltermp3 = new FileChooser.ExtensionFilter("mp3 files (*.mp3)", "*.mp3");
+
+				// Add extension files to the file chooser
+				browseMediaFiles.getExtensionFilters().addAll(extFilterMP4, extFiltermp4, extFilterWAV, 
+						extFilterwav, extFilterMP3, extFiltermp3);
+
+				// Assign a File object as the file chooser - open the system dialogue
+				selectedMediaFile = browseMediaFiles.showOpenDialog(window);
+
+				// Open the PWS selected xml file and change the scene to presentation scene
+				// with a pagination layout
+				openSelectedMediaFile(selectedMediaFile);
+			}
+		});
 		//
-		//		// Event handler for btnCreate
-		//		btnCreate.setOnAction(new EventHandler<ActionEvent>() 
-		//		{
-		//			@Override
-		//			public void handle(ActionEvent e) 
-		//			{
-		//				//				title = textFieldTitle.getText();
-		//				//				author = textFieldAuthor.getText();
-		//				//				language = textFieldLanguage.getText();
-		//				//
-		//				//				// Set the username and password fields in local SignUpDetails class
-		//				//				presentationShell.setTitle(title);
-		//				//				presentationShell.setAuthor(author);
-		//				//				presentationShell.setLanguage(language);
-		//				//
-		//				//				response3.setText("Searching for results");
-		//				//				response3.setFill(Color.MEDIUMPURPLE);
-		//				//				searchView.setVisible(true);
-		//				//				userScreenLayout.setRight(searchDetails());
-		//			}
-		//		}); 
+		// Event handler for btnCreate
+		btnCreate.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				//				title = textFieldTitle.getText();
+				//				author = textFieldAuthor.getText();
+				//				language = textFieldLanguage.getText();
+				//
+				//				// Set the username and password fields in local SignUpDetails class
+				//				presentationShell.setTitle(title);
+				//				presentationShell.setAuthor(author);
+				//				presentationShell.setLanguage(language);
+				//
+				//				response3.setText("Searching for results");
+				//				response3.setFill(Color.MEDIUMPURPLE);
+				//				searchView.setVisible(true);
+				//				userScreenLayout.setRight(searchDetails());
+			}
+		}); 
 
 		return grid;
 	}
-	
+
+	/* Method for GridPane items for User Screen Menu */
+	public GridPane addCommentScreenGridItems(){
+
+		// Create a root node called grid. In this case a grid pane layout 
+		// is used, with vertical and horizontal gaps of 10
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+
+		// Centre the controls in the scene
+		grid.setAlignment(Pos.CENTER);
+
+		// Add padding
+		grid.setPadding(new Insets(25, 25, 25, 25));
+
+		// Create the Default message
+		messageRating = new Text("Please give your rating");
+		messageRating.setId("messageRating"); // Id for gui_style.css
+		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
+		messageRating.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		grid.add(messageRating, 0, 0, 2, 1);
+
+
+		// Creating buttons for rating up or down
+		Image thumbsUp = new Image(getClass().getResourceAsStream("thumb_up.png"));
+		btnLike = new Button("Like", new ImageView(thumbsUp));
+		btnLike.setPrefSize(120, 50);
+		btnLike.setId("btnLike");
+
+		Image thumbsDown = new Image(getClass().getResourceAsStream("thumb_down.png"));
+		btnDislike = new Button("Dislike", new ImageView(thumbsDown));
+		btnDislike.setPrefSize(120, 50);
+		btnDislike.setId("btnDislike");
+
+		// Creating a HBox area to add the buttons to
+		VBox vbArea = new VBox(10);
+		vbArea.setAlignment(Pos.CENTER);
+		vbArea.getChildren().addAll(btnLike, btnDislike);
+
+		// Adding hbArea with the button in it to the rootNode
+		grid.add(vbArea, 1, 5);
+
+		// Event handler for btnLogout
+		btnLike.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+
+			}
+		});
+
+		// Event handler for btnSearch
+		btnDislike.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+
+			}
+		}); 
+
+
+		return grid;
+	}
+
 	public Group commentsDetails()
 	{
 		Group listGroup = new Group();
 		commentsView.setId("listView");
-		commentsView.setPrefHeight(userScreenLayout.getHeight());
-		searchView.setPrefWidth(userScreenLayout.getWidth()/2);
+		commentsView.setPrefHeight(commentsScreenLayout.getHeight());
+		commentsView.setPrefWidth(commentsScreenLayout.getWidth()/2);
 		//System.out.println(observableList);
 
-		
-
-		commentsView.setItems(observableList);
+		//commentsView.setItems(observableList);
 
 		//searchView.getSelectionModel().getSelectedIndex();
 		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
