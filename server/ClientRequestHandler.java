@@ -1,10 +1,17 @@
 package server;
 
 
-// java imports
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+//java imports
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -25,12 +32,15 @@ public class ClientRequestHandler implements Runnable {
 	boolean threadDone = false;			// thread is still running
 	int order;
 	
+	// transfer socket
+	ServerSocket tSocket;
+	
 	// list of request handling objects
 	ArrayList<Response> responses;
 	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql, ServerSocket tSocket){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
 		this.responses = responses;
@@ -45,6 +55,9 @@ public class ClientRequestHandler implements Runnable {
 		preLoginReqs.add(new String("DISCONNECT"));
 		preLoginReqs.add(new String("REQUEST_LOGIN"));
 		preLoginReqs.add(new String("REQUEST_SIGNUP"));
+		
+		// transfer socket factory
+		this.tSocket = tSocket;
 	}
 	
 	
@@ -60,7 +73,7 @@ public class ClientRequestHandler implements Runnable {
 			try {
 				currentRequest = getRequest(clientSocket);
 			} catch(IOException e) {
-				System.out.printf("[H-%d][ERR] Exception on socket recieve \n", handlerInstance);
+				System.out.printf("[H-%d-ERR] Exception on request recieve\n", handlerInstance);
 				e.printStackTrace();
 				done = true;
 				break;
@@ -71,7 +84,6 @@ public class ClientRequestHandler implements Runnable {
 			
 			// search for response in response list
 			Response currentResponse = searchResponses(currentRequest.id);
-			System.out.printf("[H-%d] Got request %s\n", handlerInstance, currentRequest.id);
 			
 			if(currentResponse != null){
 				// if the user has not logged in, log them in
@@ -79,11 +91,11 @@ public class ClientRequestHandler implements Runnable {
 					// respond to request
 					currentResponse.respond(this);
 				} else {
-					sendResponse(new RequestObject("RESPONSE_FAIL", new String("login first you little shit"), order));
+					respondFail("not logged in");
 				}
 			} else {
-				System.out.printf("[H-%d][ERR] Unrecognised request '%s'\n", handlerInstance, currentRequest.id);
-				respondUnknown("Request: '" + currentRequest.id + "' not recognised");
+				System.out.printf("[H-%d-ERR] unrecognised request: '%s'\n", handlerInstance, currentRequest.id);
+				respondUnknown(currentRequest.id);
 			}
 		}
 		
@@ -91,7 +103,7 @@ public class ClientRequestHandler implements Runnable {
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
-			System.out.printf("[H-%d][ERR] Exception on socket close \n", handlerInstance);
+			System.out.printf("[H-%d-ERR] Exception on socket close \n", handlerInstance);
 			e.printStackTrace();
 		}
 		
@@ -119,11 +131,11 @@ public class ClientRequestHandler implements Runnable {
 		ObjectInputStream inputFromClient;
 		RequestObject thisRequest;
 		try {
-			inputFromClient = new ObjectInputStream(threadSocket.getInputStream());
+			inputFromClient = new ObjectInputStream(new BufferedInputStream(threadSocket.getInputStream()));
 			thisRequest = (RequestObject)inputFromClient.readObject();
 			return thisRequest;
 		} catch (ClassNotFoundException e) {
-			System.out.printf("[H-%d][ERR] Request is of wrong format\n", handlerInstance);
+			System.out.printf("[H-%d-ERR] Sent malformed request\n", handlerInstance);
 			e.printStackTrace();			
 		}
 		return null;
@@ -135,11 +147,11 @@ public class ClientRequestHandler implements Runnable {
 	public void sendResponse(RequestObject thisRequest) {
 		// instantiate request object
 		try {
-			ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+			ObjectOutputStream outputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
 			outputStream.writeObject(thisRequest);
 			outputStream.flush();
 		} catch(IOException e) {
-			System.out.printf("[H-%d][ERR] Failed to send response (IOException)", handlerInstance);
+			System.out.printf("[H-%d-ERR] Response error\n", handlerInstance);
 			e.printStackTrace();
 		} 
 	}
@@ -187,6 +199,66 @@ public class ClientRequestHandler implements Runnable {
 		
 		// send response
 		sendResponse(thisRequest);			
+	}
+	
+	
+	
+	// sends file to client
+	// returns null on success
+	public String sendFile(String path){
+		// buffer variables
+		int bufSize = 131072; 				
+		byte[] buffer = new byte[bufSize];
+		
+		// other variables
+		boolean doTransfer = true;			// end of transfer signal variable
+		InputStream file = null;			// file input stream
+		String rString = null;				// return value
+		
+		try {
+			file = new FileInputStream(path);
+		} catch (FileNotFoundException e) {
+			// report failure to handler
+			doTransfer = false;
+			return "File not found";
+		}
+		
+		// per loop variables
+		int count = 0;
+		RequestObject responseData = new RequestObject("RESPOND_DATA", null, order);
+		FileBlock blockData = null;
+		
+		// iterate over the file sending one chunk at a time
+		while (doTransfer){
+			// get block of data from file
+			try {
+				count = file.read(buffer);
+			} catch (IOException e) {
+				e.printStackTrace(); 
+				rString = "Error on file read";
+				doTransfer = false;
+			}
+			
+			// put block of data into file transfer object
+			if ((count < 0) || (!doTransfer)) break;
+			
+			// create data block
+			blockData = new FileBlock(buffer, count);
+			responseData.param = (Object)blockData;
+			
+			// send the response object with the data in it to client
+			sendResponse(responseData);
+		}
+		
+		// close file
+		try {
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// indicate state of transfer
+		return rString;
 	}
 	
 	
@@ -246,4 +318,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	// setter for logging in a user
 	public void setUser(User user) {this.user = user;}
+	
+	// setter for logging in a user
+	public User getUser() {return user;}
 }

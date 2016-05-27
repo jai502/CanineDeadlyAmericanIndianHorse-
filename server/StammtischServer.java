@@ -19,6 +19,7 @@ package server;
 import SQL.*;
 import com.*;
 
+
 // java imports
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,9 +29,13 @@ import java.util.ArrayList;
 
 public class StammtischServer {
 	
-	// Socket stuff
+	// Server comms stuff
 	public static int defaultPort = 26656;
 	public ServerSocket sSocket;
+	
+	// server file transfer stuff
+	public static int transferPort = 26655;
+	public ServerSocket tSocket;
 	
 	// SQL connection stuff
 	int sqlPort = 3306;
@@ -91,6 +96,7 @@ public class StammtischServer {
 		// response to a disconnect request
 		responses.add(new Response("DISCONNECT"){
 			@Override public void respond(ClientRequestHandler handler){
+				System.out.printf("[H-%d] Disconnected\n", handler.getNum());
 				handler.stop();
 			}
 		});
@@ -103,11 +109,24 @@ public class StammtischServer {
 				SQLHandler SQLHandler = handler.getSQLHandler();
 				
 				// get the user object
-				User thisUser = (User)thisRequest.param;
+				User thisUser;
+				try {
+					thisUser = (User)thisRequest.param;
+				} catch (Exception e){
+					handler.respondFail("Malformed request");
+					return;
+				}
 				
 				// check that user exists 
 				if(SQLHandler.checkLoginDetails(thisUser)){
-					handler.setUser(thisUser);	// set handler user to this user
+					System.out.printf(
+						"[H-%d] Logged in as user: %s\n", 
+						handler.getNum(), 
+						thisUser.getUsername()
+					);
+					
+					// set handler user to this user
+					handler.setUser(thisUser);	
 					handler.respondOk(null);
 				}
 				
@@ -115,6 +134,24 @@ public class StammtischServer {
 				else handler.respondFail("invalid login");
 			}
 		});
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_LOGOUT"){
+			@Override public void respond(ClientRequestHandler handler){
+				User thisUser = handler.getUser();
+				if (thisUser == null) {
+					// failed to log out (not logged in)
+					handler.respondFail("not logged in");
+				} else {
+					// logout successful
+					handler.respondOk(null);
+				}
+				
+				// log user out of server
+				System.out.printf("[H-%d] User '%s' logged out\n", handler, thisUser.getUsername());
+				handler.setUser(null);
+			}
+		});	
 		
 		// respond to signup request
 		responses.add(new Response("REQUEST_SIGNUP"){
@@ -186,21 +223,16 @@ public class StammtischServer {
 				// get ID of the presentation that the client wants
 				Integer presId = presentation.getId();
 				
-				// return string
-				String returnString = 
-						"ID: " +
-						presId.toString() +
-						"|auth: " +
-						presentation.getAuthor() +
-						"|lang: " +
-						presentation.getLanguage() +
-						"|rating: " +
-						presentation.getRating() +
-						"|title: " +
-						presentation.getTitle();
+				// open the file for transfer
+				String transferFailureReason = handler.sendFile("pres/" + presId.toString() + ".zip");		
 				
-				// notify client that presentation ID has been received
-				handler.respondOk(returnString);
+				// respond with failure of file transfer did not success
+				if(transferFailureReason != null){
+					handler.respondFail(transferFailureReason);
+					return;
+				} else {
+					handler.respondOk(null);
+				}
 			}
 		});
 		
@@ -253,6 +285,14 @@ public class StammtischServer {
 				sSocket = new ServerSocket(defaultPort);
 			} catch (IOException e) {
 				e.printStackTrace();
+				System.exit(0);
+			}
+			
+			try {
+				tSocket = new ServerSocket(transferPort);
+			} catch (IOException e){
+				e.printStackTrace();
+				System.exit(0);
 			}
 			
 			while(true) {
@@ -263,7 +303,8 @@ public class StammtischServer {
 							sSocket.accept(),
 							nextInstance,
 							responses,
-							sqlInterface
+							sqlInterface,
+							tSocket
 						);
 					
 					// add handler to handler list
@@ -271,7 +312,7 @@ public class StammtischServer {
 					
 					// start request handler thread
 					Thread thread = new Thread(handlers.get(handlers.size()-1));					
-					System.out.printf("[INFO] Client connected, starting handler thread %d \n", nextInstance);
+					System.out.printf("[H-%d] Connected \n", nextInstance);
 					nextInstance++;
 					thread.start();
 				} catch (IOException e) {
