@@ -224,17 +224,26 @@
 
 #messageRating{
 	-fx-font: 35 arial;
-	-fx-text-color: red;
+	-fx-text-color: white;
+	-fx-outer-border: black;
 }
 
 #btnLike{
 	-fx-font: 15 arial;
 	-fx-base: #5092D6;
+	-fx-outer-border: black;
+	-fx-outer-border-width: 20
 }
 
 #btnDislike{
 	-fx-font: 15 arial;
 	-fx-base: #FF1512;
+	-fx-outer-border: black;
+	-fx-border-width: 20
+}
+#btnSubmit{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
 }
 
 

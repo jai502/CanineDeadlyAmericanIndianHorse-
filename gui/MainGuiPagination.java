@@ -157,11 +157,15 @@ public class MainGuiPagination extends Application
 	private FileChooser browseMediaFiles = new FileChooser();
 	private File selectedMediaFile;
 	private String mediaPathname;
+	
 
 	/* variables for the commentsMenu */
 	private BorderPane commentsScreenLayout;
-	private Text messageRating;
-	private Button btnLike, btnDislike;
+	private Text messageRating, messageSubmit;
+	private Button btnLike, btnDislike, btnSubmit;
+	private int rating = 0;
+	private String writtenComments;
+	private TextArea commentsToWrite = new TextArea();
 	private ArrayList<String[]> commentResults = new ArrayList<String[]>(); 
 
 	/* variables for the Scroll Pane */
@@ -231,10 +235,6 @@ public class MainGuiPagination extends Application
 	@Override
 	public void stop()
 	{
-		//		if(logout == false)
-		//		{
-		//			com.stop();
-		//		}
 		com.stop();
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
@@ -401,11 +401,12 @@ public class MainGuiPagination extends Application
 		commentsScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		GridPane commentsGrid = addCommentScreenGridItems();
-		VBox vBox = new VBox();
 		Group commentsResults = commentsDetails();	
-		TextArea commentsToWrite = new TextArea();
+		TextArea inputComments = commentsEdit();
 		
-		vBox.getChildren().addAll(commentsResults, commentsToWrite);
+		VBox vBox = new VBox();		
+		vBox.getChildren().addAll(commentsResults, inputComments);
+		
 		// Add menu bar to User screen
 		commentsScreenLayout.setTop(commentsMenuBar);
 		commentsScreenLayout.setLeft(commentsGrid);
@@ -591,10 +592,8 @@ public class MainGuiPagination extends Application
 		{
 			public void handle(ActionEvent t) 
 			{
-				if(logout == false)
-				{
-					com.stop();
-				}
+				com.logoutFromServer();
+				com.stop();
 				System.exit(0);
 			}
 
@@ -1272,7 +1271,7 @@ public class MainGuiPagination extends Application
 		textFieldTitle.setPromptText("Search by Title");
 		grid.add(textFieldTitle, 1, 1);
 		textFieldAuthor = new TextField();
-		textFieldAuthor.setPromptText("Seacrh by Author");
+		textFieldAuthor.setPromptText("Search by Author");
 		grid.add(textFieldAuthor, 1, 2);
 		textFieldLanguage = new TextField();
 		textFieldLanguage.setPromptText("Search by Language");
@@ -1308,7 +1307,7 @@ public class MainGuiPagination extends Application
 			public void handle(ActionEvent e) 
 			{
 				logout = true;
-				com.stop();
+				com.logoutFromServer();
 				textFieldName.clear();
 				textFieldPassword1.clear();
 				window.setTitle("Main Menu");
@@ -1622,30 +1621,6 @@ public class MainGuiPagination extends Application
 			}
 		});
 
-		//		btnOpenVideoDty.setOnAction(new EventHandler<ActionEvent>() 
-		//		{
-		//			@Override
-		//			public void handle(ActionEvent e) 
-		//			{
-		//				//				// More stuff here for saving!!!!!!!!!!
-		//				//				videoLanguageText.getText();
-		//				//				videoTranslationText.getText();
-		//				//				startTimeField.getText();
-		//				//				endTimeField.getText();
-		//				//								
-		//				//				// Clear for next input
-		//				//				videoLanguageText.clear();
-		//				//				videoTranslationText.clear();
-		//				//				startTimeField.clear();
-		//				//				endTimeField.clear();
-		//				//				
-		//				//				window.setTitle("Create Presentation Menu");
-		//				//				window.setScene(createPresentationMenu);
-		//
-		//
-		//			}
-		//		});
-
 		// Event handler for Browsing A File
 		btnOpenVideoDty.setOnAction(new EventHandler<ActionEvent>() 
 		{
@@ -1717,10 +1692,10 @@ public class MainGuiPagination extends Application
 		// Create the Default message
 		messageRating = new Text("Please give your rating");
 		messageRating.setId("messageRating"); // Id for gui_style.css
-		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
-		messageRating.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+//		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
+		messageRating.setFill(Color.ALICEBLUE);
+		messageRating.setFont(Font.font("Arial", FontWeight.BOLD, 40));
 		grid.add(messageRating, 0, 0, 2, 1);
-
 
 		// Creating buttons for rating up or down
 		Image thumbsUp = new Image(getClass().getResourceAsStream("thumb_up.png"));
@@ -1732,14 +1707,25 @@ public class MainGuiPagination extends Application
 		btnDislike = new Button("Dislike", new ImageView(thumbsDown));
 		btnDislike.setPrefSize(120, 50);
 		btnDislike.setId("btnDislike");
+		
+		btnSubmit = new Button("Submit");
+		btnSubmit.setPrefSize(120, 50);
+		btnSubmit.setId("btnSubmit");
 
 		// Creating a HBox area to add the buttons to
 		VBox vbArea = new VBox(10);
 		vbArea.setAlignment(Pos.CENTER);
-		vbArea.getChildren().addAll(btnLike, btnDislike);
+		vbArea.getChildren().addAll(btnLike, btnDislike, btnSubmit);
 
 		// Adding hbArea with the button in it to the rootNode
 		grid.add(vbArea, 1, 5);
+		
+		messageSubmit = new Text("Hit submit to upload your ratings and comments!");
+		messageSubmit.setId("messageSubmit"); // Id for gui_style.css
+//		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
+		messageSubmit.setFill(Color.ALICEBLUE);
+		messageSubmit.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+		grid.add(messageSubmit, 0, 6, 2, 1);
 
 		// Event handler for btnLogout
 		btnLike.setOnAction(new EventHandler<ActionEvent>() 
@@ -1747,7 +1733,9 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-
+				rating = 1;
+				// Need to assign this rating value to some
+				// kind of presentation object 
 			}
 		});
 
@@ -1757,10 +1745,24 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-
+				rating = -1;
+				// Need to assign this rating value to some
+				// kind of presentation object 
 			}
 		}); 
 
+		// Event handler for btnLogout
+		btnSubmit.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) 
+			{
+				writtenComments = commentsToWrite.getText();
+				System.out.println(writtenComments);
+				// Need to assign the text to the presentation
+				// object and send that to the server
+			}
+		});
 
 		return grid;
 	}
@@ -1769,7 +1771,7 @@ public class MainGuiPagination extends Application
 	{
 		Group listGroup = new Group();
 		commentsView.setId("listView");
-		commentsView.setPrefHeight(commentsScreenLayout.getHeight());
+		commentsView.setPrefHeight(commentsScreenLayout.getHeight()/2);
 		commentsView.setPrefWidth(commentsScreenLayout.getWidth()/2);
 		//System.out.println(observableList);
 
@@ -1780,11 +1782,17 @@ public class MainGuiPagination extends Application
 		listGroup.getChildren().add(commentsView);
 		return listGroup;
 	}
-	
+
 	public TextArea commentsEdit()
 	{
-		TextArea commentsToWrite = new TextArea();
+		//commentsToWrite = new TextArea();
+		commentsToWrite.setPromptText("Please add your comments");
+		commentsToWrite.setMinHeight(commentsScreenLayout.getHeight()/2);
+		commentsToWrite.setMinWidth(commentsScreenLayout.getWidth()/2);
+		//commentsToWrite.setPrefHeight(commentsScreenLayout.getHeight()/2);
+		//commentsToWrite.setPrefWidth(commentsScreenLayout.getWidth()/2);
 		
+
 		return commentsToWrite;
 	}
 

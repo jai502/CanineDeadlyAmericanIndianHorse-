@@ -107,6 +107,42 @@ public class ServerRequestHandler
     }
     
     //=========================================================================
+    // Send the logout command to Server
+    //=========================================================================
+    public final Boolean logoutFromServer()
+    {
+        Boolean logout = false;
+        
+        RequestObject logoutRequest = new RequestObject("REQUEST_LOGOUT", null, order);
+        System.out.println("Sending " + logoutRequest.id + " with order " + logoutRequest.order + "...");
+        sendRequest(logoutRequest);
+        System.out.println("Successfully sent, waiting for response...");
+        
+        RequestObject response = getResponse();
+        
+        switch(response.id)
+        {
+        case "RESPONSE_OK":
+            logout = true;
+            break;
+        case "RESPONSE_FAIL":
+            System.out.println("Logout failed: " + (String) response.param);
+            logout = false;
+            break;
+        case "RESPONSE_UNKNOWN":
+            System.out.println("Logout failed: Server didn't recognise request");
+            logout = false;
+            break;
+        default:
+            System.out.println("Logout failed: (Response " + response.id + " Unknown)");
+            logout = false;
+            break;
+        }
+        
+        return logout;
+    }
+    
+    //=========================================================================
     // Send the sign-up details to the Server
     //=========================================================================
     public final String signUp(User user)
