@@ -401,12 +401,15 @@ public class MainGuiPagination extends Application
 		commentsScreenLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		GridPane commentsGrid = addCommentScreenGridItems();
+		VBox vBox = new VBox();
 		Group commentsResults = commentsDetails();	
-
+		TextArea commentsToWrite = new TextArea();
+		
+		vBox.getChildren().addAll(commentsResults, commentsToWrite);
 		// Add menu bar to User screen
 		commentsScreenLayout.setTop(commentsMenuBar);
 		commentsScreenLayout.setLeft(commentsGrid);
-		commentsScreenLayout.setRight(commentsResults);
+		commentsScreenLayout.setRight(vBox);
 
 		/**************************************************************/
 
@@ -1776,6 +1779,13 @@ public class MainGuiPagination extends Application
 		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listGroup.getChildren().add(commentsView);
 		return listGroup;
+	}
+	
+	public TextArea commentsEdit()
+	{
+		TextArea commentsToWrite = new TextArea();
+		
+		return commentsToWrite;
 	}
 
 }
