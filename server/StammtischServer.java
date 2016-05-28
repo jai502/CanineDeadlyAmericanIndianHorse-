@@ -5,11 +5,11 @@
 * 
 * Last version by: Alexander Cramb (ac1362)
 * Date of last update: 
-* Version number: 0.1
+* Version number: 1.3.7
 * 
 * Commit date: 
 * Description: 
-* Load bearing server for stammtisch application
+* 	Load bearing server for stammtisch application
 */
 
 package server;
@@ -21,6 +21,7 @@ import com.*;
 
 
 // java imports
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
@@ -28,14 +29,23 @@ import java.util.ArrayList;
 
 
 public class StammtischServer {
+	// path to configuration file
+	public static String configFilePath = "config.txt";
 	
-	// Server comms stuff
-	public static int defaultPort = 26656;
+	// Default configuration file values
+	public static Integer defaultPort = 26656;
+	public static Integer defaultSqlPort = 3306;
+	public static String defaultSqlHost = "stammtischsql.ddns.net";
+	
+	// actual values from configuration file
+	public static Integer port = 0;
+	public static Integer sqlPort = 0;
+	public static String sqlHost = null;
+	
+	// server socket factory
 	public ServerSocket sSocket;
 	
 	// SQL connection stuff
-	int sqlPort = 3306;
-	String sqlServer = "stammtischsql.ddns.net";
 	SQLHandler sqlInterface;
 
 	// client request handlers
@@ -55,7 +65,7 @@ public class StammtischServer {
 		System.out.printf("Starting server on port %d\n", port);
 		
 		// connect to SQL servers
-		sqlInterface = new SQLHandler(sqlServer, sqlPort);
+		sqlInterface = new SQLHandler(sqlHost, sqlPort);
 
 		// initialise client request handler list
 		handlers = new ArrayList<ClientRequestHandler>();
@@ -304,7 +314,7 @@ public class StammtischServer {
 					
 					// start request handler thread
 					Thread thread = new Thread(handlers.get(handlers.size()-1));					
-					System.out.printf("[H-%d] Connected \n", nextInstance);
+					thisHandler.log("Connected");
 					nextInstance++;
 					thread.start();
 				} catch (IOException e) {
@@ -548,6 +558,7 @@ public class StammtischServer {
 				for(int i = 0; i < boundHandlers.size(); i++){
 					boundHandlers.get(i).stop();
 					boundHandlers.get(i).setUser(null);
+					boundHandlers.get(i).setBlock(true);
 				}
 			}
 		});
@@ -578,12 +589,108 @@ public class StammtischServer {
 	
 	
 	
+	// loads configuration file
+	public static void loadConfig(String path){
+		FileInputStream file;		// file input stream
+		Scanner fs = null;			// file scanner
+		Scanner ls = null;			// file line scanner
+		String line;				// line from file
+		ArrayList<String> lineData;	// line data
+		boolean cfgDone = false;	// parsing done
+		boolean useDefault = false;	// signal variable for whether to use default or not
+		
+		// open the file
+		try {
+			file = new FileInputStream(path);
+			System.out.printf("Config file %s open\n", path);
+		} catch (IOException e) {
+			// print to console
+			System.out.printf("Config file %s not found %s\n", path);
+			System.out.printf("Using default values.");
+			
+			// use default values
+			port = defaultPort;
+			sqlPort = defaultSqlPort;
+			sqlHost = defaultSqlHost;
+			return;
+		}
+		
+		// parse the config file
+		fs = new Scanner(file);
+
+		while(!cfgDone){
+			// get a line from the file
+			line = fs.nextLine();
+			
+			// make a scanner for the line
+			ls = new Scanner(line);
+			
+			// get line data
+			lineData = getParams(ls);
+			
+			switch(lineData.get(0)){
+				// server port parameter
+				case "serverPort:":
+					useDefault = false;
+					// no line data
+					if (lineData.size() < 2) useDefault = true;
+					// set server port accordingly
+					port = parseAsInt(lineData.get(1), 0, 65535);
+					// if parse failed use default port
+					if(port == null) useDefault = true;
+					if(useDefault) port = defaultPort;
+					else System.out.printf("Server port read from config file: %d\n", port);
+					break;
+				
+				// sql port parameter
+				case "sqlPort:":
+					useDefault = false;
+					// no line data
+					if (lineData.size() < 2) useDefault = true;
+					// set server port accordingly
+					sqlPort = parseAsInt(lineData.get(1), 0, 65535);
+					// if parse failed use default port
+					if(sqlPort == null) useDefault = true;
+					if(useDefault) sqlPort = defaultSqlPort;
+					else System.out.printf("SQL server port read from config file: %d\n", sqlPort);
+					break;
+				
+				// SQL server host parameter
+				case "sqlHost:":
+					useDefault = false;
+					// no line data
+					if (lineData.size() < 2) useDefault = true;
+					if (useDefault) sqlHost = defaultSqlHost;
+					else {
+						System.out.printf("Server host read from config file: %s\n", lineData.get(1));
+						sqlHost = lineData.get(1);
+					}
+					break;
+					
+				// line tag not recognised
+				default:
+					System.out.printf("Unrecognised config file tag: %s\n", lineData.get(0));
+					break;
+			}
+			
+			// configuration is done
+			if(!fs.hasNextLine()) cfgDone = true;
+		}
+		
+		// no resource leaks, thank you!
+		fs.close();
+		if (ls != null) ls.close();
+	}
+	
+	
+	
 	// Main method for launching server
 	public static void main(String[] args) {
-		// do command-line argument parsing here
+		// configuration file load would happen here
+		loadConfig(configFilePath);
 		
 		// start the stammtisch server connection listener
-		new StammtischServer(defaultPort);
+		new StammtischServer(port);
 		
 		// "scanner" object for reading from command line (javawtf?)
 		String line = null;

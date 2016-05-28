@@ -212,10 +212,6 @@ public class SQLHandler
 				searchResult[3] = data.getString("languagetype");
 				searchResult[4] = (new Integer(data.getInt("totalRating"))).toString();
 				searchResults.add(index, searchResult);
-				
-				System.out.println(searchResult[0]);
-				System.out.println(searchResult[1]);
-				System.out.println(searchResult[2]);
 			}
 		}			
 		catch (SQLException e) 

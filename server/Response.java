@@ -4,8 +4,8 @@
 * Date of first version: 24/05/2016
 * 
 * Last version by: Alexander Cramb (ac1362)
-* Date of last update: 24/05/2016
-* Version number: 0.1
+* Date of last update: 28/05/2016
+* Version number: 1.0.3
 * 
 * Commit date: 
 * Description: 

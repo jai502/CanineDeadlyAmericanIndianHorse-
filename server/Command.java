@@ -5,7 +5,7 @@
 * 
 * Last version by: Alexander Cramb (ac1362)
 * Date of last update: 23/05/2016
-* Version number: 0.1
+* Version number: 1.0.2
 * 
 * Commit date: 
 * Description: 

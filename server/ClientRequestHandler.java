@@ -1,17 +1,30 @@
+/*
+* (C) Stammtisch
+* First version created by: Alexander Cramb (ac1362)
+* Date of first version: 28/01/2016
+* 
+* Last version by: Alexander Cramb (ac1362)
+* Date of last update: 28/05/2016
+* Version number: 1.5.12
+* 
+* Commit date: 28/05/2016
+* Description: 
+* 	Client request handler
+*/
+
+
 package server;
 
 
-
+//java imports
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-//java imports
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -28,9 +41,11 @@ public class ClientRequestHandler implements Runnable {
 	private SQLHandler sql;
 	private Socket clientSocket;	    // socket for this client connection
 	private int handlerInstance;		// unique number associated with client
-	boolean done = false;			    // main loop complete
-	boolean threadDone = false;			// thread is still running
-	int order;
+	private boolean blocked = false;			// user is allowed to make requests
+	private boolean done = false;			    // main loop complete
+	private boolean threadDone = false;			// thread running
+	private boolean doLogging = false;
+	private int order;
 	
 	// list of request handling objects
 	ArrayList<Response> responses;
@@ -64,13 +79,8 @@ public class ClientRequestHandler implements Runnable {
 		
 		while (!done) {
 			// wait for request from client
-			try {
+			while(currentRequest != null){
 				currentRequest = getRequest(clientSocket);
-			} catch(IOException e) {
-				System.out.printf("[H-%d-ERR] Exception on request recieve\n", handlerInstance);
-				e.printStackTrace();
-				done = true;
-				break;
 			}
 			
 			// take order number for current request
@@ -80,16 +90,22 @@ public class ClientRequestHandler implements Runnable {
 			Response currentResponse = searchResponses(currentRequest.id);
 			
 			if(currentResponse != null){
-				// if the user has not logged in, log them in
-				if((user != null) || reqAllowed(currentRequest.id)){
+				if(reqAllowed(currentRequest.id, user) && !blocked){
 					// respond to request
+					log("Recieved req '%s' responding...");
 					currentResponse.respond(this);
 				} else {
-					respondFail("not logged in");
+					if(!blocked){
+						respondFail("not logged in");
+						log("Recieved req '%s' blocked, not logged in", currentRequest.id);
+					} else {
+						respondFail("action blocked");
+						log("Recieved req '%s' blocked, handler blocked", currentRequest.id);
+					}
 				}
 			} else {
-				System.out.printf("[H-%d-ERR] unrecognised request: '%s'\n", handlerInstance, currentRequest.id);
-				respondUnknown(currentRequest.id);
+				log("Recieved req '%s' not recognised", currentRequest.id);
+				respondFail(String.format("Request '%s' not recongised"));
 			}
 		}
 		
@@ -97,7 +113,7 @@ public class ClientRequestHandler implements Runnable {
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
-			System.out.printf("[H-%d-ERR] Exception on socket close \n", handlerInstance);
+			logErr("Exception on socket close");
 			e.printStackTrace();
 		}
 		
@@ -108,7 +124,10 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// method returns true of string matches any allowable pre-login requests
-	private boolean reqAllowed(String req){
+	private boolean reqAllowed(String req, User user){
+		// if user is logged in, allow the request
+		if (user != null) return true;
+		
 		// loop through all allowable pre-login requests
 		for(int i = 0; i < preLoginReqs.size(); i++)
 			if(preLoginReqs.get(i).equals(req))
@@ -121,15 +140,15 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// Thread local request retrieval method
-	private RequestObject getRequest(Socket threadSocket) throws IOException {
+	private RequestObject getRequest(Socket threadSocket) {
 		ObjectInputStream inputFromClient;
 		RequestObject thisRequest;
 		try {
 			inputFromClient = new ObjectInputStream(new BufferedInputStream(threadSocket.getInputStream()));
 			thisRequest = (RequestObject)inputFromClient.readObject();
 			return thisRequest;
-		} catch (ClassNotFoundException e) {
-			System.out.printf("[H-%d-ERR] Sent malformed request\n", handlerInstance);
+		} catch (Exception e) {
+			logErr("Exception on request receive");
 			e.printStackTrace();			
 		}
 		return null;
@@ -145,7 +164,7 @@ public class ClientRequestHandler implements Runnable {
 			outputStream.writeObject(thisRequest);
 			outputStream.flush();
 		} catch(IOException e) {
-			System.out.printf("[H-%d-ERR] Response error\n", handlerInstance);
+			logErr("Exception sending response");
 			e.printStackTrace();
 		} 
 	}
@@ -178,21 +197,6 @@ public class ClientRequestHandler implements Runnable {
 		
 		// send response
 		sendResponse(thisRequest);		
-	}
-	
-	
-	
-	// send REQUEST_UNKNOWN acknowledgement
-	public void respondUnknown(String reason){
-		// request object to return
-		RequestObject thisRequest = new RequestObject(
-			"RESPONSE_UNKNOWN",
-			reason,
-			order
-		);
-		
-		// send response
-		sendResponse(thisRequest);			
 	}
 	
 	
@@ -283,6 +287,42 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	
+	// print stuff, if printing is enabled
+	public void log(String format, Object... args){
+		String outputStr;	// string to output after the handler identifier
+		String idStr;		// [H-#] etc
+		
+		// only print if 
+		if (doLogging) {
+			// format output string
+			outputStr = String.format(format, args);
+			idStr = String.format("[H-%d] ", handlerInstance);
+			
+			// print along with ID string
+			System.out.println(idStr + outputStr);
+		}
+	}
+	
+	
+	
+	// print stuff, if printing is enabled
+	public void logErr(String format, Object... args){
+		String outputStr;	// string to output after the handler identifier
+		String idStr;		// [H-#] etc
+		
+		// only print if 
+		if (doLogging) {
+			// format output string
+			outputStr = String.format(format, args);
+			idStr = String.format("[H-%d-ERR] ", handlerInstance);
+			
+			// print along with ID string
+			System.out.println(idStr + outputStr);
+		}
+	}
+	
+	
+	
 	// return this handler instance number
 	public int getNum() {return handlerInstance;}
 	
@@ -315,4 +355,10 @@ public class ClientRequestHandler implements Runnable {
 	
 	// setter for logging in a user
 	public User getUser() {return user;}
+	
+	// method for blocking/unblocking a handler
+	public void setBlock(boolean value) {blocked = value;}
+	
+	// set whether handler can output
+	public void doLogging(boolean value) {doLogging = value;}
 }
