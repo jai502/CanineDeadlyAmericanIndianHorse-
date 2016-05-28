@@ -102,7 +102,7 @@ public class StammtischServer {
 		// response to a disconnect request
 		responses.add(new Response("DISCONNECT"){
 			@Override public void respond(ClientRequestHandler handler){
-				System.out.printf("[H-%d] Disconnected\n", handler.getNum());
+				handler.log("Disconnected");
 				handler.stop();
 			}
 		});
@@ -125,11 +125,7 @@ public class StammtischServer {
 				
 				// check that user exists 
 				if(SQLHandler.checkLoginDetails(thisUser)){
-					System.out.printf(
-						"[H-%d] Logged in as user: %s\n", 
-						handler.getNum(), 
-						thisUser.getUsername()
-					);
+					handler.log("Logged in as user: %s", thisUser.getUsername());
 					
 					// set handler user to this user
 					handler.setUser(thisUser);	

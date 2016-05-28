@@ -44,7 +44,7 @@ public class ClientRequestHandler implements Runnable {
 	private boolean blocked = false;			// user is allowed to make requests
 	private boolean done = false;			    // main loop complete
 	private boolean threadDone = false;			// thread running
-	private boolean doLogging = false;
+	private boolean doLogging = true;
 	private int order;
 	
 	// list of request handling objects
@@ -79,8 +79,16 @@ public class ClientRequestHandler implements Runnable {
 		
 		while (!done) {
 			// wait for request from client
-			while(currentRequest != null){
-				currentRequest = getRequest(clientSocket);
+			currentRequest = null;
+			while(currentRequest == null){
+				try {
+					currentRequest = getRequest(clientSocket);
+				} catch (IOException e) {
+					logErr("IO exception on request recieve");
+					e.printStackTrace();
+					done = true;
+					break;
+				}
 			}
 			
 			// take order number for current request
@@ -92,7 +100,7 @@ public class ClientRequestHandler implements Runnable {
 			if(currentResponse != null){
 				if(reqAllowed(currentRequest.id, user) && !blocked){
 					// respond to request
-					log("Recieved req '%s' responding...");
+					log("Recieved req '%s' responding...", currentRequest.id);
 					currentResponse.respond(this);
 				} else {
 					if(!blocked){
@@ -140,16 +148,16 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// Thread local request retrieval method
-	private RequestObject getRequest(Socket threadSocket) {
+	private RequestObject getRequest(Socket threadSocket) throws IOException {
 		ObjectInputStream inputFromClient;
 		RequestObject thisRequest;
 		try {
 			inputFromClient = new ObjectInputStream(new BufferedInputStream(threadSocket.getInputStream()));
 			thisRequest = (RequestObject)inputFromClient.readObject();
 			return thisRequest;
-		} catch (Exception e) {
-			logErr("Exception on request receive");
-			e.printStackTrace();			
+		} catch (ClassNotFoundException e1) {
+			logErr("Malformed request object recieved");
+			e1.printStackTrace();
 		}
 		return null;
 	}
@@ -187,13 +195,16 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// send FAIL acknowledgement response
-	public void respondFail(Object param){
+	public void respondFail(String reason){
 		// request object to return
 		RequestObject thisRequest = new RequestObject(
 			"RESPONSE_FAIL",
-			param,
+			reason,
 			order
 		);
+		
+		//print to console
+		logErr("Response failure: %s", reason);
 		
 		// send response
 		sendResponse(thisRequest);		
