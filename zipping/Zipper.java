@@ -29,7 +29,7 @@ public class Zipper{
 	//create a buffer for the input stream data to be temporarily stored
 	private static final int BUFFER_SIZE = 4096;
 
-	public void unzip(String input, String outputLocation)	throws IOException 
+	public static void unzip(String input, String outputLocation)	throws IOException 
 	{
 		//create the output file
 		File output = new File(outputLocation);
@@ -66,7 +66,7 @@ public class Zipper{
 		inputStream.close();
 	}
 
-	private void extract(ZipInputStream inputStream, String input)throws IOException
+	private static void extract(ZipInputStream inputStream, String input)throws IOException
 	{
 		//create an outputstream and add a buffer to improve performance and reduce overhead during extraction
 		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(input));
@@ -83,7 +83,7 @@ public class Zipper{
 		outputStream.close();
 	}
 	
-	public void deleteFolder(String outputLocation)
+	public static void deleteFolder(String outputLocation)
 	{
 		//check if the location to delete exists and if it does, delete it
 		File toDelete = new File(outputLocation);
@@ -104,7 +104,7 @@ public class Zipper{
 		}
 	}
 	
-	private void delete(File toDelete) throws IOException
+	private static void delete(File toDelete) throws IOException
 	{
 		//check if the file to delete is a directory or a file
 		if(toDelete.isDirectory())
@@ -140,7 +140,7 @@ public class Zipper{
 	}
 	
 	//a method to compress a folder to a destination folder
-	public void zip(String sourceFolder, String destinationFile) throws Exception
+	public static void zip(String sourceFolder, String destinationFile) throws Exception
 	{
 		//two streams for reading the files and compressing
 		ZipOutputStream zipStream = null;
@@ -157,7 +157,7 @@ public class Zipper{
 	}
 
 	//a method to zip individual files
-	public void zipFile(String filePath, String sourceFile, ZipOutputStream zipStream) throws Exception 
+	public static void zipFile(String filePath, String sourceFile, ZipOutputStream zipStream) throws Exception 
 	{
 		//create a file to manipulate and assign it
 		File folder = new File(sourceFile);
@@ -184,7 +184,7 @@ public class Zipper{
 	}
 
 	//a method to zip a folder
-	private void zipFolder(String filePath, String sourceFolder,ZipOutputStream zipStream) throws Exception 
+	private static void zipFolder(String filePath, String sourceFolder,ZipOutputStream zipStream) throws Exception 
 	{
 		File folder = new File(sourceFolder);
 		//loop through the folder and call the zip file method for all files found. This will run recursively
@@ -233,7 +233,7 @@ public class Zipper{
 	}
 	
 	//a simple method to create a folder
-	public void makeFolder(String folderName)
+	public static void makeFolder(String folderName)
 	{
 		File folder = new File(folderName);
 		folder.mkdir();
