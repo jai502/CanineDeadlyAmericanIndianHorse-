@@ -40,6 +40,9 @@ public class ServerRequestHandler
     public static Socket socket;
     public RequestObject contentFromServer;
     
+    public ObjectInputStream streamFromServer;
+    public ObjectOutputStream contentToServer;
+    
     public ServerRequestHandler(int port, String host)
     {
         this.port = port;
@@ -264,10 +267,14 @@ public class ServerRequestHandler
             }
             
             blockData = (FileBlock)response.param;
+            
+            recievedData = new byte[blockData.size()];
+            
             recievedData = blockData.getData();
                 
             try {
                 fs.write(recievedData, 0, blockData.size());
+                fs.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -286,11 +293,14 @@ public class ServerRequestHandler
     
     public final String ping()
     {
+    	// Don't ask...
+        //byte[] megaPing = new byte[1000000];
+    	
         String result = null;
-        RequestObject ping = new RequestObject("PING", null, order);
+        RequestObject ping = new RequestObject("PING", (Object) null, order);
         System.out.println("Sending " + ping.id + " with order " + ping.order + "...");
         sendRequest(ping);
-        
+            
         RequestObject response = getResponse();
         System.out.println("Response received: " + response.id + " with order: " + response.order);
         
@@ -325,13 +335,14 @@ public class ServerRequestHandler
     private void sendRequest(RequestObject request)
     {
         //Open the output stream to the server
-        ObjectOutputStream contentToServer;
         
         try {
-            //contentToServer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-        	contentToServer = new ObjectOutputStream(socket.getOutputStream());
+            // Create output stream
+            contentToServer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        	//contentToServer = new ObjectOutputStream(socket.getOutputStream());
             contentToServer.writeObject(request);
             contentToServer.flush();
+
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
@@ -347,14 +358,15 @@ public class ServerRequestHandler
     {
         int timeout = 5000;
         RequestObject response = null;
-        ObjectInputStream contentFromServer;
         
         try 
         {
             socket.setSoTimeout(timeout);
-            //contentFromServer = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-            contentFromServer = new ObjectInputStream(socket.getInputStream());
-            response = (RequestObject) contentFromServer.readObject();
+            // Create input stream
+            streamFromServer = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+            //streamFromServer = new ObjectInputStream(socket.getInputStream());
+            response = (RequestObject) streamFromServer.readObject();
+            //streamFromServer.reset();
         }
         catch (IOException e)
         {

@@ -39,7 +39,6 @@ public class XMLParser extends DefaultHandler {
 	private ImageItem currentImage;
 	private VideoItem currentVideo;
 	private AudioItem currentAudio;
-	private InteractableItem currentInteractable;
 	private ShadingItem currentShading;
 	private boolean isInteractable = false;
 	private DocumentInfo currentDocInfo;
@@ -49,6 +48,7 @@ public class XMLParser extends DefaultHandler {
 	private ArrayList<SlideItem> slideList;
 	private boolean defaultsSet = false;
 	private String interactableTarget;
+	private int slideID, oldSlideID, index;
 
 
 
@@ -119,6 +119,8 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.setSlideId(attributes.getValue("slideID"));
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
+			
+			slideID = Integer.parseInt(attributes.getValue("slideID"));
 		}
 
 		if (qName.equalsIgnoreCase("Text"))
@@ -261,7 +263,6 @@ public class XMLParser extends DefaultHandler {
 
 		if (qName.equalsIgnoreCase("Interactable"))
 		{
-			//currentInteractable = new InteractableItem();
 			interactableTarget = attributes.getValue("targetSlide");
 			isInteractable = true;
 		}
@@ -291,15 +292,16 @@ public class XMLParser extends DefaultHandler {
 			defaultsSet = true;
 			System.out.println("DefaultsItem set");
 		}
-
+		//TODO
 		if (qName.equalsIgnoreCase("Slide"))
 		{
 			if (currentSlide.getBackgroundColour() == null)
 			{
 				currentSlide.setBackgroundColour(currentDefaults.getBackground());
 			}
+			
+			
 			slideList.add(currentSlide);
-			currentSlide = null;
 
 		}
 
@@ -336,7 +338,7 @@ public class XMLParser extends DefaultHandler {
 			else
 			{               
 				currentSlide.setBackgroundColour(newContent);
-
+				
 			}
 		}
 
@@ -560,6 +562,23 @@ public class XMLParser extends DefaultHandler {
 
 	public void endDocument() throws SAXException 
 	{
+		//sort the slides in terms of their ID
+        SlideItem current;
+       if (slideList.size()>1) // check if the number of orders is larger than 1
+       {
+           for (int x=0; x<slideList.size(); x++) // bubble sort outer loop
+           {
+               for (int i=0; i < slideList.size() - x - 1; i++) {
+                   if (slideList.get(i).getSlideId() > (slideList.get(i+1).getSlideId()))
+                   {
+                       current = slideList.get(i);
+                       slideList.set(i,slideList.get(i+1) );
+                       slideList.set(i+1, current);
+                   }
+               }
+           }
+       }
+       
 		System.out.println("Finished parsing, stored presentation with " + slideList.size() + " slides.");
 	}
 
