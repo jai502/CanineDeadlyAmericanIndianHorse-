@@ -283,12 +283,10 @@
 /*****************************************************************************/
 
 #createPresentationScreenLayout{
-	 -fx-background-color: #8454EE;
-	 -fx-background-color-opacity: 0.2;
-	/*-fx-background-image: url("Create_Presentation_Background.jpg"), url("logo.png");
-	-fx-background-size: cover, 300 200;
-	-background-position: CENTER, TOP LEFT;
-	-fx-background-repeat: no-repeat, no-repeat;*/	
+	-fx-background-image: url("Create_Presentation_Background.jpg");
+	-fx-background-size: cover, 300;
+	-background-position: CENTER;
+	-fx-background-repeat: no-repeat;
 }
 
 #btnNext{

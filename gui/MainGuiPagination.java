@@ -93,7 +93,7 @@ public class MainGuiPagination extends Application
 	//final ListView<String[]> listView = new ListView<String[]>();
 	private final ListView<String> searchView = new ListView<String>();
 	private final ListView<String> commentsView = new ListView<String>();
-	private ObservableList<String> observableList;
+	private ObservableList<String> observableListSearch, observableListComments;
 	private ArrayList<String> searchList = new ArrayList<String>();
 	private ArrayList<String> idList = new ArrayList<String>();
 	private boolean logout = true;
@@ -168,6 +168,7 @@ public class MainGuiPagination extends Application
 	private int rating = 0;
 	private String writtenComments;
 	private TextArea commentsToWrite = new TextArea();
+	private ArrayList<String> commentsList = new ArrayList<String>();
 	private ArrayList<String[]> commentResults = new ArrayList<String[]>(); 
 
 	/* variables for the Scroll Pane */
@@ -689,9 +690,43 @@ public class MainGuiPagination extends Application
 		{
 			@Override
 			public void handle(ActionEvent e) {
+				
+//				/************* Client/Server Communication ***************/
+//				commentResults = com.searchForPresentation(presentationShell);
+//				/*********************************************************/
+//
+//				int x = 0;
+//
+//				for (int i = 0; i < commentResults.size(); i++)
+//				{
+//					for(x = 0; x < commentResults.get(i).length; x++)
+//					{
+//						if (x == 0)
+//						{
+//							commentsList.add("Title: " + commentResults.get(i)[x] + "\n");
+//						}
+//						else if (x == 1)
+//						{	
+//							commentsList.add(commentsList.get(i) + "Author: " + commentResults.get(i)[x]+ "\n");
+//							commentsList.remove(i);
+//						}
+//						else if (x == 2)
+//						{
+//							commentsList.add(commentsList.get(i) + "Language: " + commentResults.get(i)[x]);
+//							commentsList.remove(i);
+//						}
+//					}
+//				}
+//
+//				//				userScreenLayout.setRight(searchDetails());
+//				System.out.println(commentsList);
+//
+//				observableListSearch = FXCollections.observableList(commentsList);
+
+				
 				tempPres = null;
 				window.setTitle("Comments Menu");
-				window.setScene(commentsMenu);				
+				window.setScene(commentsMenu);					
 			}
 		});
 
@@ -1391,11 +1426,10 @@ public class MainGuiPagination extends Application
 				presentationShell.setAuthor(author);
 				presentationShell.setLanguage(language);
 
-
-
 				/************* Client/Server Communication ***************/
 				searchResults = com.searchForPresentation(presentationShell);
 				/*********************************************************/
+				
 				//ArrayList<String> searchList = new ArrayList<String>();
 				searchList.clear();
 				idList.clear();
@@ -1429,7 +1463,7 @@ public class MainGuiPagination extends Application
 				//				userScreenLayout.setRight(searchDetails());
 				System.out.println(searchList);
 
-				observableList = FXCollections.observableList(searchList);
+				observableListSearch = FXCollections.observableList(searchList);
 
 
 				for(int i = 0; i<searchResults.size(); i++)
@@ -1538,7 +1572,7 @@ public class MainGuiPagination extends Application
 		searchView.setId("listView");
 		searchView.setPrefHeight(userScreenLayout.getHeight());
 		searchView.setPrefWidth(userScreenLayout.getWidth()/2);
-		System.out.println(observableList);
+		System.out.println(observableListSearch);
 
 		final StringProperty hoveredItem = new SimpleStringProperty(null);
 
@@ -1583,7 +1617,7 @@ public class MainGuiPagination extends Application
 			}
 		});
 
-		searchView.setItems(observableList);
+		searchView.setItems(observableListSearch);
 
 		//searchView.getSelectionModel().getSelectedIndex();
 		searchView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -1808,6 +1842,8 @@ public class MainGuiPagination extends Application
 				//				response3.setFill(Color.MEDIUMPURPLE);
 				//				searchView.setVisible(true);
 				//				userScreenLayout.setRight(searchDetails());
+				
+				
 			}
 		}); 
 
@@ -1930,10 +1966,11 @@ public class MainGuiPagination extends Application
 		commentsView.setPrefWidth(commentsScreenLayout.getWidth()/2);
 		//System.out.println(observableList);
 
-		//commentsView.setItems(observableList);
-
 		//searchView.getSelectionModel().getSelectedIndex();
 		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		
+		//commentsView.setItems(observableListComments);
+		
 		listGroup.getChildren().add(commentsView);
 		return listGroup;
 	}
