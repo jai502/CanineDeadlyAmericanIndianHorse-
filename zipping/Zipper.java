@@ -4,10 +4,10 @@
 * Date of first version: 2nd May 2016
 * 
 * Last version by: Joseph Ingleby
-* Date of last update: 27th May 2016
-* Version number: 2.0
+* Date of last update: 28th May 2016
+* Version number: 2.1
 * 
-* Commit date: 27thMay 2016
+* Commit date: 28thMay 2016
 * Description: This class has functions to compress, decompress,delete  and copy files.
 */
 
@@ -154,6 +154,8 @@ public class Zipper{
 		zipFolder("", sourceFolder, zipStream);
 		zipStream.flush();
 		zipStream.close();
+		fileStream.flush();
+		fileStream.close();
 	}
 
 	//a method to zip individual files
@@ -180,6 +182,8 @@ public class Zipper{
 			{
 				zipStream.write(buffer, 0, write);
 			}
+			
+			fileStream.close();
 		}
 	}
 
