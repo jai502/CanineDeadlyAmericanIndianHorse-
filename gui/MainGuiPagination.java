@@ -253,8 +253,8 @@ public class MainGuiPagination extends Application
 	public void init()
 	{
 		System.out.println("Setting up/initialising GUI now");
-		com = new ServerRequestHandler(serverPort, serverHost);
-		com.start();
+		//com = new ServerRequestHandler(serverPort, serverHost);
+		//com.start();
 		
 	}
 
