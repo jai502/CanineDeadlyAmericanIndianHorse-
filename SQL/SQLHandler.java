@@ -631,6 +631,84 @@ public class SQLHandler
 	
 	
 	//======================================================================================================================
+	// Method for updating a users payment status
+	//======================================================================================================================
+	public final void updateUserPaymentState(User user, Boolean paidMember)
+	{
+		Statement command = null;
+		int paymentState = 0;
+		
+		// Convert from Boolean to int (0 or 1) for MySQL bit(1) type
+		if(paidMember)
+		{
+			paymentState = 1;
+		}
+		else
+		{
+			paymentState = 0;
+		}
+		
+		String updatePaymentSQL = "UPDATE " + userTable
+				+ " SET premiummember = " + paymentState
+				+ " WHERE username = '" + user.getUsername() +"'";
+		
+		try 
+		{
+			// Create new JDBC statement
+			command = userCon.createStatement();
+			// Execute statement
+			command.executeUpdate(updatePaymentSQL);
+			System.out.println("Set payment state for " + user.getUsername() + " to: " + paidMember);
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally 
+		{
+			if (command != null)
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					e.printStackTrace();
+				} 
+			}
+		}	
+	}
+	
+	
+	//======================================================================================================================
+	// Method for checking a users payment status
+	//======================================================================================================================
+	public final boolean checkUserPayamentState(User user)
+	{
+		boolean paidMember = false;
+		Statement command = null;
+		ResultSet data;
+		String checkPaymentStateSQL = "SELECT premiummember FROM " + userTable
+					+ " WHERE username = '" + user.getUsername() +"'";
+		
+		
+		try {
+			command = userCon.createStatement();
+			
+			data = command.executeQuery(checkPaymentStateSQL);
+			
+			while(data.next())
+			 {
+				 paidMember = data.getBoolean("premiummember");
+			 }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return paidMember;
+	}
+	//======================================================================================================================
 	// Method for creation of table with presentation and user tracking details upon first access of a presentation
 	//======================================================================================================================
 	public final void userFirstAccess(User user, PresentationShell pres)
