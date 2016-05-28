@@ -4,11 +4,12 @@
  * Date of first version: 22nd February 2016
  * 
  * Last version by: Joseph Ingleby & Callum Silver
- * Date of last update: 28th February 2016
- * Version number: 0.1
+ * Date of last update: 28th May 2016
+ * Version number: 2.0
  * 
  * Commit date: 28th February 2016
- * Description: This class parses an xml file
+ * Description: This class parses an xml file 
+ * Modified to include defaults. - 28th May
  */
 
 package Parsers;
@@ -47,16 +48,17 @@ public class XMLParser extends DefaultHandler {
 	private Presentation currentPres;
 	private ArrayList<SlideItem> slideList;
 	private boolean defaultsSet = false;
-	
-	
+	private String interactableTarget;
+
+
 
 	public XMLParser() {
-		
+
 		super();
 	}
-	
+
 	public void parseXML(String inputFile){
-		
+
 		readingFile = inputFile;
 
 		try 
@@ -80,26 +82,26 @@ public class XMLParser extends DefaultHandler {
 	}
 
 
-	
+
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException 
 	{
 		newContent = new String(ch, start, length);
 
-	}	
+	}   
 
 	@Override
 	public void startElement(String uri, String localName, String qName,Attributes attributes) throws SAXException 
 	{
-		
-		
+
+
 		if (qName.equalsIgnoreCase("presentation"))
 		{
 			System.out.println("Started parsing: " + readingFile);
 			currentPres = new Presentation();
 			slideList = new ArrayList<SlideItem>();
 		}
-		
+
 		if (qName.equalsIgnoreCase("documentInfo"))
 		{
 			currentDocInfo = new DocumentInfo();
@@ -118,7 +120,7 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.setNextSlide(attributes.getValue("nextSlide"));
 			currentSlide.setDuration(attributes.getValue("duration"));
 		}
-		
+
 		if (qName.equalsIgnoreCase("Text"))
 		{
 			currentText = new TextItem();
@@ -130,20 +132,43 @@ public class XMLParser extends DefaultHandler {
 			currentText.setFontSize(attributes.getValue("fontsize"));
 			currentText.setFontColour(attributes.getValue("fontcolour"));
 			currentText.setSourceText(attributes.getValue("sourceFile"));
-			currentText.setWidth(attributes.getValue("width"));
-			currentText.setHeight(attributes.getValue("height"));
+
+			if (attributes.getValue("height") == null)
+			{
+				currentText.setHeight("0.5");
+			}
+			else
+			{
+				currentText.setHeight(attributes.getValue("height"));
+			}
+
+			if (attributes.getValue("width") == null)
+			{
+				currentText.setWidth("0.5");
+			}
+			else
+			{
+				currentText.setWidth(attributes.getValue("width"));
+			}
+
+			text = (text + newContent);
+			currentText.setText(text);
+
+
+			System.out.println("TEXT = " + text);
+			System.out.println("NC =" + newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("b"))
 		{
 			text = (text + newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("i"))
 		{
 			text = (text + newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("Shape"))
 		{
 			currentShape = new ShapeItem();
@@ -156,10 +181,10 @@ public class XMLParser extends DefaultHandler {
 			currentShape.setHeight(attributes.getValue("height"));
 			currentShape.setLineColour(attributes.getValue("lineColour"));
 			currentShape.setFillColour(attributes.getValue("fillColour"));
-		
+
 			ShapeOrPolyShade = true;
 		}
-		
+
 		if (qName.equalsIgnoreCase("Polygon"))
 		{
 			currentPolygon = new PolygonItem();
@@ -168,10 +193,10 @@ public class XMLParser extends DefaultHandler {
 			currentPolygon.setDuration(attributes.getValue("duration"));
 			currentPolygon.setLineColour(attributes.getValue("lineColour"));
 			currentPolygon.setFillColour(attributes.getValue("fillColour"));
-			
+
 			ShapeOrPolyShade = false;
 		}
-		
+
 		if (qName.equalsIgnoreCase("Shading"))
 		{
 			currentShading = new ShadingItem();
@@ -181,9 +206,9 @@ public class XMLParser extends DefaultHandler {
 			currentShading.setyTwo(attributes.getValue("y2"));
 			currentShading.setColourOne(attributes.getValue("colour1"));
 			currentShading.setColourTwo(attributes.getValue("colour2"));
-			
+
 		}
-		
+
 		if (qName.equalsIgnoreCase("image"))
 		{
 			currentImage = new ImageItem();
@@ -195,7 +220,7 @@ public class XMLParser extends DefaultHandler {
 			currentImage.setWidth(attributes.getValue("width"));
 			currentImage.setHeight(attributes.getValue("height"));
 		}
-		
+
 		if (qName.equalsIgnoreCase("Video"))
 		{
 			currentVideo = new VideoItem();
@@ -205,10 +230,26 @@ public class XMLParser extends DefaultHandler {
 			currentVideo.setyStart(attributes.getValue("ystart"));
 			currentVideo.setSourceFile(attributes.getValue("sourceFile"));
 			currentVideo.setLoop(attributes.getValue("loop"));
-			currentVideo.setHeight(attributes.getValue("height"));
-			currentVideo.setWidth(attributes.getValue("width"));
+
+			if (attributes.getValue("height") == null)
+			{
+				currentVideo.setHeight("0.5");
+			}
+			else
+			{
+				currentVideo.setHeight(attributes.getValue("height"));
+			}
+
+			if (attributes.getValue("width") == null)
+			{
+				currentVideo.setWidth("0.5");
+			}
+			else
+			{
+				currentVideo.setWidth(attributes.getValue("width"));
+			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("Audio"))
 		{
 			currentAudio = new AudioItem();
@@ -217,71 +258,75 @@ public class XMLParser extends DefaultHandler {
 			currentAudio.setSourceFile(attributes.getValue("sourceFile"));
 			currentAudio.setLoop(attributes.getValue("loop"));
 		}
-		
+
 		if (qName.equalsIgnoreCase("Interactable"))
 		{
-			currentInteractable = new InteractableItem();
-			currentInteractable.setTargetSlide(attributes.getValue("targetSlide"));
+			//currentInteractable = new InteractableItem();
+			interactableTarget = attributes.getValue("targetSlide");
 			isInteractable = true;
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 	@Override
-    public void endElement(String uri, String localName, String qName) throws SAXException 
-    {
+	public void endElement(String uri, String localName, String qName) throws SAXException 
+	{
 		if (qName.equalsIgnoreCase("presentation"))
 		{
 			currentPres.setSlides(slideList);
 		}
-		
+
 		if (qName.equalsIgnoreCase("documentInfo"))
 		{
 			currentPres.setDocInfo(currentDocInfo);
 			currentDocInfo = null;
 			System.out.println("doc info set");
 		}
-		
+
 		if (qName.equalsIgnoreCase("Defaults"))
 		{
 			currentPres.setDefaults(currentDefaults);
-			currentDefaults = null;
 			defaultsSet = true;
 			System.out.println("DefaultsItem set");
 		}
-		
+
 		if (qName.equalsIgnoreCase("Slide"))
 		{
+			if (currentSlide.getBackgroundColour() == null)
+			{
+				currentSlide.setBackgroundColour(currentDefaults.getBackground());
+			}
 			slideList.add(currentSlide);
 			currentSlide = null;
+
 		}
-		
+
 		// Document info setting
-		
+
 		if (qName.equalsIgnoreCase("Title"))
 		{
 			currentDocInfo.setTitle(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("Author"))
 		{
 			currentDocInfo.setAuthor(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("Version"))
 		{
 			currentDocInfo.setVersion(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("Comment"))
 		{
 			currentDocInfo.setComment(newContent);
 		}
-		
+
 		// DefaultsItem setting
-		
+
 		if (qName.equalsIgnoreCase("backgroundColour"))
 		{
 			if (defaultsSet == false)
@@ -289,88 +334,163 @@ public class XMLParser extends DefaultHandler {
 				currentDefaults.setBackground(newContent);
 			}
 			else
-			{				
+			{               
 				currentSlide.setBackgroundColour(newContent);
-				
+
 			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("font"))
 		{
 			currentDefaults.setFont(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("fontSize"))
 		{
 			currentDefaults.setFontSize(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("fontColour"))
 		{
 			currentDefaults.setFontColour(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("lineColour"))
 		{
 			currentDefaults.setLineColour(newContent);
 		}
-		
+
 		if (qName.equalsIgnoreCase("fillColour"))
 		{
 			currentDefaults.setFillColour(newContent);
 		}
-		
+
 		// Slides setting
-		
+
 		if (qName.equalsIgnoreCase("Text"))
 		{
 			if (isInteractable == true){
+
+				if (currentText.getFont() == null){
+					currentText.setFont(currentDefaults.getFont());
+				}
+
+				if (currentText.getFontSize() == 0){
+					currentText.setFontSize(currentDefaults.getFontSize());
+				}
+
+				if (currentText.getFontColour() == null)
+				{
+					currentText.setFontColour(currentDefaults.getFontColour());
+				}
 				text = (text + newContent);
-				currentText.setText(text);
-				currentInteractable.addText(currentText);
-				currentText = null;
-				text = "";
-			}
-			else
-			{
-				text = (text + newContent);
+				currentText.setInteractableSlide(interactableTarget);
 				currentText.setText(text);
 				currentSlide.addText(currentText);
 				currentText = null;
 				text = "";
 			}
+			else
+			{
+
+				if (currentText.getFont() == null){
+					currentText.setFont(currentDefaults.getFont());
+				}
+
+				if (currentText.getFontSize() == 0){
+					currentText.setFontSize(currentDefaults.getFontSize());
+				}
+
+				if (currentText.getFontColour() == null)
+				{
+					currentText.setFontColour(currentDefaults.getFontColour());
+				}
+
+				text = (text + newContent);
+				currentText.setText(text);
+				currentText.setInteractableSlide("-1");
+				currentSlide.addText(currentText);
+				currentText = null;
+				text = "";
+			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("b"))
 		{
 			text = (text + "<b>" + newContent + "</b>");
 		}
-		
+
 		if (qName.equalsIgnoreCase("i"))
 		{
 			text = (text + "<i>" + newContent + "</i>");
 		}
-		
+
 		if (qName.equalsIgnoreCase("Shape"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.addShape(currentShape);
+				if (currentShape.getFillColour() == null)
+				{
+					currentShape.setFillColour(currentDefaults.getFillColour());
+				}
+				if (currentShape.getLineColour() == null)
+				{
+					currentShape.setLineColour(currentDefaults.getLineColour());
+				}
+				currentShape.setInteractableSlide(interactableTarget);
+				currentSlide.addShape(currentShape);
 			}
-			
-			currentSlide.addShape(currentShape);
-			
+			else
+			{
+				if (currentShape.getFillColour() == null)
+				{
+					currentShape.setFillColour(currentDefaults.getFillColour());
+				}
+
+				if (currentShape.getLineColour() == null)
+				{
+					currentShape.setLineColour(currentDefaults.getLineColour());
+				}
+				currentShape.setInteractableSlide("-1");
+				currentSlide.addShape(currentShape);    
+			}   
 		}
-		
+
+
 		if (qName.equalsIgnoreCase("Polygon"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.addPolygon(currentPolygon);
+				if (currentPolygon.getFillColour() == null)
+				{
+					currentPolygon.setFillColour(currentDefaults.getFillColour());
+				}
+
+				if (currentPolygon.getLineColour() == null)
+				{
+					currentPolygon.setLineColour(currentDefaults.getLineColour());
+				}
+				currentPolygon.setInteractableSlide(interactableTarget);
+				currentSlide.addPolygon(currentPolygon);
 			}
-			currentSlide.addPolygon(currentPolygon);
+			else
+			{
+				if (currentPolygon.getFillColour() == null)
+				{
+					currentPolygon.setFillColour(currentDefaults.getFillColour());
+				}
+
+				if (currentPolygon.getLineColour() == null)
+				{
+					currentPolygon.setLineColour(currentDefaults.getLineColour());
+				}
+
+				currentPolygon.setInteractableSlide("-1");
+				currentSlide.addPolygon(currentPolygon);
+			}
 		}
-		
+
+
 		if (qName.equalsIgnoreCase("Shading"))
 		{
 			if (ShapeOrPolyShade == true) // if current ShadingItem is for a ShapeItem
@@ -382,59 +502,73 @@ public class XMLParser extends DefaultHandler {
 				currentPolygon.setShading(currentShading);
 			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("image"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.addImage(currentImage);
+				currentImage.setInteractableSlide(interactableTarget);
+				currentSlide.addImage(currentImage);
 			}
-			
-			currentSlide.addImage(currentImage);
+			else 
+			{
+				currentImage.setInteractableSlide("-1");
+				currentSlide.addImage(currentImage);
+			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("Audio"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.addAudio(currentAudio);
+				currentAudio.setInteractableSlide(interactableTarget);
+				currentSlide.addAudio(currentAudio);
 			}
-			currentSlide.addAudio(currentAudio);
+			else
+			{
+				currentAudio.setInteractableSlide("-1");
+				currentSlide.addAudio(currentAudio);
+			}
+
 		}
-		
+
 		if (qName.equalsIgnoreCase("Video"))
 		{
 			if (isInteractable == true)
 			{
-				currentInteractable.addVideo(currentVideo);
+				currentVideo.setInteractableSlide(interactableTarget);
+				currentSlide.addVideo(currentVideo);
 			}
-			currentSlide.addVideo(currentVideo);
+			else
+			{
+				currentVideo.setInteractableSlide("-1");
+				currentSlide.addVideo(currentVideo);
+			}
 		}
-		
+
 		if (qName.equalsIgnoreCase("Interactable"))
 		{
-			currentSlide.addInteractable(currentInteractable);
 			isInteractable = false;
 		}
-		
+
 		if (qName.equalsIgnoreCase("Presentation"))
 		{
 			currentPres.setSlides(slideList);
 		}
-			
+
 	}
-	
+
 	public void endDocument() throws SAXException 
 	{
-        System.out.println("Finished parsing, stored presentation with " + slideList.size() + " slides.");
+		System.out.println("Finished parsing, stored presentation with " + slideList.size() + " slides.");
 	}
-	
+
 	public Presentation getPresentation()
 	{
 		return currentPres;
 	}
-	
-	
+
+
 
 
 }

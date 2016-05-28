@@ -1,3 +1,18 @@
+/*
+ * (C) Stammtisch
+ * First version created by: Callum Silver
+ * Date of first version: 7th March 2016
+ * 
+ * Last version by: Callum Silver
+ * Date of last update: 6th May 2016
+ * Version number: 3.0
+ * 
+ * Commit date: 7th March 2016
+ * Description: This class compiles all of the slides and includes the
+ * ability to time them using a time line.
+ * It also includes the updated media handler (6th May)
+ * 
+ */
 package handlers;
 
 import java.io.IOException;
@@ -8,9 +23,12 @@ import com.sun.prism.paint.Color;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -35,11 +53,26 @@ public class SlideHandler {
 		double reducedWidth = (myWidth-5);
 		int width = (int) Math.floor(reducedWidth);
 		int height =(int) Math.floor(reducedHeight);
-		System.out.println("\nSlides in presentation according to handler: " + presentation.getSlides().size());
+		System.out.println("\nSlides in presentation according to handler: " +presentation.getSlides().size());
 		StackPane slidePane = new StackPane();
 
 		// Adding a TimeLine
 		Timeline timeline = new Timeline();
+
+		// Slide background
+
+		Canvas backgroundCanvas = new Canvas(width, height);
+		GraphicsContext gc= backgroundCanvas.getGraphicsContext2D();
+		gc.setFill(presentation.getSlides().get(i).getBackgroundColour());
+		gc.fillRect(0,0,backgroundCanvas.getWidth(),backgroundCanvas.getHeight());
+
+		AnchorPane backgroundAnchor = new AnchorPane();
+		backgroundAnchor.getChildren().add(backgroundCanvas);
+		slidePane.getChildren().addAll(backgroundAnchor);
+
+
+
+
 
 		for (int x = 0; x < presentation.getSlides().get(i).getTextList().size(); x++)
 		{
@@ -103,7 +136,7 @@ public class SlideHandler {
 			}
 
 			AnchorPane anchor = new AnchorPane();
-			anchor.getChildren().add(imageCanvas);	
+			anchor.getChildren().add(imageCanvas);  
 			slidePane.getChildren().addAll(anchor);
 		}
 		for (int x = 0; x < presentation.getSlides().get(i).getPolygonList().size(); x++)
@@ -139,6 +172,8 @@ public class SlideHandler {
 		}
 		for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++)
 		{
+
+			//TODO add timing
 			MediaFx videoPlayer = new MediaFx (presentation.getSlides().get(i).getVideoList().get(x), 0.5, 0.5);
 			AnchorPane anchor = new AnchorPane();
 			Group group = new Group();
@@ -149,6 +184,7 @@ public class SlideHandler {
 		}
 		for (int x = 0; x < presentation.getSlides().get(i).getAudioList().size(); x++)
 		{
+			//TODO add timing
 			MediaFx audioPlayer = new MediaFx(presentation.getSlides().get(i).getAudioList().get(x));
 			Group group = new Group();
 			AnchorPane anchor = new AnchorPane();
@@ -158,6 +194,7 @@ public class SlideHandler {
 		}
 		for (int x = 0; x < presentation.getSlides().get(i).getShapeList().size(); x++)
 		{
+
 			GraphicsHandler graphicsHandler = new GraphicsHandler();
 			Canvas shapeCanvas = graphicsHandler.drawCanvas(presentation.getSlides().get(i).getShapeList().get(x), width, height);
 
@@ -187,12 +224,10 @@ public class SlideHandler {
 			anchor.getChildren().add(shapeCanvas);
 			slidePane.getChildren().addAll(anchor);
 		}
-		for (int x = 0; x < presentation.getSlides().get(i).getInteractableList().size(); x++)
-		{
-
-		}
 		timeline.play();
+
+
 		return slidePane;
 	}
-
 }
+

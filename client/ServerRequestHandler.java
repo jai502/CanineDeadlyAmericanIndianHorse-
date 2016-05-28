@@ -214,7 +214,7 @@ public class ServerRequestHandler
         // create a file for the presentation
         FileOutputStream  fs;
         try {
-            fs = new FileOutputStream("testimage.jpg");
+            fs = new FileOutputStream("test.pws");
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -328,7 +328,8 @@ public class ServerRequestHandler
         ObjectOutputStream contentToServer;
         
         try {
-            contentToServer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            //contentToServer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        	contentToServer = new ObjectOutputStream(socket.getOutputStream());
             contentToServer.writeObject(request);
             contentToServer.flush();
         }
@@ -351,7 +352,8 @@ public class ServerRequestHandler
         try 
         {
             socket.setSoTimeout(timeout);
-            contentFromServer = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+            //contentFromServer = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+            contentFromServer = new ObjectInputStream(socket.getInputStream());
             response = (RequestObject) contentFromServer.readObject();
         }
         catch (IOException e)

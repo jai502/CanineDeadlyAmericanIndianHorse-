@@ -215,6 +215,7 @@ public class MainGuiPagination extends Application
 	private Pagination pagination;
 	private double stackWidth;
 	private double stackHeight;
+	private StackPane slidePane = new StackPane();
 
 	/* variables for menuItems() method */
 	private MenuBar menuBar;
@@ -246,6 +247,7 @@ public class MainGuiPagination extends Application
 	public static void main(String[] args) {
 		// Required for JavaFX to run
 		launch(args);
+		//com.apple.eawt.Application.getApplication().setDockIconImage(new Image("files/icon.png"));
 	}
 
 	// Override the init() method
@@ -253,9 +255,9 @@ public class MainGuiPagination extends Application
 	public void init()
 	{
 		System.out.println("Setting up/initialising GUI now");
-		//com = new ServerRequestHandler(serverPort, serverHost);
-		//com.start();
-		
+		com = new ServerRequestHandler(serverPort, serverHost);
+		com.start();
+
 	}
 
 	// Required method to run the JavaFX code
@@ -278,7 +280,9 @@ public class MainGuiPagination extends Application
 
 		// Assign window variable as the primary stage
 		window = stage;
-
+			
+		window.getIcons().add(new Image("files/icon.png"));
+	
 		// Create menu bar objects ready to add to the Scenes - Crashes if trying to add same one
 		//MenuBar mainMenuBar = menuItems(); // Main Menu
 		//MenuBar loginMenuBar = menuItems(); // Login Menu
@@ -303,7 +307,7 @@ public class MainGuiPagination extends Application
 		// scenes
 		menuLayout.getStylesheets().add(
 				MainGuiPagination.class.getResource("gui_style.css")
-						.toExternalForm());
+				.toExternalForm());
 
 		// Create the grid items
 		GridPane controls1 = addMainGridItems();
@@ -333,7 +337,7 @@ public class MainGuiPagination extends Application
 		// scenes
 		loginLayout.getStylesheets().add(
 				MainGuiPagination.class.getResource("gui_style.css")
-						.toExternalForm());
+				.toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls2 = addLoginGridItems();
@@ -359,7 +363,7 @@ public class MainGuiPagination extends Application
 		// scenes
 		signupLayout.getStylesheets().add(
 				MainGuiPagination.class.getResource("gui_style.css")
-						.toExternalForm());
+				.toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls3 = addSignupGridItems();
@@ -510,27 +514,6 @@ public class MainGuiPagination extends Application
 		canvas.heightProperty().addListener(resizeChangeListener);
 
 		/******************************************************/
-
-		/* Mouse event handler for the canvas */
-		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED,
-				new EventHandler<MouseEvent>() {
-
-					// Add mouse event handler to the images part of the
-					// pagination
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						if (mouseEvent.isPrimaryButtonDown()) {
-							pagination.setCurrentPageIndex(pagination
-									.getCurrentPageIndex() + 1);
-						}
-						if (mouseEvent.isSecondaryButtonDown()) {
-							pagination.setCurrentPageIndex(pagination
-									.getCurrentPageIndex() - 1);
-						}
-
-						mouseEvent.consume();
-					}
-				});
 
 		// Make a new root node
 		StackPane pane = new StackPane();
@@ -715,40 +698,40 @@ public class MainGuiPagination extends Application
 		{
 			@Override
 			public void handle(ActionEvent e) {
-				
-//				/************* Client/Server Communication ***************/
-//				commentResults = com.searchForPresentation(presentationShell);
-//				/*********************************************************/
-//
-//				int x = 0;
-//
-//				for (int i = 0; i < commentResults.size(); i++)
-//				{
-//					for(x = 0; x < commentResults.get(i).length; x++)
-//					{
-//						if (x == 0)
-//						{
-//							commentsList.add("Title: " + commentResults.get(i)[x] + "\n");
-//						}
-//						else if (x == 1)
-//						{	
-//							commentsList.add(commentsList.get(i) + "Author: " + commentResults.get(i)[x]+ "\n");
-//							commentsList.remove(i);
-//						}
-//						else if (x == 2)
-//						{
-//							commentsList.add(commentsList.get(i) + "Language: " + commentResults.get(i)[x]);
-//							commentsList.remove(i);
-//						}
-//					}
-//				}
-//
-//				//				userScreenLayout.setRight(searchDetails());
-//				System.out.println(commentsList);
-//
-//				observableListSearch = FXCollections.observableList(commentsList);
 
-				
+				//				/************* Client/Server Communication ***************/
+				//				commentResults = com.searchForPresentation(presentationShell);
+				//				/*********************************************************/
+				//
+				//				int x = 0;
+				//
+				//				for (int i = 0; i < commentResults.size(); i++)
+				//				{
+				//					for(x = 0; x < commentResults.get(i).length; x++)
+				//					{
+				//						if (x == 0)
+				//						{
+				//							commentsList.add("Title: " + commentResults.get(i)[x] + "\n");
+				//						}
+				//						else if (x == 1)
+				//						{	
+				//							commentsList.add(commentsList.get(i) + "Author: " + commentResults.get(i)[x]+ "\n");
+				//							commentsList.remove(i);
+				//						}
+				//						else if (x == 2)
+				//						{
+				//							commentsList.add(commentsList.get(i) + "Language: " + commentResults.get(i)[x]);
+				//							commentsList.remove(i);
+				//						}
+				//					}
+				//				}
+				//
+				//				//				userScreenLayout.setRight(searchDetails());
+				//				System.out.println(commentsList);
+				//
+				//				observableListSearch = FXCollections.observableList(commentsList);
+
+
 				tempPres = null;
 				window.setTitle("Comments Menu");
 				window.setScene(commentsMenu);					
@@ -790,7 +773,30 @@ public class MainGuiPagination extends Application
 					{
 						System.out.println("You have reached the end of the presentation");
 					}
-					return sh.getSlideStack(tempPres, pageIndex, width-100, height-100, presentationMenu);
+
+					slidePane = sh.getSlideStack(tempPres, pageIndex, width-100, height-100, presentationMenu);
+					
+					/* Mouse event handler for the canvas */
+					slidePane.addEventHandler(MouseEvent.MOUSE_PRESSED,
+							new EventHandler<MouseEvent>() {
+						// Add mouse event handler to the images part of the
+						// pagination
+						@Override
+						public void handle(MouseEvent mouseEvent) {
+							if (mouseEvent.isPrimaryButtonDown()) {
+								pagination.setCurrentPageIndex(pagination
+										.getCurrentPageIndex() + 1);
+							}
+							if (mouseEvent.isSecondaryButtonDown()) {
+								pagination.setCurrentPageIndex(pagination
+										.getCurrentPageIndex() - 1);
+							}
+
+							mouseEvent.consume();
+						}
+					});
+					
+					return slidePane;
 
 				} catch (IOException e) {
 					return null;
@@ -1440,7 +1446,7 @@ public class MainGuiPagination extends Application
 				/************* Client/Server Communication ***************/
 				searchResults = com.searchForPresentation(presentationShell);
 				/*********************************************************/
-				
+
 				//ArrayList<String> searchList = new ArrayList<String>();
 				searchList.clear();
 				idList.clear();
@@ -1525,7 +1531,7 @@ public class MainGuiPagination extends Application
 				presentationLoad.setTitle(searchResults.get(presentationIndex)[1]);
 				presentationLoad.setAuthor(searchResults.get(presentationIndex)[2]);
 				presentationLoad.setLanguage(searchResults.get(presentationIndex)[3]);
-
+				//TODO
 				/************* Client/Server Communication ***************/
 				com.getPresentation(presentationLoad);
 				/*********************************************************/
@@ -1977,9 +1983,9 @@ public class MainGuiPagination extends Application
 
 		//searchView.getSelectionModel().getSelectedIndex();
 		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		
+
 		//commentsView.setItems(observableListComments);
-		
+
 		listGroup.getChildren().add(commentsView);
 		return listGroup;
 	}

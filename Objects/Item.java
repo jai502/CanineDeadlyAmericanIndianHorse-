@@ -5,6 +5,7 @@ public abstract class Item {
 	//Class variables
 	private int startTime;
 	private int duration;
+	private int interactableSlide; // (-1 for non-interactables and target slide (0-#) for interactables.
 
 	public int getStartTime()
 	{
@@ -15,7 +16,7 @@ public abstract class Item {
 	{
 		this.startTime = startTime;
 	}
-	
+
 	public void setStartTime(String startTime) 
 	{
 		try
@@ -37,8 +38,9 @@ public abstract class Item {
 	{
 		this.duration = duration;
 	}
-	
-	public void setDuration(String duration) {
+
+	public void setDuration(String duration) 
+	{
 		try
 		{
 			this.duration = Integer.parseInt(duration);
@@ -48,5 +50,25 @@ public abstract class Item {
 			this.duration = 0;
 		}
 	}
-	
+
+	public int getInteractableSlide() {
+		return interactableSlide;
+	}
+
+	public void setInteractableSlide(int interactableSlide) {
+		this.interactableSlide = interactableSlide;
+	}
+
+	public void setInteractableSlide(String interactableSlide)
+	{
+		try
+		{
+			this.interactableSlide = Integer.parseInt(interactableSlide);
+		}
+		catch(Exception e)
+		{
+			this.duration = 0;
+		}
+
+	}
 }
