@@ -32,15 +32,12 @@ public class ClientRequestHandler implements Runnable {
 	boolean threadDone = false;			// thread is still running
 	int order;
 	
-	// transfer socket
-	ServerSocket tSocket;
-	
 	// list of request handling objects
 	ArrayList<Response> responses;
 	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql, ServerSocket tSocket){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
 		this.responses = responses;
@@ -55,9 +52,6 @@ public class ClientRequestHandler implements Runnable {
 		preLoginReqs.add(new String("DISCONNECT"));
 		preLoginReqs.add(new String("REQUEST_LOGIN"));
 		preLoginReqs.add(new String("REQUEST_SIGNUP"));
-		
-		// transfer socket factory
-		this.tSocket = tSocket;
 	}
 	
 	

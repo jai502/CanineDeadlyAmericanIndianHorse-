@@ -33,10 +33,6 @@ public class StammtischServer {
 	public static int defaultPort = 26656;
 	public ServerSocket sSocket;
 	
-	// server file transfer stuff
-	public static int transferPort = 26655;
-	public ServerSocket tSocket;
-	
 	// SQL connection stuff
 	int sqlPort = 3306;
 	String sqlServer = "stammtischsql.ddns.net";
@@ -292,13 +288,6 @@ public class StammtischServer {
 				System.exit(0);
 			}
 			
-			try {
-				tSocket = new ServerSocket(transferPort);
-			} catch (IOException e){
-				e.printStackTrace();
-				System.exit(0);
-			}
-			
 			while(true) {
 				try {
 					// wait for client connection & make handler
@@ -307,8 +296,7 @@ public class StammtischServer {
 							sSocket.accept(),
 							nextInstance,
 							responses,
-							sqlInterface,
-							tSocket
+							sqlInterface
 						);
 					
 					// add handler to handler list
