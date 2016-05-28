@@ -165,6 +165,35 @@
 	-fx-text-color: red;
 }
 
+#btnSearch{
+	-fx-font: 15 arial;
+	-fx-base: #5092D6;
+	-fx-outer-border: black;
+	-fx-outer-border-width: 20
+}
+
+#btnReset{
+	-fx-font: 15 arial;
+	/*-fx-font-color: black;*/
+	-fx-base: #FF1512;
+	-fx-outer-border: black;
+	-fx-border-width: 20
+}
+
+#btnLoadPres{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+	-fx-outer-border: black;
+	-fx-outer-border-width: 20
+}
+
+#btnLogOut{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+	-fx-outer-border: black;
+	-fx-outer-border-width: 20
+}
+
 /*#scrollPane{
   -fx-background-color: transparent;
   /*-fx-background-color: #DAD6D4;
@@ -178,7 +207,7 @@
 .list-view {
     -fx-padding: 3px ;
     /*-fx-background-color: orange;*/
-}
+
 
 /*.list-view {
     -fx-padding: 2px ;
@@ -216,7 +245,7 @@
 /*****************************************************************************/
 
 #commentsScreenLayout{
-	-fx-background-image: url("Create_Presentation_Background.jpg"), url("logo.png");
+	-fx-background-image: url("Comments_Rating_Background.jpg"), url("logo.png");
 	-fx-background-size: cover, 300 200;
 	-background-position: CENTER, TOP LEFT;
 	-fx-background-repeat: no-repeat, no-repeat;	
@@ -237,6 +266,7 @@
 
 #btnDislike{
 	-fx-font: 15 arial;
+	/*-fx-font-color: black;*/
 	-fx-base: #FF1512;
 	-fx-outer-border: black;
 	-fx-border-width: 20
@@ -246,4 +276,52 @@
 	-fx-base: #BAE98A;
 }
 
+/*****************************************************************************/
 
+/* Create Presentation Scene */
+
+/*****************************************************************************/
+
+#createPresentationScreenLayout{
+	 -fx-background-color: #8454EE;
+	 -fx-background-color-opacity: 0.2;
+	/*-fx-background-image: url("Create_Presentation_Background.jpg"), url("logo.png");
+	-fx-background-size: cover, 300 200;
+	-background-position: CENTER, TOP LEFT;
+	-fx-background-repeat: no-repeat, no-repeat;*/	
+}
+
+#btnNext{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+	-fx-outer-border: black;
+	-fx-outer-border-width: 20
+}
+
+#btnOpenMediaDty{
+	-fx-font: 15 arial;
+	/*-fx-font-color: black;*/
+	-fx-base: #FFF81E;
+	-fx-outer-border: black;
+	-fx-border-width: 20
+}
+#btnCreate{
+	-fx-font: 15 arial;
+	-fx-base: #BAE98A;
+}
+
+#mediaLanguage{
+	-fx-text-fill: white;
+}
+
+#mediaTranslation{
+	-fx-text-fill: white;
+}
+
+#startTime{
+	-fx-text-fill: white;
+}
+
+#endTime{
+	-fx-text-fill: white;
+}
