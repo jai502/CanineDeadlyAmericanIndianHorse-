@@ -1,8 +1,5 @@
-package gui;
 
-
-
-/*
+/**
  * (C) Stammtisch
  * First version created by: Mathew Gould & Alexander Stassis (Design Team)
  * Date of first version: 21/02/16
@@ -16,6 +13,8 @@ package gui;
  * This class currently is still in implementation
  * NOTE:
  */
+
+package gui;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -35,8 +34,8 @@ import client.ServerRequestHandler;
 import encryptionRSA.RSAEncryptDecrypt;
 import encryptionRSA.Serializer;
 import handlers.SlideHandler;
+
 import java.awt.Desktop;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -51,6 +50,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 //import javafx.beans.InvalidationListener;
 //import javafx.beans.Observable;
+
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -68,9 +69,31 @@ import com.User;
 import com.PresentationShell;
 
 import javafx.scene.*;
+
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -83,6 +106,14 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import Objects.Presentation;
+import Parsers.XMLParser;
+//import javafx.beans.InvalidationListener;
+//import javafx.beans.Observable;
+
 
 public class MainGuiPagination extends Application 
 {	
@@ -195,25 +226,24 @@ public class MainGuiPagination extends Application
 	private Desktop desktop = Desktop.getDesktop();
 
 	/* variables for createPage() method */
-	//	private AnchorPane pageBox;
-	//	private Canvas canvas;
-	//	private Canvas canvasTest;
-	//	private GraphicsContext gc;
-	//	private Image[] images = createContent();
+	// private AnchorPane pageBox;
+	// private Canvas canvas;
+	// private Canvas canvasTest;
+	// private GraphicsContext gc;
+	// private Image[] images = createContent();
 
 	/* variables for createContent() method */
-	//	private ImageView image;
-	//	private boolean x = false;
+	// private ImageView image;
+	// private boolean x = false;
 
 	private ServerRequestHandler com;
 
 	// Constructor
-	public MainGuiPagination(){
+	public MainGuiPagination() {
 
 	}
 
-	public static void main(String[] args) 
-	{
+	public static void main(String[] args) {
 		// Required for JavaFX to run
 		launch(args);
 	}
@@ -222,15 +252,15 @@ public class MainGuiPagination extends Application
 	@Override
 	public void init()
 	{
+		System.out.println("Setting up/initialising GUI now");
 		com = new ServerRequestHandler(serverPort, serverHost);
 		com.start();
-		System.out.println("Setting up/initialising GUI now");
+		
 	}
 
 	// Required method to run the JavaFX code
 	@Override
-	public void start(Stage primaryStage) throws IOException 
-	{
+	public void start(Stage primaryStage) throws IOException {
 		initialiseGUI(primaryStage);
 	}
 
@@ -243,7 +273,7 @@ public class MainGuiPagination extends Application
 		System.exit(0);
 	}
 
-	/* Method which initialises and creates all the GUI */ 
+	/* Method which initialises and creates all the GUI */
 	private boolean initialiseGUI(Stage stage) throws IOException {
 
 		// Assign window variable as the primary stage
@@ -269,8 +299,11 @@ public class MainGuiPagination extends Application
 		// Add the root node to the scene
 		mainMenu = new Scene(menuLayout, width, height);
 
-		// Load style.ccs from same directory to provide the styling for the scenes
-		menuLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+		// Load style.ccs from same directory to provide the styling for the
+		// scenes
+		menuLayout.getStylesheets().add(
+				MainGuiPagination.class.getResource("gui_style.css")
+						.toExternalForm());
 
 		// Create the grid items
 		GridPane controls1 = addMainGridItems();
@@ -296,8 +329,11 @@ public class MainGuiPagination extends Application
 		// Add the root node to the scene
 		logInMenu = new Scene(loginLayout, width, height);
 
-		// Load gui_style.ccs from same directory to provide the styling for the scenes
-		loginLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+		// Load gui_style.ccs from same directory to provide the styling for the
+		// scenes
+		loginLayout.getStylesheets().add(
+				MainGuiPagination.class.getResource("gui_style.css")
+						.toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls2 = addLoginGridItems();
@@ -315,11 +351,15 @@ public class MainGuiPagination extends Application
 		showCommentsMenuBar = false;
 
 		signupLayout.setId("signupLayout"); // rootNode id for Sign Up Scene in gui_style.css
+
 		// Add the root node to the scene
 		signUpMenu = new Scene(signupLayout, width, height);
 
-		// Load gui_style.ccs from same directory to provide the styling for the scenes
-		signupLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
+		// Load gui_style.ccs from same directory to provide the styling for the
+		// scenes
+		signupLayout.getStylesheets().add(
+				MainGuiPagination.class.getResource("gui_style.css")
+						.toExternalForm());
 
 		// ready to add to logInMenu scene
 		GridPane controls3 = addSignupGridItems();
@@ -384,32 +424,28 @@ public class MainGuiPagination extends Application
 		showCommentsMenuBar = true;
 
 		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in gui_style.css
+
 		// Add the root node to the scene
 		presentationMenu = new Scene(presentationLayout, width, height, Color.BLACK);
 		// Load style.ccs from same directory to provide the styling for the scenes
 		presentationLayout.getStylesheets().add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		// create a temporary presentation
-		//tempPres = new Presentation();
+		// tempPres = new Presentation();
 
 		// Add menu bar to presentation screen
 		MenuBar presentationMenuBar = menuItems(); // Presentation Menu
 		presentationLayout.setTop(presentationMenuBar);
 
 		/* FullScreen for presentation menu */
-		presentationMenu.setOnKeyPressed(new EventHandler<KeyEvent>()
-		{
+		presentationMenu.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(KeyEvent ke)
-			{
-				if (ke.getCode().equals(KeyCode.F))
-				{
-					//x = true;
+			public void handle(KeyEvent ke) {
+				if (ke.getCode().equals(KeyCode.F)) {
+					// x = true;
 					window.setFullScreen(true);
-				}
-				else if (ke.getCode().equals(KeyCode.ESCAPE))
-				{	
-					//x = false;
+				} else if (ke.getCode().equals(KeyCode.ESCAPE)) {
+					// x = false;
 					window.setFullScreen(false);
 				}
 			}
@@ -452,19 +488,23 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method which will add the panes (each slide) to the presentation screen */
-	private StackPane presentationCanvas() throws IOException{
+	private StackPane presentationCanvas() throws IOException {
 
-		Image img = new Image(getClass().getResource("animal1.jpg").openStream());
-		Canvas canvas = new Canvas(presentationLayout.getWidth(), presentationLayout.getHeight());
+		Image img = new Image(getClass().getResource("animal1.jpg")
+				.openStream());
+		Canvas canvas = new Canvas(presentationLayout.getWidth(),
+				presentationLayout.getHeight());
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		// Draw the image to the canvas
-		gc.drawImage(img, 0, 0, presentationLayout.getWidth(), presentationLayout.getHeight());
+		gc.drawImage(img, 0, 0, presentationLayout.getWidth(),
+				presentationLayout.getHeight());
 
 		/**** Binding and Resize attributes to the canvas ****/
 		canvas.widthProperty().bind(presentationLayout.widthProperty());
 		canvas.heightProperty().bind(presentationLayout.heightProperty());
 
-		final ResizeChangeListener resizeChangeListener = new ResizeChangeListener(presentationLayout, gc, img);
+		final ResizeChangeListener resizeChangeListener = new ResizeChangeListener(
+				presentationLayout, gc, img);
 
 		canvas.widthProperty().addListener(resizeChangeListener);
 		canvas.heightProperty().addListener(resizeChangeListener);
@@ -472,21 +512,25 @@ public class MainGuiPagination extends Application
 		/******************************************************/
 
 		/* Mouse event handler for the canvas */
-		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED,
+				new EventHandler<MouseEvent>() {
 
-			// Add mouse event handler to the images part of the pagination
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				if (mouseEvent.isPrimaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
-				}
-				if (mouseEvent.isSecondaryButtonDown()) {
-					pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
-				}
+					// Add mouse event handler to the images part of the
+					// pagination
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						if (mouseEvent.isPrimaryButtonDown()) {
+							pagination.setCurrentPageIndex(pagination
+									.getCurrentPageIndex() + 1);
+						}
+						if (mouseEvent.isSecondaryButtonDown()) {
+							pagination.setCurrentPageIndex(pagination
+									.getCurrentPageIndex() - 1);
+						}
 
-				mouseEvent.consume();
-			}
-		});
+						mouseEvent.consume();
+					}
+				});
 
 		// Make a new root node
 		StackPane pane = new StackPane();
@@ -497,7 +541,7 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method which will create extra controls for the presentation screen */
-	private HBox controls(){
+	private HBox controls() {
 		HBox controls = new HBox(8); // Spacing of 8
 
 		Button next = new Button("Next");
@@ -512,24 +556,20 @@ public class MainGuiPagination extends Application
 		controls.getChildren().addAll(next, previous);
 
 		// Event handler for the Next Button
-		next.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		next.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				// Increase PageIndex by 1
-				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()+1);
+				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() + 1);
 			}
 		});
 
 		// Event handler for the Previous Button
-		previous.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		previous.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				// Decrease PageIndex by 1
-				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex()-1);
+				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() - 1);
 			}
 		});
 
@@ -537,51 +577,35 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method to add menu items and buttons for all GUIs */
-	public MenuBar menuItems()
-	{
+	public MenuBar menuItems() {
 		// Instantiate the menu bar
 		menuBar = new MenuBar();
 
 		// File Menu \\
 		Menu fileMenu = new Menu("File");
 
-		//fileMenu.getItems().add(new SeparatorMenuItem());
+		// fileMenu.getItems().add(new SeparatorMenuItem());
 		MenuItem settings = new MenuItem("Settings...");
 
 		//MenuItem goToPresentation = new MenuItem("Go To Presentation...");
 
-		/*	// Go to presentation
-		goToPresentation.setOnAction(new EventHandler<ActionEvent>() 
-		{
-			public void handle(ActionEvent e) 
-			{
-				// Parsing of the pws xml file
-				parser = new XMLParser();
-				//parser.parseXML("PWS/pwsTest.xml");
-				parser.parseXML(newFileName);
-				tempPres = parser.getPresentation();
-
-				// Creates Pagination Layout
-				pagination = new Pagination(tempPres.getSlides().size(), 0);
-				pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-
-				// Create the pagination page
-				pagination.setPageFactory(new Callback<Integer, Node>() {
-					@Override
-					public Node call(Integer pageIndex) {
-						try {
-							return sh.getSlideStack(tempPres, pageIndex, width-200, height-150);
-						} catch (IOException e) {
-							return null;
-						}
-					}});
-
-				presentationLayout.setCenter(pagination);
-				window.setTitle("Presentation");
-				window.setScene(presentationMenu);
-			}
-
-		});
+		/*
+		 * // Go to presentation goToPresentation.setOnAction(new
+		 * EventHandler<ActionEvent>() { public void handle(ActionEvent e) { //
+		 * Parsing of the pws xml file parser = new XMLParser();
+		 * //parser.parseXML("PWS/pwsTest.xml"); parser.parseXML(newFileName);
+		 * tempPres = parser.getPresentation(); // Creates Pagination Layout
+		 * pagination = new Pagination(tempPres.getSlides().size(), 0);
+		 * pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET); //
+		 * Create the pagination page pagination.setPageFactory(new
+		 * Callback<Integer, Node>() {
+		 * 
+		 * @Override public Node call(Integer pageIndex) { try { return
+		 * sh.getSlideStack(tempPres, pageIndex, width-200, height-150); } catch
+		 * (IOException e) { return null; } }});
+		 * presentationLayout.setCenter(pagination);
+		 * window.setTitle("Presentation"); window.setScene(presentationMenu); }
+		 * });
 		 */
 
 		MenuItem goToUserScreen = new MenuItem("Go To User Screen...");
@@ -615,6 +639,7 @@ public class MainGuiPagination extends Application
 		});
 
 		//fileMenu.getItems().add(new SeparatorMenuItem());
+
 
 		// Close System
 		exit = new MenuItem("Exit...");
@@ -746,13 +771,11 @@ public class MainGuiPagination extends Application
 	}
 
 	// Method for opening a file in the browser with normal OS procedure
-	/*	private void openFile(File file) {
-		try {
-			desktop.open(file);
-		} catch (IOException ex) {
-			Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
+	/*
+	 * private void openFile(File file) { try { desktop.open(file); } catch
+	 * (IOException ex) {
+	 * Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex); }
+	 * }
 	 */
 
 	/* Method for creating the Pagination Page count and indexes */
@@ -795,15 +818,15 @@ public class MainGuiPagination extends Application
 			//parsingFileName = filename1 + filename2 + filename3; // concatenate full path
 			parsingFileName = xmlPathname;
 			// display the details
-			System.out.println("File selected: " + parsingFileName); 
+			System.out.println("File selected: " + parsingFileName);
 
 			// Parse the pws xml file
 			parser = new XMLParser();
-			//parser.parseXML("PWS/pwsTest.xml");
+			// parser.parseXML("PWS/pwsTest.xml");
 			parser.parseXML(parsingFileName);
 			tempPres = parser.getPresentation();
 
-			// Creates Pagination Layout 
+			// Creates Pagination Layout
 			pagination = new Pagination(tempPres.getSlides().size(), 0);
 			System.out.println("Pagination Page Count is: " + pagination.getPageCount());
 			// Setting the style of the pagination
@@ -830,6 +853,7 @@ public class MainGuiPagination extends Application
 			/*pagination.widthProperty().addListener(new ChangeListener()
 			{
 				@Override
+<<<<<<< HEAD
 				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
 					stackWidth  = pagination.getWidth();
 					pageTurn();
@@ -849,9 +873,7 @@ public class MainGuiPagination extends Application
 			window.setTitle("Presentation");
 			window.setScene(presentationMenu);
 
-		}
-		else
-		{
+		} else {
 			System.out.println("File selection cancelled!");
 		}
 
@@ -935,6 +957,7 @@ public class MainGuiPagination extends Application
 		return mediaFile;
 	}
 
+
 	/* Inner Class for allowing the Resizing of Canvas objects */
 	private static class ResizeChangeListener implements ChangeListener<Number> {
 
@@ -942,14 +965,16 @@ public class MainGuiPagination extends Application
 		private final GraphicsContext context;
 		private final Image img;
 
-		public ResizeChangeListener(Pane parent, GraphicsContext context, Image image) {
+		public ResizeChangeListener(Pane parent, GraphicsContext context,
+				Image image) {
 			this.parent = parent;
 			this.context = context;
 			this.img = image;
 		}
 
 		@Override
-		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+		public void changed(ObservableValue<? extends Number> observable,
+				Number oldValue, Number newValue) {
 			final double width = parent.getWidth();
 			final double height = parent.getHeight();
 			context.clearRect(0, 0, width, height);
@@ -958,23 +983,22 @@ public class MainGuiPagination extends Application
 	}
 
 	/* method to create pagination content of Image array */
-	public Image[] createContent()
-	{
+	public Image[] createContent() {
 		Image[] images = new Image[3];
 
-		//Images for our pages
+		// Images for our pages
 		for (int i = 0; i < 3; i++) {
-			images[i] = new Image(MainGuiPagination.class.getResource("animal" + (i + 1) + ".jpg").toExternalForm(), false);
+			images[i] = new Image(MainGuiPagination.class.getResource(
+					"animal" + (i + 1) + ".jpg").toExternalForm(), false);
 		}
 
 		return images;
 	}
 
 	/* Method for GridPane for Main Menu */
-	public GridPane addMainGridItems()
-	{
-		// Create a root node called grid. In this case a grid pane layout 
-		// is used, with vertical and horizontal gaps of 50 
+	public GridPane addMainGridItems() {
+		// Create a root node called grid. In this case a grid pane layout
+		// is used, with vertical and horizontal gaps of 50
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(50);
@@ -986,7 +1010,8 @@ public class MainGuiPagination extends Application
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
 		// Create the Default message
-		welcomeMessage = new Text("Try Our Interactive Language Learning Experience");
+		welcomeMessage = new Text(
+				"Try Our Interactive Language Learning Experience");
 		welcomeMessage.setFill(Color.BLACK);
 		welcomeMessage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(welcomeMessage, 0, 0, 2, 1);
@@ -995,71 +1020,65 @@ public class MainGuiPagination extends Application
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER);
 		hbox.setSpacing(35);
-		//hbox.setStyle("-fx-background-color: #336699;");
+		// hbox.setStyle("-fx-background-color: #336699;");
 
 		// Create Sign Up and Login buttons
 		signUp = new Button("Sign Up");
 		signUp.setPrefSize(150, 50);
 		signUp.setId("signUp"); // id for gui_style.css file
-		//signUp.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
+		// signUp.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
 
 		logIn = new Button("Login");
 		logIn.setPrefSize(150, 50);
 		logIn.setId("logIn"); // id for gui_style.css file
-		//logIn.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
+		// logIn.setStyle("-fx-font: 22 arial; -fx-base: #BAE98A;");
 
 		/*
-		Button presentation = new Button("Presentation");
-		presentation.setPrefSize(150, 50);
-		presentation.setId("presentation"); // id for gui_style.css file */
+		 * Button presentation = new Button("Presentation");
+		 * presentation.setPrefSize(150, 50);
+		 * presentation.setId("presentation"); // id for gui_style.css file
+		 */
 
 		// Adding buttons to the hbox
 		hbox.getChildren().addAll(signUp, logIn);
-		//hbox.getChildren().addAll(signUp, logIn, presentation);
+		// hbox.getChildren().addAll(signUp, logIn, presentation);
 
 		// Adding hbox with the buttons in it to the rootNode
 		grid.add(hbox, 1, 1);
 
 		// Event handler for SignUp Button
-		signUp.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		signUp.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				window.setTitle("Sign Up");
 				window.setScene(signUpMenu);
 			}
 		});
 
 		// Event handler for Login Button
-		logIn.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		logIn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				window.setTitle("Login");
 				window.setScene(logInMenu);
 			}
 		});
 
 		// Event handler for presentation Button
-		/*	presentation.setOnAction(new EventHandler<ActionEvent>() 
-		{
-			@Override
-			public void handle(ActionEvent e) 
-			{
-				window.setTitle("Presentation Example");
-				window.setScene(presentationMenu);
-			}
-		}); */
+		/*
+		 * presentation.setOnAction(new EventHandler<ActionEvent>() {
+		 * 
+		 * @Override public void handle(ActionEvent e) {
+		 * window.setTitle("Presentation Example");
+		 * window.setScene(presentationMenu); } });
+		 */
 
 		return grid;
-	} 
+	}
 
 	/* Method for GridPane items for login Menu */
-	public GridPane addLoginGridItems()
-	{
-		// Create a root node called grid. In this case a grid pane layout 
+	public GridPane addLoginGridItems() {
+		// Create a root node called grid. In this case a grid pane layout
 		// is used, with vertical and horizontal gaps of 10
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -1074,8 +1093,8 @@ public class MainGuiPagination extends Application
 		// Create the Default message
 		messageLogIn = new Text("Welcome Back");
 		messageLogIn.setId("messageLogIn");
-		//messageLogIn.setFill(Color.DARKCYAN);
-		//messageLogIn.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		// messageLogIn.setFill(Color.DARKCYAN);
+		// messageLogIn.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(messageLogIn, 0, 0, 2, 1);
 
 		// Create the labels for username and password
@@ -1106,11 +1125,9 @@ public class MainGuiPagination extends Application
 		hbArea.getChildren().addAll(btnLogIn, btnGoBack1);
 
 		// Event handler for btnGoBack1
-		btnGoBack1.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnGoBack1.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				window.setTitle("Main Menu");
 				window.setScene(mainMenu);
 			}
@@ -1123,13 +1140,11 @@ public class MainGuiPagination extends Application
 		response1 = new Text();
 		grid.add(response1, 1, 6);
 
-		// Event handler to get text from the text field 
+		// Event handler to get text from the text field
 		// when button is pressed.
-		btnLogIn.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnLogIn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{								
+			public void handle(ActionEvent e) {
 				sUsernameLogin = textFieldName.getText();
 				sPasswordLogin = textFieldPassword1.getText();
 
@@ -1137,8 +1152,7 @@ public class MainGuiPagination extends Application
 				//LoginDetails loginDetails = new LoginDetails();
 
 				// Check if any of the textfields are null
-				if(sUsernameLogin.equals("") || sPasswordLogin.equals(""))
-				{	
+				if (sUsernameLogin.equals("") || sPasswordLogin.equals("")) {
 					response1.setText("Textfields are empty!");
 					response1.setFill(Color.RED);
 				}	
@@ -1177,15 +1191,15 @@ public class MainGuiPagination extends Application
 
 				}								
 			}
-		}); 
+		});
 
 		return grid;
 	}
 
 	/* Method for GridPane items for Sign Up Menu */
-	public GridPane addSignupGridItems(){
+	public GridPane addSignupGridItems() {
 
-		// Create a root node called grid. In this case a grid pane layout 
+		// Create a root node called grid. In this case a grid pane layout
 		// is used, with vertical and horizontal gaps of 10
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -1200,8 +1214,8 @@ public class MainGuiPagination extends Application
 		// Create the Default message
 		messageSignUp = new Text("An Exciting Experience!");
 		messageSignUp.setId("messageSignUp"); // Id for gui_style.css
-		//messageSignUp.setFill(Color.DARKCYAN);
-		//messageSignUp.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+		// messageSignUp.setFill(Color.DARKCYAN);
+		// messageSignUp.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(messageSignUp, 0, 0, 2, 1);
 
 		// Create the labels for First Name, Surname Name, email,
@@ -1250,11 +1264,9 @@ public class MainGuiPagination extends Application
 		hbArea.getChildren().addAll(btnRegister, btnGoBack2);
 
 		// Event handler for btnGoBack1
-		btnGoBack2.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnGoBack2.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				window.setTitle("Main Menu");
 				window.setScene(mainMenu);
 			}
@@ -1267,10 +1279,9 @@ public class MainGuiPagination extends Application
 		response2 = new Text();
 		grid.add(response2, 1, 10);
 
-		// Event handler to get text from the text field 
+		// Event handler to get text from the text field
 		// when button is pressed.
-		btnRegister.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnRegister.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) 
 			{
@@ -1842,10 +1853,8 @@ public class MainGuiPagination extends Application
 				//				response3.setFill(Color.MEDIUMPURPLE);
 				//				searchView.setVisible(true);
 				//				userScreenLayout.setRight(searchDetails());
-				
-				
 			}
-		}); 
+		});
 
 		return grid;
 	}
@@ -1990,4 +1999,3 @@ public class MainGuiPagination extends Application
 	}
 
 }
-
