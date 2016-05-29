@@ -22,7 +22,6 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -44,7 +43,8 @@ public class ClientRequestHandler implements Runnable {
 	private boolean blocked = false;			// user is allowed to make requests
 	private boolean done = false;			    // main loop complete
 	private boolean threadDone = false;			// thread running
-	private boolean doLogging = true;
+	private boolean doLogging = false;
+	private int transferBlockSize;
 	private int order;
 	
 	// input and output streams
@@ -56,7 +56,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql, int blockSize){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
 		this.responses = responses;
@@ -71,6 +71,9 @@ public class ClientRequestHandler implements Runnable {
 		preLoginReqs.add(new String("DISCONNECT"));
 		preLoginReqs.add(new String("REQUEST_LOGIN"));
 		preLoginReqs.add(new String("REQUEST_SIGNUP"));
+		
+		// get transfer block size
+		this.transferBlockSize = blockSize;
 	}
 	
 	
@@ -123,19 +126,19 @@ public class ClientRequestHandler implements Runnable {
 			if(currentResponse != null){
 				if(reqAllowed(currentRequest.id, user) && !blocked){
 					// respond to request
-					log("Recieved req '%s' responding...", currentRequest.id);
+					log(doLogging, "Recieved req '%s' responding...", currentRequest.id);
 					currentResponse.respond(this);
 				} else {
 					if(!blocked){
 						respondFail("not logged in");
-						log("Recieved req '%s' blocked, not logged in", currentRequest.id);
+						log(doLogging, "Recieved req '%s' blocked, not logged in", currentRequest.id);
 					} else {
 						respondFail("action blocked");
-						log("Recieved req '%s' blocked, handler blocked", currentRequest.id);
+						log(doLogging, "Recieved req '%s' blocked, handler blocked", currentRequest.id);
 					}
 				}
 			} else {
-				log("Recieved req '%s' not recognised", currentRequest.id);
+				log(doLogging, "Recieved req '%s' not recognised", currentRequest.id);
 				respondFail(String.format("Request '%s' not recongised"));
 			}
 		}
@@ -237,7 +240,7 @@ public class ClientRequestHandler implements Runnable {
 	// returns null on success
 	public String sendFile(String path){
 		// buffer variables
-		int bufSize = 131072; 
+		int bufSize = transferBlockSize; 
 		int blockCount = 0;
 		byte[] buffer = new byte[bufSize];
 		
@@ -283,7 +286,7 @@ public class ClientRequestHandler implements Runnable {
 		}
 		
 		// display number of transmitted blocks
-		log("Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
+		log(doLogging, "Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
 		
 		// close file
 		try {
@@ -325,12 +328,12 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// print stuff, if printing is enabled
-	public void log(String format, Object... args){
+	public void log(boolean doLog, String format, Object... args){
 		String outputStr;	// string to output after the handler identifier
 		String idStr;		// [H-#] etc
 		
 		// only print if 
-		if (doLogging) {
+		if (doLog) {
 			// format output string
 			outputStr = String.format(format, args);
 			idStr = String.format("[H-%d] ", handlerInstance);
@@ -398,4 +401,10 @@ public class ClientRequestHandler implements Runnable {
 	
 	// set whether handler can output
 	public void doLogging(boolean value) {doLogging = value;}
+	
+	// returns whether handler is currently logging to console
+	public boolean isLogging() {return doLogging;}
+	
+	// set size of file transfer block
+	public void setTransferBlockSize(int value) {transferBlockSize = value;}
 }

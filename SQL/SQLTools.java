@@ -66,7 +66,6 @@ public class SQLTools
 			{
 				//Obtain the presentation ID from the query result
 				presID = data.getInt("id");
-				System.out.println("Returned id is: " + presID);
 			}
 		}
 		catch (SQLException e) {

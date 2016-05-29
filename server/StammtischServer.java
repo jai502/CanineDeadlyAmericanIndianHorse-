@@ -35,6 +35,9 @@ public class StammtischServer {
 	// Default configuration file values
 	public static Integer defaultPort = 26656;
 	public static Integer defaultSqlPort = 3306;
+	public static Integer minTransferBlockSize = 1024;
+	public static Integer maxTransferBlockSize = 1048576;
+	public static Integer transferBlockSize = 32768;
 	public static String defaultSqlHost = "stammtischsql.ddns.net";
 	
 	// actual values from configuration file
@@ -102,7 +105,7 @@ public class StammtischServer {
 		// response to a disconnect request
 		responses.add(new Response("DISCONNECT"){
 			@Override public void respond(ClientRequestHandler handler){
-				handler.log("Disconnected");
+				handler.log(true, "Disconnected");
 				handler.stop();
 			}
 		});
@@ -125,7 +128,7 @@ public class StammtischServer {
 				
 				// check that user exists 
 				if(SQLHandler.checkLoginDetails(thisUser)){
-					handler.log("Logged in as user: %s", thisUser.getUsername());
+					handler.log(handler.isLogging(), "Logged in as user: %s", thisUser.getUsername());
 					
 					// set handler user to this user
 					handler.setUser(thisUser);	
@@ -150,7 +153,7 @@ public class StammtischServer {
 				}
 				
 				// log user out of server
-				System.out.printf("[H-%d] User '%s' logged out\n", handler.getNum(), thisUser.getUsername());
+				handler.log(handler.isLogging(), "User '%s' logged out\n", thisUser.getUsername());
 				handler.setUser(null);
 			}
 		});	
@@ -302,7 +305,8 @@ public class StammtischServer {
 							sSocket.accept(),
 							nextInstance,
 							responses,
-							sqlInterface
+							sqlInterface,
+							transferBlockSize
 						);
 					
 					// add handler to handler list
@@ -310,7 +314,7 @@ public class StammtischServer {
 					
 					// start request handler thread
 					Thread thread = new Thread(handlers.get(handlers.size()-1));					
-					thisHandler.log("Connected");
+					thisHandler.log(true, "Connected");
 					nextInstance++;
 					thread.start();
 				} catch (IOException e) {
@@ -345,13 +349,13 @@ public class StammtischServer {
 		try {
 			p1int = Integer.parseInt(p1);
 		} catch (NumberFormatException e){
-			System.out.printf("[ERR] '%s' invalid, expected integer.\n", p1);
+			System.out.printf("'%s' invalid, expected integer.\n", p1);
 			return null;
 		}
 		
 		// if the number is not in expected range
 		if ((p1int < min) || (p1int > max)){
-			System.out.printf("[ERR] '%d' out of range.\n", p1int);
+			System.out.printf("'%d' out of range.\n", p1int);
 			return null;
 		}
 		
@@ -382,12 +386,18 @@ public class StammtischServer {
 	
 	// sets up commands
 	public static void setUpCommands(){
+		// Usage string
+		String desc = "no description";
+		String usage = "Dont fuck up!";
+		
 		// clear commands
 		commands = new ArrayList<Command>();
 		commands.clear();
 		
 		// stop command
-		commands.add(new Command("stop", 0){
+		desc = "\tstops the server";
+		usage = "\t [stop] - no parameters";
+		commands.add(new Command("stop", 0, desc, usage){
 			@Override public void execute(Scanner cs){
 				// some code here
 				System.out.printf("Stopping stammtisch server.\n");
@@ -396,7 +406,9 @@ public class StammtischServer {
 		});
 		
 		// list handlers
-		commands.add(new Command("lh", 0){
+		desc = "\tlists all currently running handlers";
+		usage = "\t[lh] - no parameters";
+		commands.add(new Command("lh", 0, desc, usage){
 			@Override public void execute(Scanner cs){
 				// prune the handler list
 				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
@@ -420,7 +432,9 @@ public class StammtischServer {
 		});
 	
 		// list bound handlers
-		commands.add(new Command("lbh", 0){
+		desc = "\tlists all currently bound handlers";
+		usage = "\t[lbh] - no parameters";
+		commands.add(new Command("lbh", 0, desc, usage){
 			@Override public void execute(Scanner cs){
 				// prune the handler list
 				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
@@ -442,28 +456,11 @@ public class StammtischServer {
 				printHandlerList(boundHandlers); 
 			}
 		});		
-			
-		// bind all handlers
-		commands.add(new Command("bindAll", 0){
-			@Override public void execute(Scanner cs){
-				boundHandlers.clear();
-				for(int i = 0; i < handlers.size(); i++){
-					boundHandlers.add(handlers.get(i));
-				}
-				System.out.printf("bound %d handlers\n", boundHandlers.size());
-			}
-		});	
-		
-		// unbind all handlers
-		commands.add(new Command("unbindall", 0){
-			@Override public void execute(Scanner cs){
-				System.out.printf("Unbound %d client request handlers\n", boundHandlers.size());
-				boundHandlers.clear();
-			}
-		});
 		
 		// bind a handler
-		commands.add(new Command("bind", 1){
+		desc = "\tadds a handler to the list of bound handlers";
+		usage = "\t[bind <handler index>] - find handler index with 'lh', or use 'all'";
+		commands.add(new Command("bind", 1, desc, usage){
 			@Override public void execute(Scanner cs){
 				// get command parameters
 				ArrayList<String> params = getParams(cs);
@@ -471,9 +468,23 @@ public class StammtischServer {
 				// check that there are enough parameters
 				if(params.size() < this.getParamCount()){
 					System.out.printf(
-						"[ERR] '%s' expects at least %d parameters\n", 
+						"'%s' expects at least %d parameters\n", 
 						this.toString(), this.getParamCount()
 					);
+					return;
+				}
+				
+				// bind all handlers
+				if(params.get(0).equalsIgnoreCase("all")){
+					// clear bound handlers
+					boundHandlers.clear();
+					
+					// add all handlers to bound handler list
+					for(int i = 0; i < handlers.size(); i++)
+						boundHandlers.add(handlers.get(i));
+					
+					// print results of command to console
+					System.out.printf("Bound %d handlers\n", boundHandlers.size());
 					return;
 				}
 				
@@ -489,13 +500,15 @@ public class StammtischServer {
 						System.out.printf("Handler '%d' added to bound handlers.\n", p1);	
 					}
 				} else {
-					System.out.printf("[ERR] No handlers exist!\n");
+					System.out.printf("No handlers exist!\n");
 				}	
 			}
 		});	
 		
 		// unbind handler
-		commands.add(new Command("unbind", 1){
+		desc = "removes a handler from the list of currently bound handlers";
+		usage = "\t[unbind <bound handler index>] - find handler index with 'lh' or use 'all'";
+		commands.add(new Command("unbind", 1, desc, usage){
 			@Override public void execute(Scanner cs){
 				// get command parameters
 				ArrayList<String> params = getParams(cs);
@@ -503,9 +516,17 @@ public class StammtischServer {
 				// check that there are enough parameters
 				if(params.size() < this.getParamCount()){
 					System.out.printf(
-						"[ERR] '%s' expects at least %d parameters\n", 
+						"'%s' expects at least %d parameters\n", 
 						this.toString(), this.getParamCount()
 					);
+					return;
+				}
+				
+				// if parameter is all, unbind all handlers
+				if(params.get(0).equalsIgnoreCase("all")){
+					// clear bound handlers
+					System.out.printf("Unbound %d handlers\n", boundHandlers.size());
+					boundHandlers.clear();
 					return;
 				}
 				
@@ -516,15 +537,17 @@ public class StammtischServer {
 				// your parse succeeded! add handler to bound handlers list
 				if(!boundHandlers.isEmpty()){
 					boundHandlers.remove(p1);
-					System.out.printf("Handler '%d' added to bound handlers.\n", p1);
+					System.out.printf("Bound handler '%d' removed from bound handlers\n", p1);
 				} else {
-					System.out.printf("[ERR] No bound handlers!\n");
+					System.out.printf("No bound handlers!\n");
 				}
 			}
 		});		
 		
 		// remove inactive handlers
-		commands.add(new Command("Prune", 0){
+		desc = "\tremoves inactive handlers from the handler lists";
+		usage = "\t[prune] - no parameters";
+		commands.add(new Command("prune", 0, desc, usage){
 			@Override public void execute(Scanner cs){
 				// list of inactive handlers
 				ArrayList<ClientRequestHandler> inactiveHandlers = new ArrayList<ClientRequestHandler>();
@@ -547,17 +570,197 @@ public class StammtischServer {
 		});
 	
 		// disconnect all bound handlers
-		commands.add(new Command("kick", 0){
+		desc = "\tforcefully kicks handlers";
+		usage = "\t[kick <handler index>] - use 'lh' to get handler index, or use 'all'/'bound'";
+		commands.add(new Command("kick", 1, desc, usage){
 			@Override public void execute(Scanner scanner){
-				// loop though all handlers and disconnect them
-				System.out.printf("Forcefully disconnected %d handlers\n", boundHandlers.size());
-				for(int i = 0; i < boundHandlers.size(); i++){
-					boundHandlers.get(i).stop();
-					boundHandlers.get(i).setUser(null);
-					boundHandlers.get(i).setBlock(true);
+				// get command parameters
+				ArrayList<String> params = getParams(scanner);
+
+				// check that there are enough parameters
+				if(params.size() < this.getParamCount()){
+					System.out.printf(
+						"'%s' expects at least %d parameters\n", 
+						this.toString(), this.getParamCount()
+					);
+					return;
 				}
+				
+				// kick all handlers
+				if(params.get(0).equalsIgnoreCase("all")){
+					// loop though all handlers and disconnect them
+					System.out.printf("Forcefully disconnected %d handlers\n", handlers.size());
+					for(int i = 0; i < handlers.size(); i++){
+						handlers.get(i).stop();
+						handlers.get(i).setUser(null);
+						handlers.get(i).setBlock(true);
+					}
+					return;
+				} 
+				
+				// bound handlers
+				if (params.get(0).equalsIgnoreCase("bound")){
+					// loop though all handlers and disconnect them
+					System.out.printf("Forcefully disconnected %d handlers\n", boundHandlers.size());
+					for(int i = 0; i < boundHandlers.size(); i++){
+						boundHandlers.get(i).stop();
+						boundHandlers.get(i).setUser(null);
+						boundHandlers.get(i).setBlock(true);
+					}
+					return;
+				}
+				
+				// else, treat command as kicking a specific handler
+				// parse first parameter as an integer
+				Integer p1 = parseAsInt(params.get(0), 0, handlers.size());
+				if(p1 == null) return;
+				
+				// kick this handler
+				ClientRequestHandler handlerToKick = handlers.get(p1);
+				handlerToKick.stop();
+				handlerToKick.setUser(null);
+				handlerToKick.setBlock(true);
 			}
 		});
+		
+		// disconnect all bound handlers
+		desc = "sets block size (in bytes) to be used for file transfers";
+		usage = "\t[blockSize <size of blocks in bytes>]";
+		commands.add(new Command("blockSize", 1, desc, usage){
+			@Override public void execute(Scanner cs){
+				// get command parameters
+				ArrayList<String> params = getParams(cs);
+
+				// check that there are enough parameters
+				if(params.size() < this.getParamCount()){
+					System.out.printf(
+						"'%s' expects at least %d parameters\n", 
+						this.toString(), this.getParamCount()
+					);
+					return;
+				}
+				
+				// attempt to parse command input
+				Integer p1 = parseAsInt(
+					params.get(0), 
+					minTransferBlockSize, maxTransferBlockSize
+				);
+				
+				// didn't parse the integer properly
+				if(p1 == null) return;
+				
+				// your parse succeeded! add handler to bound handlers list
+				if(!handlers.isEmpty()){
+					// loop through all bound handlers setting transfer size
+					for (int i = 0; i < handlers.size(); i++){
+						boundHandlers.get(i).setTransferBlockSize(p1);
+					}
+				}
+				
+				// print out new block size
+				transferBlockSize = p1;
+				System.out.printf("Set transfer block size to %d bytes\n", p1);
+			}
+		});
+		
+		// do handler logging
+		desc = "sets the command line logging status of running handlers";
+		usage = "\t[doLogging <handler index> <status>]\n"
+			  + "\t\t - find handler index using 'lh' or use 'all/bound' \n"
+			  + "\t\t - status can take the value 'true' or 'false'";
+		commands.add(new Command("dologging", 2, desc, usage){
+			@Override public void execute(Scanner scanner){
+				// get command parameters
+				ArrayList<String> params = getParams(scanner);
+
+				// check that there are enough parameters
+				if(params.size() < this.getParamCount()){
+					System.out.printf(
+						"'%s' expects at least %d parameters\n", 
+						this.toString(), this.getParamCount()
+					);
+					return;
+				}
+				
+				// use second argument to determine how to set logging status
+				boolean newLoggingStatus;
+				String p2 = params.get(1);
+				if (p2.equalsIgnoreCase("false") || p2.equalsIgnoreCase("0")) {
+					newLoggingStatus = false;
+				} else if (p2.equalsIgnoreCase("true") || p2.equalsIgnoreCase("1")) {
+					newLoggingStatus = true;
+				} else {
+					System.out.printf("'%s' invalid, expected [true/false], [1/0]\n", p2);
+					return;
+				}
+				
+				// set logging status of all handlers
+				if(params.get(0).equalsIgnoreCase("all")){
+					// loop though all handlers and disconnect them
+					System.out.printf("Set logging status for %d handlers\n", handlers.size());
+					for(int i = 0; i < handlers.size(); i++){
+						handlers.get(0).doLogging(newLoggingStatus);
+					}
+					return;
+				} 
+				
+				// set logging status of bound handlers only 
+				if (params.get(0).equalsIgnoreCase("bound")){
+					// loop though all handlers and disconnect them
+					System.out.printf("Set logging status for %d handlers\n", boundHandlers.size());
+					for(int i = 0; i < boundHandlers.size(); i++){
+						boundHandlers.get(i).doLogging(newLoggingStatus);
+					}
+					return;
+				}
+				
+				// parse first parameter as an integer
+				Integer p1 = parseAsInt(params.get(0), 0, handlers.size());
+				if(p1 == null) return;
+				
+				// set logging status of just this handler
+				ClientRequestHandler thisHandler = handlers.get(p1);
+				thisHandler.doLogging(newLoggingStatus);
+			}
+		});
+		
+		// server help command
+		desc = "\tdisplays help information for server commands";
+		usage = "\t[help] or [help <name of command>]";
+		commands.add(new Command("help", 0, desc, usage){
+			@Override public void execute(Scanner cs){
+				// get command parameters
+				ArrayList<String> params = getParams(cs);
+				Command command = null;
+				
+				// if params is not empty then display usage of listed command
+				if(params.size() > 0){
+					// get the command for which the help command was issued
+					command = searchCommands(params.get(0));
+					
+					// if command is null then there is no command with this name
+					if(command == null){
+						// notify user that this command does not exist
+						System.out.printf("No such command! %s", params.get(0));
+					} else {
+						// print out usage and help of selected command
+						command.displayDesc();
+						command.displayUsage();
+					}
+				} else {
+					// loop through all server commands, displaying their usage strings 
+					System.out.printf(
+						"====[SERVER COMMANDS]==================================================\n");
+					for(int i = 0; i < commands.size(); i++){
+						commands.get(i).displayDesc();
+					}
+					System.out.printf(
+						"=======================================================================\n");
+					System.out.printf(
+						"For usage information on a specific command use [help <command name>]\n");
+				}
+			}
+		});		
 	}
 	
 	
@@ -580,7 +783,7 @@ public class StammtischServer {
 		Command thisCommand = searchCommands(commandID);	// get the command associated with this ID
 		
 		if (thisCommand != null) thisCommand.execute(lineScanner);
-		else System.out.printf("[ERR] '%s' not recognised as command\n", commandID);
+		else System.out.printf("'%s' is not a recognised command!\n", commandID);
 	}
 	
 	
