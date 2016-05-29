@@ -218,12 +218,12 @@ public class ServerRequestHandler
 		return presentationList;
 	}
 
-	public final void getPresentation(PresentationShell pres)
+	public final void getPresentation(PresentationShell pres, String path)
 	{
 		// create a file for the presentation
 		FileOutputStream  fs;
 		try {
-			fs = new FileOutputStream("test.pws");
+			fs = new FileOutputStream(path + pres.getId().toString() + ".pws");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
