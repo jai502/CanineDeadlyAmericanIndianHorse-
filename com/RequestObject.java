@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 // Object to identify requests from the client
 // serialised and sent over the network to identify requests
-public class RequestObject implements Serializable{
+public final class RequestObject implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public String id;

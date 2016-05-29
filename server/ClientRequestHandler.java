@@ -47,6 +47,10 @@ public class ClientRequestHandler implements Runnable {
 	private boolean doLogging = true;
 	private int order;
 	
+	// input and output streams
+	ObjectOutputStream outputStream;
+	ObjectInputStream inputStream;
+	
 	// list of request handling objects
 	ArrayList<Response> responses;
 	
@@ -74,22 +78,41 @@ public class ClientRequestHandler implements Runnable {
 	// client request handler thread code
 	@Override
 	public void run() {
-		// test file for transmission
-		//String testFile = new String("M:/w2k/My Pictures/norgate.gif");
+		// open the output stream
+		try {
+			outputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
+			outputStream.flush();
+		} catch (Exception e) {
+			logErr("Failed to open output stream! Handler terminating.");
+			e.printStackTrace();
+			done = true;
+		}
 		
+		// open the input stream
+		try {
+			inputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+		} catch (Exception e) {
+			logErr("Failed to open input stream! Handler terminating.");
+			e.printStackTrace();
+			done = true;
+		}
+		
+		// main loop
 		while (!done) {
 			// wait for request from client
 			currentRequest = null;
 			while(currentRequest == null){
 				try {
-					currentRequest = getRequest(clientSocket);
+					currentRequest = getRequest();
 				} catch (IOException e) {
 					logErr("IO exception on request recieve");
 					e.printStackTrace();
 					done = true;
 					break;
 				}
+				if (done) break;
 			}
+			if (done) break;
 			
 			// take order number for current request
 			order = currentRequest.order;
@@ -148,12 +171,10 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// Thread local request retrieval method
-	private RequestObject getRequest(Socket threadSocket) throws IOException {
-		ObjectInputStream inputFromClient;
+	private RequestObject getRequest() throws IOException {
 		RequestObject thisRequest;
 		try {
-			inputFromClient = new ObjectInputStream(new BufferedInputStream(threadSocket.getInputStream()));
-			thisRequest = (RequestObject)inputFromClient.readObject();
+			thisRequest = (RequestObject)inputStream.readObject();
 			return thisRequest;
 		} catch (ClassNotFoundException e1) {
 			logErr("Malformed request object recieved");
@@ -168,7 +189,7 @@ public class ClientRequestHandler implements Runnable {
 	public void sendResponse(RequestObject thisRequest) {
 		// instantiate request object
 		try {
-			ObjectOutputStream outputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
+			outputStream.reset();
 			outputStream.writeObject(thisRequest);
 			outputStream.flush();
 		} catch(IOException e) {
@@ -216,12 +237,13 @@ public class ClientRequestHandler implements Runnable {
 	// returns null on success
 	public String sendFile(String path){
 		// buffer variables
-		int bufSize = 131072; 				
+		int bufSize = 131072; 
+		int blockCount = 0;
 		byte[] buffer = new byte[bufSize];
 		
 		// other variables
 		boolean doTransfer = true;			// end of transfer signal variable
-		InputStream file = null;			// file input stream
+		FileInputStream file = null;		// file input stream
 		String rString = null;				// return value
 		
 		try {
@@ -234,7 +256,6 @@ public class ClientRequestHandler implements Runnable {
 		
 		// per loop variables
 		int count = 0;
-		RequestObject responseData = new RequestObject("RESPOND_DATA", null, order);
 		FileBlock blockData = null;
 		
 		// iterate over the file sending one chunk at a time
@@ -253,11 +274,16 @@ public class ClientRequestHandler implements Runnable {
 			
 			// create data block
 			blockData = new FileBlock(buffer, count);
-			responseData.param = (Object)blockData;
+			
+			RequestObject responseData = new RequestObject("RESPOND_DATA", (Object)blockData, order);
 			
 			// send the response object with the data in it to client
 			sendResponse(responseData);
+			blockCount++;
 		}
+		
+		// display number of transmitted blocks
+		log("Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
 		
 		// close file
 		try {

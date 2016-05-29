@@ -230,7 +230,7 @@ public class StammtischServer {
 				Integer presId = presentation.getId();
 				
 				// open the file for transfer
-				String transferFailureReason = handler.sendFile("pres/" + presId.toString() + ".zip");		
+				String transferFailureReason = handler.sendFile("presentations/" + presId.toString() + ".zip");		
 				
 				// respond with failure of file transfer did not success
 				if(transferFailureReason != null){
