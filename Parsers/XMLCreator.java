@@ -37,7 +37,7 @@ public class XMLCreator {
 	}
 
 	public void createXML(Presentation presentation, boolean containsDefaults ,boolean containsImage, 
-			boolean containsShape, boolean containsPoly,
+			boolean containsShape,boolean shapeShade, boolean containsPoly,
 			boolean containsText, boolean containsVideo, boolean containsAudio) 
 	{
 		try {
@@ -163,7 +163,17 @@ public class XMLCreator {
 						imageDuration.setValue(
 								String.valueOf(presentation.getSlides().get(i).getImageList().get(x).getDuration()));
 
+						image.setAttributeNode(imageYstart);
+						image.setAttributeNode(imageXstart);
+						image.setAttributeNode(imageSource);
+						image.setAttributeNode(imageStart);
+						image.setAttributeNode(imageDuration);
+						image.setAttributeNode(imageHeight);
+						image.setAttributeNode(imageWidth);
+						
 						slide.appendChild(image);
+						
+						
 
 					}
 				}
@@ -187,15 +197,7 @@ public class XMLCreator {
 						Attr shapeFill = presentationDoc.createAttribute("fillColour");
 						Attr shapeLine = presentationDoc.createAttribute("lineColour");
 
-						shape.setAttributeNode(shapeYstart);
-						shape.setAttributeNode(shapeXstart);
-						shape.setAttributeNode(shapeStart);
-						shape.setAttributeNode(shapeDuration);
-						shape.setAttributeNode(shapeType);
-						shape.setAttributeNode(shapeWidth);
-						shape.setAttributeNode(shapeHeight);
-						shape.setAttributeNode(shapeFill);
-						shape.setAttributeNode(shapeLine);
+						
 
 						// Set shape attributes
 						shapeWidth.setValue(
@@ -216,7 +218,17 @@ public class XMLCreator {
 								String.valueOf(presentation.getSlides().get(i).getShapeList().get(x).getFillColour()));
 						shapeLine.setValue(
 								String.valueOf(presentation.getSlides().get(i).getShapeList().get(x).getLineColour()));
-
+						
+						shape.setAttributeNode(shapeYstart);
+						shape.setAttributeNode(shapeXstart);
+						shape.setAttributeNode(shapeStart);
+						shape.setAttributeNode(shapeDuration);
+						shape.setAttributeNode(shapeType);
+						shape.setAttributeNode(shapeWidth);
+						shape.setAttributeNode(shapeHeight);
+						shape.setAttributeNode(shapeFill);
+						shape.setAttributeNode(shapeLine);
+						
 						// Shading element for shape 
 						Element shapeShading = presentationDoc.createElement("Shading");
 
@@ -227,6 +239,7 @@ public class XMLCreator {
 						Attr shapeShadeColourOne = presentationDoc.createAttribute("colour1");
 						Attr shapeShadeColourTwo = presentationDoc.createAttribute("colour2");				
 
+						if (shapeShade == true){
 						shapeShadeXOne.setValue(String
 								.valueOf(presentation.getSlides().get(i).getShapeList().get(x).getShading().getxOne()));
 						shapeShadeXTwo.setValue(String
@@ -249,6 +262,7 @@ public class XMLCreator {
 
 
 						shape.appendChild(shapeShading);
+						}
 						slide.appendChild(shape);
 					}
 				}
@@ -452,7 +466,7 @@ public class XMLCreator {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			DOMSource source = new DOMSource(presentationDoc);
-			StreamResult result = new StreamResult(new File("/Users/alexander_stassis/Desktop/newfile.xml"));
+			StreamResult result = new StreamResult(new File("C:/Users/Callum/Desktop/pres.xml"));
 			transformer.transform(source, result);
 
 			System.out.println("created XML file");

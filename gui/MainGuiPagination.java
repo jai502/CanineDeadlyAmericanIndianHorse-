@@ -29,6 +29,7 @@ import Objects.Presentation;
 import Objects.SlideItem;
 import Objects.TextItem;
 import Objects.VideoItem;
+import Parsers.FillPres;
 import Parsers.XMLCreator;
 import Parsers.XMLParser;
 import SQL.SQLHandler;
@@ -138,8 +139,8 @@ public class MainGuiPagination extends Application
 	/* variables for the primary stage */
 	private Stage window;
 	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu, commentsMenu;
-	private int width = 800;
-	private int height = 600;
+	private int width = 880;
+	private int height = 660;
 	private MenuItem exit;
 
 	/* variables for addMainGridItems() method */
@@ -183,6 +184,7 @@ public class MainGuiPagination extends Application
 	private ArrayList<String[]> searchResults = new ArrayList<String[]>(); //Define an arraylist for the search results
 
 	/* variables for the createPresentationMenu */
+	private Presentation createdPres;
 	private BorderPane createPresentationScreenLayout;
 	private Button btnNext, btnCreate, btnOpenMediaDty;
 	private Label mediaLanguage, mediaTranslation, startTime, endTime;
@@ -686,6 +688,7 @@ public class MainGuiPagination extends Application
 			public void handle(ActionEvent e) {
 				System.out.println("Please create a presentation...");
 				tempPres = null;
+				createdPres = null;
 				window.setTitle("Create Presentation Menu");
 				window.setScene(createPresentationMenu);				
 			}
@@ -781,7 +784,7 @@ public class MainGuiPagination extends Application
 						System.out.println("You have reached the end of the presentation");
 					}
 
-					slidePane = sh.getSlideStack(tempPres, pageIndex, width-100, height-100, presentationMenu);
+					slidePane = sh.getSlideStack(tempPres, pageIndex, width, height-100, presentationMenu);
 					
 					/* Mouse event handler for the canvas */
 					slidePane.addEventHandler(MouseEvent.MOUSE_PRESSED,
@@ -875,20 +878,16 @@ public class MainGuiPagination extends Application
 
 				videoItem.setSourceFile(mediaPathname);
 
-				videoItem.setxStart(0.5);
-				videoItem.setyStart(0.5);
+				videoItem.setxStart(0.6);
+				videoItem.setyStart(0.1);
 
-				/* might not need these 
-						videoItem.setHeight(height);
-						videoItem.setWidth(stackWidth);*/
-
+				
 				videoItem.setLoop(false);
 				videoItem.setStartTime(0);
 				
 				containsVideo = true;
 				containsAudio = false;
 				
-				//xmlSlide.addVideo(videoItem);
 
 
 				// Add the pagination to the presentation scene
@@ -905,7 +904,7 @@ public class MainGuiPagination extends Application
 				System.out.println("File selected: " + mediaPathname);
 
 				audioItem.setSourceFile(mediaPathname);
-
+				//TODO Add these to audio handler
 				/* might not need these 
 				  	audioItem.setxStart(0.5);
 					audioItem.setyStart(0.5);
@@ -919,7 +918,6 @@ public class MainGuiPagination extends Application
 				containsVideo = false;
 				containsAudio = true;
 
-				//xmlSlide.addAudio(audioItem);
 
 				// Add the pagination to the presentation scene
 				window.setTitle("Create Presentation Menu");
@@ -1792,6 +1790,9 @@ public class MainGuiPagination extends Application
 					transText.setWidth(0.4f);
 					transText.setxStart(0.1f);
 					transText.setyStart(0.6f);
+					
+					videoText.setFont("SansSerif");
+					transText.setFont("SansSerif");
 
 					xmlSlide.addText(videoText);
 					xmlSlide.addText(transText);				
@@ -1843,17 +1844,9 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				Presentation pres = new Presentation();
-				DocumentInfo docInfo = new DocumentInfo();
+				createdPres = new Presentation();
 				
 				XMLCreator creator = new XMLCreator();
-				
-				//sUsernameLogin = textFieldName.getText();
-				docInfo.setAuthor(sUsernameLogin);
-				//docInfo.setAuthor("hello");
-				docInfo.setComment("Created Presentation");
-				docInfo.setTitle("New Pres-entation");//TODO
-				docInfo.setVersion("1.0");
 				
 				if(containsVideo == true)
 				{
@@ -1864,12 +1857,10 @@ public class MainGuiPagination extends Application
 					xmlSlide.addAudio(audioItem);
 				}
 				
-				xmlSlideList.add(xmlSlide);
-				pres.setSlides(xmlSlideList);
+				FillPres fp = new FillPres();
+				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide);
 
-				pres.setDocInfo(docInfo);
-
-				creator.createXML(pres, false, false, false, false, true, containsVideo, containsAudio);
+				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio);
 			}
 		});
 

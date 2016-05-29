@@ -373,7 +373,7 @@ public class XMLParser extends DefaultHandler {
 		{
 			if (isInteractable == true){
 
-				if (currentText.getFont() == null){
+				if (currentText.getFont() == "null"){
 					currentText.setFont(currentDefaults.getFont());
 				}
 
@@ -395,7 +395,8 @@ public class XMLParser extends DefaultHandler {
 			else
 			{
 
-				if (currentText.getFont() == null){
+				if (currentText.getFont() == "null" || currentText.getFont() == null){
+					System.out.println("font = " + currentDefaults.getFont());
 					currentText.setFont(currentDefaults.getFont());
 				}
 
@@ -407,7 +408,10 @@ public class XMLParser extends DefaultHandler {
 				{
 					currentText.setFontColour(currentDefaults.getFontColour());
 				}
-
+				
+				System.out.println(currentText.getFont());
+				System.out.println(currentText.getFontColour());
+				System.out.println(currentText.getFontSize());
 				text = (text + newContent);
 				currentText.setText(text);
 				currentText.setInteractableSlide("-1");
@@ -415,6 +419,7 @@ public class XMLParser extends DefaultHandler {
 				currentText = null;
 				text = "";
 			}
+			
 		}
 
 		if (qName.equalsIgnoreCase("b"))
