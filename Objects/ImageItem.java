@@ -3,12 +3,13 @@
 * First version created by: Joseph Ingleby & Callum Silver
 * Date of first version: 22nd February 2016
 * 
-* Last version by: Joseph Ingleby & Callum Silver
-* Date of last update: 22nd February 2016
+* Last version by: Callum Silver
+* Date of last update: 29th May 2016
 * Version number: 1.0
 * 
-* Commit date: 22nd February 2016
+* Commit date: 29th May 2016
 * Description: This class holds the information for imagefiles received from the xml document.
+* Update: 29th may: added in a creator for no sourcefile
 */
 
 package Objects;
@@ -21,6 +22,17 @@ public class ImageItem extends Item
 	public ImageItem(String mySourceFile, int myStartTime, int myDuration, float myXStart, float myYStart, float myHeight, float myWidth)
 	{
 		sourceFile = mySourceFile; 
+		xStart = myXStart; 
+		yStart = myYStart; 
+		height = myHeight; 
+		width = myWidth;
+	}
+	
+	// image with no source for fillPres
+	public ImageItem(int myStartTime, int myDuration, float myXStart, float myYStart, float myHeight, float myWidth)
+	{
+		startTime = myStartTime;
+		duration = myDuration;
 		xStart = myXStart; 
 		yStart = myYStart; 
 		height = myHeight; 

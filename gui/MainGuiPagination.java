@@ -24,10 +24,12 @@ import javax.imageio.ImageIO;
 import org.omg.CORBA.SystemException;
 
 import Objects.AudioItem;
+import Objects.DocumentInfo;
 import Objects.Presentation;
 import Objects.SlideItem;
 import Objects.TextItem;
 import Objects.VideoItem;
+import Parsers.XMLCreator;
 import Parsers.XMLParser;
 import SQL.SQLHandler;
 import client.ServerRequestHandler;
@@ -186,10 +188,15 @@ public class MainGuiPagination extends Application
 	private Label mediaLanguage, mediaTranslation, startTime, endTime;
 	private TextField startTimeField, endTimeField;
 	private TextArea mediaLanguageText, mediaTranslationText;
+	private VideoItem videoItem = new VideoItem();
+	private AudioItem audioItem = new AudioItem();
+	private ArrayList<SlideItem> xmlSlideList = new ArrayList<SlideItem>();
 	private SlideItem xmlSlide = new SlideItem();
 	private FileChooser browseMediaFiles = new FileChooser();
 	private File selectedMediaFile;
 	private String mediaPathname;
+	private boolean containsVideo = false;
+	private boolean containsAudio = false;
 
 
 	/* variables for the commentsMenu */
@@ -255,8 +262,8 @@ public class MainGuiPagination extends Application
 	public void init()
 	{
 		System.out.println("Setting up/initialising GUI now");
-		com = new ServerRequestHandler(serverPort, serverHost);
-		com.start();
+		//com = new ServerRequestHandler(serverPort, serverHost);
+		//com.start();
 
 	}
 
@@ -841,45 +848,13 @@ public class MainGuiPagination extends Application
 			pageTurn();
 			System.out.println("Current Page Index: " + pagination.getCurrentPageIndex());
 
-			//			for(int i=0; i <= pagination.getPageCount(); i++)
-			//			{
-			//				pageTurn();
-			//				System.out.println("Current Page Index: " + pagination.getCurrentPageIndex());
-			//				if(i == (pagination.getPageCount()))
-			//				{
-			//					System.out.println("You have reached the end of the presentation");
-			//				}
-			//			}
-
-			//			if(pagination.getCurrentPageIndex() == pagination.getPageCount())
-			//			{
-			//				System.out.println("You have reached the end of the presentation");
-			//			}
-
-			/*pagination.widthProperty().addListener(new ChangeListener()
-			{
-				@Override
-<<<<<<< HEAD
-				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-					stackWidth  = pagination.getWidth();
-					pageTurn();
-				}
-			});
-			pagination.heightProperty().addListener(new ChangeListener()
-			{
-				@Override
-				public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-					stackHeight = pagination.getHeight();
-					pageTurn();
-				}
-			});*/
-
 			// Add the pagination to the presentation scene
 			presentationLayout.setCenter(pagination);
 			window.setTitle("Presentation");
 			window.setScene(presentationMenu);
 
-		} else {
+		} else 
+		{
 			System.out.println("File selection cancelled!");
 		}
 
@@ -898,8 +873,6 @@ public class MainGuiPagination extends Application
 				mediaPathname = mediaFile.getAbsolutePath();
 				System.out.println("File selected: " + mediaPathname);
 
-				VideoItem videoItem = new VideoItem();
-
 				videoItem.setSourceFile(mediaPathname);
 
 				videoItem.setxStart(0.5);
@@ -911,8 +884,11 @@ public class MainGuiPagination extends Application
 
 				videoItem.setLoop(false);
 				videoItem.setStartTime(0);
-
-				xmlSlide.addVideo(videoItem);
+				
+				containsVideo = true;
+				containsAudio = false;
+				
+				//xmlSlide.addVideo(videoItem);
 
 
 				// Add the pagination to the presentation scene
@@ -922,13 +898,11 @@ public class MainGuiPagination extends Application
 
 			}
 
-			if((mediaFile.getName().endsWith(".wav")) || (mediaFile.getName().endsWith(".WAV"))
+			else if((mediaFile.getName().endsWith(".wav")) || (mediaFile.getName().endsWith(".WAV"))
 					|| (mediaFile.getName().endsWith(".mp3")) || (mediaFile.getName().endsWith(".MP3")))
 			{
 				mediaPathname = mediaFile.getAbsolutePath();
 				System.out.println("File selected: " + mediaPathname);
-
-				AudioItem audioItem = new AudioItem();
 
 				audioItem.setSourceFile(mediaPathname);
 
@@ -941,8 +915,11 @@ public class MainGuiPagination extends Application
 
 				audioItem.setLoop(false);
 				audioItem.setStartTime(0);
+				
+				containsVideo = false;
+				containsAudio = true;
 
-				xmlSlide.addAudio(audioItem);
+				//xmlSlide.addAudio(audioItem);
 
 				// Add the pagination to the presentation scene
 				window.setTitle("Create Presentation Menu");
@@ -980,7 +957,8 @@ public class MainGuiPagination extends Application
 
 		@Override
 		public void changed(ObservableValue<? extends Number> observable,
-				Number oldValue, Number newValue) {
+				Number oldValue, Number newValue)
+		{
 			final double width = parent.getWidth();
 			final double height = parent.getHeight();
 			context.clearRect(0, 0, width, height);
@@ -989,11 +967,13 @@ public class MainGuiPagination extends Application
 	}
 
 	/* method to create pagination content of Image array */
-	public Image[] createContent() {
+	public Image[] createContent() 
+	{
 		Image[] images = new Image[3];
 
 		// Images for our pages
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) 
+		{
 			images[i] = new Image(MainGuiPagination.class.getResource(
 					"animal" + (i + 1) + ".jpg").toExternalForm(), false);
 		}
@@ -1002,7 +982,8 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method for GridPane for Main Menu */
-	public GridPane addMainGridItems() {
+	public GridPane addMainGridItems() 
+	{
 		// Create a root node called grid. In this case a grid pane layout
 		// is used, with vertical and horizontal gaps of 50
 		GridPane grid = new GridPane();
@@ -1016,8 +997,7 @@ public class MainGuiPagination extends Application
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
 		// Create the Default message
-		welcomeMessage = new Text(
-				"Try Our Interactive Language Learning Experience");
+		welcomeMessage = new Text("Try Our Interactive Language Learning Experience");
 		welcomeMessage.setFill(Color.BLACK);
 		welcomeMessage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 		grid.add(welcomeMessage, 0, 0, 2, 1);
@@ -1053,18 +1033,22 @@ public class MainGuiPagination extends Application
 		grid.add(hbox, 1, 1);
 
 		// Event handler for SignUp Button
-		signUp.setOnAction(new EventHandler<ActionEvent>() {
+		signUp.setOnAction(new EventHandler<ActionEvent>() 
+		{
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(ActionEvent e) 
+			{
 				window.setTitle("Sign Up");
 				window.setScene(signUpMenu);
 			}
 		});
 
 		// Event handler for Login Button
-		logIn.setOnAction(new EventHandler<ActionEvent>() {
+		logIn.setOnAction(new EventHandler<ActionEvent>() 
+		{
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(ActionEvent e) 
+			{
 				window.setTitle("Login");
 				window.setScene(logInMenu);
 			}
@@ -1083,7 +1067,8 @@ public class MainGuiPagination extends Application
 	}
 
 	/* Method for GridPane items for login Menu */
-	public GridPane addLoginGridItems() {
+	public GridPane addLoginGridItems() 
+	{
 		// Create a root node called grid. In this case a grid pane layout
 		// is used, with vertical and horizontal gaps of 10
 		GridPane grid = new GridPane();
@@ -1131,9 +1116,11 @@ public class MainGuiPagination extends Application
 		hbArea.getChildren().addAll(btnLogIn, btnGoBack1);
 
 		// Event handler for btnGoBack1
-		btnGoBack1.setOnAction(new EventHandler<ActionEvent>() {
+		btnGoBack1.setOnAction(new EventHandler<ActionEvent>() 
+		{
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(ActionEvent e) 
+			{
 				window.setTitle("Main Menu");
 				window.setScene(mainMenu);
 			}
@@ -1148,9 +1135,11 @@ public class MainGuiPagination extends Application
 
 		// Event handler to get text from the text field
 		// when button is pressed.
-		btnLogIn.setOnAction(new EventHandler<ActionEvent>() {
+		btnLogIn.setOnAction(new EventHandler<ActionEvent>() 
+		{
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(ActionEvent e) 
+			{
 				sUsernameLogin = textFieldName.getText();
 				sPasswordLogin = textFieldPassword1.getText();
 
@@ -1158,7 +1147,8 @@ public class MainGuiPagination extends Application
 				//LoginDetails loginDetails = new LoginDetails();
 
 				// Check if any of the textfields are null
-				if (sUsernameLogin.equals("") || sPasswordLogin.equals("")) {
+				if (sUsernameLogin.equals("") || sPasswordLogin.equals("")) 
+				{
 					response1.setText("Textfields are empty!");
 					response1.setFill(Color.RED);
 				}	
@@ -1179,8 +1169,10 @@ public class MainGuiPagination extends Application
 					System.out.println("User login was: " + loginSuccessful);
 					/**************************************/
 
-					if(loginSuccessful == true){
+					if(loginSuccessful == true)
+					{
 						logout = false;
+						response1.setText("");
 						window.setTitle("User Menu Screen");
 						window.setScene(userScreenMenu);
 					}
@@ -1316,6 +1308,7 @@ public class MainGuiPagination extends Application
 				if(signUpSuccessful == null)
 				{
 					System.out.println("Signup was successful");
+					response2.setText("");
 					logout = false;
 					window.setTitle("User Menu Screen");
 					window.setScene(userScreenMenu);
@@ -1338,8 +1331,8 @@ public class MainGuiPagination extends Application
 				//window.setScene(userScreenMenu);
 
 				//System.out.println(inputData.get(0) + ", " + inputData.get(1));
-				response2.setText("Registering with us, please wait");
-				response2.setFill(Color.BLACK);
+//				response2.setText("Registering with us, please wait");
+//				response2.setFill(Color.BLACK);
 			}
 
 			//			// Some input did not match, clear textfelds and try again
@@ -1425,6 +1418,7 @@ public class MainGuiPagination extends Application
 				textFieldPassword1.clear();
 				window.setTitle("Main Menu");
 				window.setScene(mainMenu);
+				response3.setText("");
 			}
 		});
 
@@ -1446,15 +1440,17 @@ public class MainGuiPagination extends Application
 				/************* Client/Server Communication ***************/
 				searchResults = com.searchForPresentation(presentationShell);
 				/*********************************************************/
+				
+				response3.setText("Searching for results");
+				response3.setFill(Color.ALICEBLUE);
 
 				//ArrayList<String> searchList = new ArrayList<String>();
 				searchList.clear();
 				idList.clear();
-				int x = 0;
 
 				for (int i = 0; i < searchResults.size(); i++)
 				{
-					for(x = 0; x < searchResults.get(i).length; x++)
+					for(int x = 0; x < searchResults.get(i).length; x++)
 					{
 						if (x == 0)
 						{
@@ -1506,8 +1502,7 @@ public class MainGuiPagination extends Application
 						}
 					}
 				}
-				response3.setText("Searching for results");
-				response3.setFill(Color.MEDIUMPURPLE);
+
 				searchView.setVisible(true);
 				userScreenLayout.setRight(searchDetails());
 			}
@@ -1575,6 +1570,7 @@ public class MainGuiPagination extends Application
 				textFieldLanguage.clear();
 				searchList.clear();
 				idList.clear();
+				response3.setText("");
 				userScreenLayout.setRight(searchDetails());
 				searchView.setVisible(false);
 			}
@@ -1787,19 +1783,20 @@ public class MainGuiPagination extends Application
 					transText.setDuration((Integer.parseInt(endTimeField.getText()) - (Integer.parseInt(startTimeField.getText())))*1000);
 					System.out.println("Video TranslationText Duration: " + transText.getDuration());
 
-					videoText.setHeight(0.4f);
-					videoText.setWidth(0.5f);
+					videoText.setHeight(0.3f);
+					videoText.setWidth(0.4f);
 					videoText.setxStart(0.1f);
 					videoText.setyStart(0.1f);
 
-					transText.setHeight(0.4f);
-					transText.setWidth(0.5f);
+					transText.setHeight(0.3f);
+					transText.setWidth(0.4f);
 					transText.setxStart(0.1f);
 					transText.setyStart(0.6f);
 
 					xmlSlide.addText(videoText);
 					xmlSlide.addText(transText);				
 
+					//xmlSlideList.add(xmlSlide);
 					// Clear for next input
 					mediaLanguageText.clear();
 					mediaTranslationText.clear();
@@ -1846,19 +1843,33 @@ public class MainGuiPagination extends Application
 			@Override
 			public void handle(ActionEvent e) 
 			{
-				//				title = textFieldTitle.getText();
-				//				author = textFieldAuthor.getText();
-				//				language = textFieldLanguage.getText();
-				//
-				//				// Set the username and password fields in local SignUpDetails class
-				//				presentationShell.setTitle(title);
-				//				presentationShell.setAuthor(author);
-				//				presentationShell.setLanguage(language);
-				//
-				//				response3.setText("Searching for results");
-				//				response3.setFill(Color.MEDIUMPURPLE);
-				//				searchView.setVisible(true);
-				//				userScreenLayout.setRight(searchDetails());
+				Presentation pres = new Presentation();
+				DocumentInfo docInfo = new DocumentInfo();
+				
+				XMLCreator creator = new XMLCreator();
+				
+				//sUsernameLogin = textFieldName.getText();
+				docInfo.setAuthor(sUsernameLogin);
+				//docInfo.setAuthor("hello");
+				docInfo.setComment("Created Presentation");
+				docInfo.setTitle("New Pres-entation");//TODO
+				docInfo.setVersion("1.0");
+				
+				if(containsVideo == true)
+				{
+					xmlSlide.addVideo(videoItem);
+				}
+				else if(containsAudio == true)
+				{
+					xmlSlide.addAudio(audioItem);
+				}
+				
+				xmlSlideList.add(xmlSlide);
+				pres.setSlides(xmlSlideList);
+
+				pres.setDocInfo(docInfo);
+
+				creator.createXML(pres, false, false, false, false, true, containsVideo, containsAudio);
 			}
 		});
 

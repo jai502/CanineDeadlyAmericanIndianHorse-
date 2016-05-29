@@ -3,12 +3,14 @@
 * First version created by: Joseph Ingleby & Callum Silver
 * Date of first version: 22nd February 2016
 * 
-* Last version by: Joseph Ingleby & Callum Silver
-* Date of last update: 22nd February 2016
+* Last version by: Callum Silver
+* Date of last update: 29th May 2016
 * Version number: 1.0
 * 
 * Commit date: 22nd February 2016
 * Description: This class holds the information for shapes received from the xml document.
+* 
+* Update: added in a new shape without shading creator
 */
 
 package Objects;
@@ -22,8 +24,11 @@ public class ShapeItem extends Item
 	private Color lineColour, fillColour;
 	private ShadingItem shading;
 	
+	
 	public ShapeItem(int myStartTime, int myDuration, float myXStart, float myYStart, float myWidth, float myHeight, String myType, Color myLineColour, Color myFillColour, ShadingItem myShading)
 	{
+		startTime = myStartTime;
+		duration = myDuration;
 		xStart = myXStart;
 		yStart = myYStart;
 		width = myWidth;
@@ -33,6 +38,20 @@ public class ShapeItem extends Item
 		fillColour = myFillColour;
 		shading = myShading;
 		
+	}
+	
+	//shape with no shading;
+	public ShapeItem(int myStartTime, int myDuration, float myXStart, float myYStart, float myWidth, float myHeight, String myType, Color myLineColour, Color myFillColour)
+	{
+		startTime = myStartTime;
+		duration = myDuration;
+		xStart = myXStart;
+		yStart = myYStart;
+		width = myWidth;
+		height = myHeight;
+		type = myType;
+		lineColour = myLineColour;
+		fillColour = myFillColour;		
 	}
 
 	public ShapeItem() {

@@ -3,9 +3,9 @@ package Objects;
 
 public abstract class Item {
 	//Class variables
-	private int startTime;
-	private int duration;
-	private int interactableSlide; // (-1 for non-interactables and target slide (0-#) for interactables.
+	public int startTime;
+	public int duration;
+	public int interactableSlide; // (-1 for non-interactables and target slide (0-#) for interactables.
 
 	public int getStartTime()
 	{
