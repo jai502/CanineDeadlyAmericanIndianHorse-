@@ -86,6 +86,7 @@ import javafx.scene.control.Pagination;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.PerspectiveTransform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -98,6 +99,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -120,7 +122,10 @@ import Parsers.XMLParser;
 
 public class MainGuiPagination extends Application 
 {	
+	private ServerRequestHandler com;
 	private boolean showCommentsMenuBar = false;
+	private boolean showCreatePresMenuBar = false;
+	private boolean showUserMenuBar = false;
 	private User user = new User();
 	private PresentationShell presentationShell = new PresentationShell();
 	private PresentationShell presentationLoad;
@@ -131,10 +136,6 @@ public class MainGuiPagination extends Application
 	private ArrayList<String> searchList = new ArrayList<String>();
 	private ArrayList<String> idList = new ArrayList<String>();
 	private boolean logout = true;
-
-	private String SQLHost = "stammtischsql.ddns.net";
-	private int SQLPort = 3306;
-	private SQLHandler sqlHandler = new SQLHandler(SQLHost, SQLPort);
 
 	/* variables for the primary stage */
 	private Stage window;
@@ -246,8 +247,6 @@ public class MainGuiPagination extends Application
 	// private ImageView image;
 	// private boolean x = false;
 
-	private ServerRequestHandler com;
-
 	// Constructor
 	public MainGuiPagination() {
 
@@ -256,7 +255,6 @@ public class MainGuiPagination extends Application
 	public static void main(String[] args) {
 		// Required for JavaFX to run
 		launch(args);
-		//com.apple.eawt.Application.getApplication().setDockIconImage(new Image("files/icon.png"));
 	}
 
 	// Override the init() method
@@ -289,9 +287,9 @@ public class MainGuiPagination extends Application
 
 		// Assign window variable as the primary stage
 		window = stage;
-			
+
 		window.getIcons().add(new Image("files/icon.png"));
-	
+
 		// Create menu bar objects ready to add to the Scenes - Crashes if trying to add same one
 		//MenuBar mainMenuBar = menuItems(); // Main Menu
 		//MenuBar loginMenuBar = menuItems(); // Login Menu
@@ -307,6 +305,8 @@ public class MainGuiPagination extends Application
 		BorderPane menuLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = false;
 
 		menuLayout.setId("menuLayout"); // rootNode id for Main Menu Scene in gui_style.gui_style.css
 		// Add the root node to the scene
@@ -337,6 +337,8 @@ public class MainGuiPagination extends Application
 		BorderPane loginLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = false;
 
 		loginLayout.setId("loginLayout"); // rootNode id for LogIn Scene in gui_style.css
 		// Add the root node to the scene
@@ -362,6 +364,8 @@ public class MainGuiPagination extends Application
 		BorderPane signupLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = false;
 
 		signupLayout.setId("signupLayout"); // rootNode id for Sign Up Scene in gui_style.css
 
@@ -388,6 +392,8 @@ public class MainGuiPagination extends Application
 		userScreenLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = true;
 
 		userScreenLayout.setId("userScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
@@ -412,6 +418,8 @@ public class MainGuiPagination extends Application
 		createPresentationScreenLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = true;
+		showUserMenuBar = true;
 
 		createPresentationScreenLayout.setId("createPresentationScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
@@ -435,6 +443,8 @@ public class MainGuiPagination extends Application
 		presentationLayout = new BorderPane();
 
 		showCommentsMenuBar = true;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = true;
 
 		presentationLayout.setId("presentationLayout"); // rootNode id for Presentation Scene in gui_style.css
 
@@ -471,6 +481,8 @@ public class MainGuiPagination extends Application
 		commentsScreenLayout = new BorderPane();
 
 		showCommentsMenuBar = false;
+		showCreatePresMenuBar = false;
+		showUserMenuBar = true;
 
 		commentsScreenLayout.setId("commentsScreenLayout"); // rootNode id for Presentation Scene in gui_style.css
 		// Add the root node to the scene
@@ -616,7 +628,7 @@ public class MainGuiPagination extends Application
 		});
 
 		// Go back to main menu
-		MenuItem goBack = new MenuItem("Go Back...");
+		MenuItem goBack = new MenuItem("Go Back To Main Menu...");
 
 		goBack.setOnAction(new EventHandler<ActionEvent>() 
 		{
@@ -750,14 +762,45 @@ public class MainGuiPagination extends Application
 
 		comments.getItems().add(commentsScreen);	
 
-		if(showCommentsMenuBar == false)
+		// Help Menu \\
+		Menu createPresScreen = new Menu("Go Back");
+
+		// for debugging purposes
+		MenuItem createPres = new MenuItem("Go to homepage...");
+
+		// Event handler for Browsing A File
+		createPres.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent e) {
+
+				tempPres = null;
+				window.setTitle("User Screen Menu");
+				window.setScene(userScreenMenu);					
+			}
+		});
+
+		createPresScreen.getItems().add(createPres);	
+
+
+		if(showCommentsMenuBar == true)
+		{
+			// Add All Menu Bar Items to the actual Menu Bar
+			menuBar.getMenus().addAll(fileMenu, presentationMenu, comments);
+		}
+		else if(showCreatePresMenuBar == true)
+		{
+			// Add All Menu Bar Items to the actual Menu Bar
+			menuBar.getMenus().addAll(fileMenu, presentationMenu, createPresScreen);
+		}
+		else if(showUserMenuBar == true)
 		{
 			// Add All Menu Bar Items to the actual Menu Bar
 			menuBar.getMenus().addAll(fileMenu, presentationMenu);
 		}
 		else
 		{
-			menuBar.getMenus().addAll(fileMenu, presentationMenu, comments);
+			menuBar.getMenus().addAll(fileMenu);
 		}
 
 		return menuBar;
@@ -785,7 +828,7 @@ public class MainGuiPagination extends Application
 					}
 
 					slidePane = sh.getSlideStack(tempPres, pageIndex, width, height-100, presentationMenu);
-					
+
 					/* Mouse event handler for the canvas */
 					slidePane.addEventHandler(MouseEvent.MOUSE_PRESSED,
 							new EventHandler<MouseEvent>() {
@@ -805,7 +848,7 @@ public class MainGuiPagination extends Application
 							mouseEvent.consume();
 						}
 					});
-					
+
 					return slidePane;
 
 				} catch (IOException e) {
@@ -881,13 +924,13 @@ public class MainGuiPagination extends Application
 				videoItem.setxStart(0.6);
 				videoItem.setyStart(0.1);
 
-				
+
 				videoItem.setLoop(false);
 				videoItem.setStartTime(0);
-				
+
 				containsVideo = true;
 				containsAudio = false;
-				
+
 
 
 				// Add the pagination to the presentation scene
@@ -914,7 +957,7 @@ public class MainGuiPagination extends Application
 
 				audioItem.setLoop(false);
 				audioItem.setStartTime(0);
-				
+
 				containsVideo = false;
 				containsAudio = true;
 
@@ -1329,8 +1372,8 @@ public class MainGuiPagination extends Application
 				//window.setScene(userScreenMenu);
 
 				//System.out.println(inputData.get(0) + ", " + inputData.get(1));
-//				response2.setText("Registering with us, please wait");
-//				response2.setFill(Color.BLACK);
+				//				response2.setText("Registering with us, please wait");
+				//				response2.setFill(Color.BLACK);
 			}
 
 			//			// Some input did not match, clear textfelds and try again
@@ -1380,6 +1423,18 @@ public class MainGuiPagination extends Application
 		textFieldLanguage = new TextField();
 		textFieldLanguage.setPromptText("Search by Language");
 		grid.add(textFieldLanguage, 1, 3);
+
+		textFieldLanguage.setOnKeyPressed(new EventHandler<KeyEvent>()
+		{
+			@Override
+			public void handle(KeyEvent ke)
+			{
+				if (ke.getCode().equals(KeyCode.ENTER))
+				{
+					System.out.println("HELLO");
+				}
+			}
+		});
 
 
 		// Creating a Button for Registering and going back to main menu
@@ -1438,7 +1493,7 @@ public class MainGuiPagination extends Application
 				/************* Client/Server Communication ***************/
 				searchResults = com.searchForPresentation(presentationShell);
 				/*********************************************************/
-				
+
 				response3.setText("Searching for results");
 				response3.setFill(Color.ALICEBLUE);
 
@@ -1507,6 +1562,9 @@ public class MainGuiPagination extends Application
 
 
 		}); 
+
+
+
 
 		// Event handler for btnLoadPres
 		btnLoadPres.setOnAction(new EventHandler<ActionEvent>() 
@@ -1790,7 +1848,7 @@ public class MainGuiPagination extends Application
 					transText.setWidth(0.4f);
 					transText.setxStart(0.1f);
 					transText.setyStart(0.6f);
-					
+
 					videoText.setFont("SansSerif");
 					transText.setFont("SansSerif");
 
@@ -1845,9 +1903,9 @@ public class MainGuiPagination extends Application
 			public void handle(ActionEvent e) 
 			{
 				createdPres = new Presentation();
-				
+
 				XMLCreator creator = new XMLCreator();
-				
+
 				if(containsVideo == true)
 				{
 					xmlSlide.addVideo(videoItem);
@@ -1856,7 +1914,7 @@ public class MainGuiPagination extends Application
 				{
 					xmlSlide.addAudio(audioItem);
 				}
-				
+
 				FillPres fp = new FillPres();
 				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide);
 
@@ -1888,7 +1946,7 @@ public class MainGuiPagination extends Application
 		//		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
 		messageRating.setFill(Color.ALICEBLUE);
 		messageRating.setFont(Font.font("Arial", FontWeight.BOLD, 40));
-		grid.add(messageRating, 0, 0, 2, 1);
+		grid.add(messageRating, 1, 0, 1, 1);
 
 		// Creating buttons for rating up or down
 		Image thumbsUp = new Image(getClass().getResourceAsStream("thumb_up.png"));
@@ -1917,11 +1975,20 @@ public class MainGuiPagination extends Application
 		// Adding hbArea with the button in it to the rootNode
 		grid.add(vbArea, 1, 5);
 
+		//PerspectiveTransform pt = new PerspectiveTransform();
+
+		Canvas backgroundCanvas = new Canvas((commentsMenu.getWidth()/2) + 30 , commentsMenu.getHeight()/8 );
+		GraphicsContext gc= backgroundCanvas.getGraphicsContext2D();
+		gc.setFill(Color.rgb(0, 0, 0, 0.35));
+		gc.fillRect(0,0,backgroundCanvas.getWidth(),backgroundCanvas.getHeight());
+
+
 		messageSubmit = new Text("Hit submit to upload your ratings and comments!");
 		messageSubmit.setId("messageSubmit"); // Id for gui_style.css
-		//		messageRating.setFill(Color.color(0.443, 0.196, 1.0));
 		messageSubmit.setFill(Color.ALICEBLUE);
 		messageSubmit.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
+		grid.add(backgroundCanvas, 0, 6, 2, 1);
 		grid.add(messageSubmit, 0, 6, 2, 1);
 
 		// Event handler for btnLogout

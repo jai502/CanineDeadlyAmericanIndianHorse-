@@ -118,10 +118,6 @@ public class ServerRequestHandler
 			System.out.println("Login failed: " + (String) response.param);
 			login = false;
 			break;
-		case "RESPONSE_UNKNOWN":
-			System.out.println("Login failed: Server didn't recognise request");
-			login = false;
-			break;
 		default:
 			System.out.println("Login failed: (Response " + response.id + " Unknown)");
 			login = false;
@@ -152,10 +148,6 @@ public class ServerRequestHandler
 			break;
 		case "RESPONSE_FAIL":
 			System.out.println("Logout failed: " + (String) response.param);
-			logout = false;
-			break;
-		case "RESPONSE_UNKNOWN":
-			System.out.println("Logout failed: Server didn't recognise request");
 			logout = false;
 			break;
 		default:
@@ -190,10 +182,6 @@ public class ServerRequestHandler
 			signUp = (String) response.param;
 			System.out.println(signUp);
 			break;
-		case "RESPONSE_UNKNOWN":
-			signUp = "Server didn't recognise request";
-			System.out.println(signUp);
-			break;
 		default:
 			signUp = "(Internal Server Error: " + response.id;
 			System.out.println(signUp);
@@ -220,10 +208,6 @@ public class ServerRequestHandler
 		case "RESPONSE_FAIL":
 			presentationList = null;
 			System.out.println("Search failed: " + response.id);
-			break;
-		case "RESPONSE_UNKNOWN":
-			presentationList = null;
-			System.out.println("Server didn't recognise request");
 			break;
 		default:
 			System.out.println("Internal Server Error: " + response.id);
@@ -259,9 +243,6 @@ public class ServerRequestHandler
 		case "RESPONSE_FAIL":
 			System.out.println("Return failed: " + (String) response.param);
 			break;
-		case "RESPONSE_UNKNOWN":
-			System.out.println("Server didn't recognise request");
-			break;
 		default:
 			System.out.println("Unknown response: " + response.id);
 			break;
@@ -291,7 +272,6 @@ public class ServerRequestHandler
 			blockData = (FileBlock)response.param;
 
 			try {
-				System.out.printf("size: %d, first byte: %d\n", blockData.size(), blockData.getData()[0]);
 				fs.write(blockData.getData(), 0, blockData.size());
 				fs.flush();
 			} catch (IOException e) {
@@ -357,6 +337,7 @@ public class ServerRequestHandler
 
 		try 
 		{
+			outputStream.reset();
 			outputStream.writeObject(request);
 			outputStream.flush();
 		}
