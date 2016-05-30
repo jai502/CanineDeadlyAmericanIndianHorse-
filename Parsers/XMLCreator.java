@@ -466,7 +466,7 @@ public class XMLCreator {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			DOMSource source = new DOMSource(presentationDoc);
-			StreamResult result = new StreamResult(new File("C:/Users/Callum/Desktop/pres.xml"));
+			StreamResult result = new StreamResult(new File("Macintosh HD/Users/joewhite/Desktop/Sweng/pres.xml"));
 			transformer.transform(source, result);
 
 			System.out.println("created XML file");

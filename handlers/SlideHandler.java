@@ -41,20 +41,22 @@ import Objects.*;
 public class SlideHandler {
 
 	private Presentation pres;
-
+	public MediaFx audioPlayer;
+	public MediaFx videoPlayer;
 
 	public SlideHandler() {
 		super();
 	}
 
 	public StackPane getSlideStack(Presentation presentation, int i, double myWidth, double myHeight, Scene scene) throws IOException {
-		this.pres = presentation;
-		double reducedHeight = (myHeight-60);
-		double reducedWidth = (myWidth-5);
-		int width = (int) Math.floor(reducedWidth);
-		int height =(int) Math.floor(reducedHeight);
-		System.out.println("\nSlides in presentation according to handler: " +presentation.getSlides().size());
+		
 		StackPane slidePane = new StackPane();
+		this.pres = presentation;
+		double reducedHeight = (myHeight - 60);
+		double reducedWidth = (myWidth - 5);
+		int width = (int) Math.floor(reducedWidth);
+		int height = (int) Math.floor(reducedHeight);
+		System.out.println("\nSlides in presentation according to handler: " + presentation.getSlides().size());
 
 		// Adding a TimeLine
 		Timeline timeline = new Timeline();
@@ -62,73 +64,79 @@ public class SlideHandler {
 		// Slide background
 
 		Canvas backgroundCanvas = new Canvas(width, height);
-		GraphicsContext gc= backgroundCanvas.getGraphicsContext2D();
+		GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
 		gc.setFill(presentation.getSlides().get(i).getBackgroundColour());
-		gc.fillRect(0,0,backgroundCanvas.getWidth(),backgroundCanvas.getHeight());
+		gc.fillRect(0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight());
 
 		AnchorPane backgroundAnchor = new AnchorPane();
 		backgroundAnchor.getChildren().add(backgroundCanvas);
 		slidePane.getChildren().addAll(backgroundAnchor);
 
-
-
-
-
-		for (int x = 0; x < presentation.getSlides().get(i).getImageList().size(); x++)
-		{
+		for (int x = 0; x < presentation.getSlides().get(i).getImageList().size(); x++) {
 			ImageHandler imageHandler = new ImageHandler();
-			Canvas imageCanvas = imageHandler.drawCanvas(presentation.getSlides().get(i).getImageList().get(x), width, height);
+			Canvas imageCanvas = imageHandler.drawCanvas(presentation.getSlides().get(i).getImageList().get(x),
+					width, height);
 
 			// First be not visible;
 			imageCanvas.setVisible(false);
-			// Ensure the image will be shown, even if there is no start time
-			if(presentation.getSlides().get(i).getImageList().get(x).getStartTime() == 0)
-			{
+			// Ensure the image will be shown, even if there is no start
+			// time
+			if (presentation.getSlides().get(i).getImageList().get(x).getStartTime() == 0) {
 				imageCanvas.setVisible(true);
 			}
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(imageCanvas.visibleProperty(), true);
-			KeyFrame visible_start_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getImageList().get(x).getStartTime()), visible_value_start);
-			System.out.println("imageCanvas "  + x + " start time: " + presentation.getSlides().get(i).getImageList().get(x).getStartTime());
+			KeyFrame visible_start_time = new KeyFrame(
+					Duration.millis(presentation.getSlides().get(i).getImageList().get(x).getStartTime()),
+					visible_value_start);
+			System.out.println("imageCanvas " + x + " start time: "
+					+ presentation.getSlides().get(i).getImageList().get(x).getStartTime());
 			timeline.getKeyFrames().add(visible_start_time);
 			// Add "Duration" or end time to the timeline
-			if((presentation.getSlides().get(i).getImageList().get(x).getDuration() > 0))
-			{
+			if ((presentation.getSlides().get(i).getImageList().get(x).getDuration() > 0)) {
 				KeyValue visible_value_end = new KeyValue(imageCanvas.visibleProperty(), false);
-				KeyFrame visible_end_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getImageList().get(x).getStartTime() + 
-						presentation.getSlides().get(i).getImageList().get(x).getDuration()), visible_value_end);
-				System.out.println("imageCanvas " + x + " duration time: " + presentation.getSlides().get(i).getImageList().get(x).getDuration());
+				KeyFrame visible_end_time = new KeyFrame(
+						Duration.millis(presentation.getSlides().get(i).getImageList().get(x).getStartTime()
+								+ presentation.getSlides().get(i).getImageList().get(x).getDuration()),
+						visible_value_end);
+				System.out.println("imageCanvas " + x + " duration time: "
+						+ presentation.getSlides().get(i).getImageList().get(x).getDuration());
 				timeline.getKeyFrames().add(visible_end_time);
 			}
 
 			AnchorPane anchor = new AnchorPane();
-			anchor.getChildren().add(imageCanvas);  
+			anchor.getChildren().add(imageCanvas);
 			slidePane.getChildren().addAll(anchor);
 		}
-		for (int x = 0; x < presentation.getSlides().get(i).getPolygonList().size(); x++)
-		{
+		for (int x = 0; x < presentation.getSlides().get(i).getPolygonList().size(); x++) {
 			GraphicsHandler graphicsHandler = new GraphicsHandler();
-			Canvas polygonCanvas = graphicsHandler.drawCanvas(presentation.getSlides().get(i).getPolygonList().get(x), width, height);
+			Canvas polygonCanvas = graphicsHandler
+					.drawCanvas(presentation.getSlides().get(i).getPolygonList().get(x), width, height);
 
 			// First be not visible;
 			polygonCanvas.setVisible(false);
-			// Ensure the image will be shown, even if there is no start time
-			if(presentation.getSlides().get(i).getPolygonList().get(x).getStartTime() == 0)
-			{
+			// Ensure the image will be shown, even if there is no start
+			// time
+			if (presentation.getSlides().get(i).getPolygonList().get(x).getStartTime() == 0) {
 				polygonCanvas.setVisible(true);
 			}
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(polygonCanvas.visibleProperty(), true);
-			KeyFrame visible_start_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getPolygonList().get(x).getStartTime()), visible_value_start);
-			System.out.println("polygonCanvas "  + x + " start time: " + presentation.getSlides().get(i).getPolygonList().get(x).getStartTime());
+			KeyFrame visible_start_time = new KeyFrame(
+					Duration.millis(presentation.getSlides().get(i).getPolygonList().get(x).getStartTime()),
+					visible_value_start);
+			System.out.println("polygonCanvas " + x + " start time: "
+					+ presentation.getSlides().get(i).getPolygonList().get(x).getStartTime());
 			timeline.getKeyFrames().add(visible_start_time);
 			// Add "Duration" or end time to the timeline
-			if((presentation.getSlides().get(i).getPolygonList().get(x).getDuration() > 0))
-			{
+			if ((presentation.getSlides().get(i).getPolygonList().get(x).getDuration() > 0)) {
 				KeyValue visible_value_end = new KeyValue(polygonCanvas.visibleProperty(), false);
-				KeyFrame visible_end_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getPolygonList().get(x).getStartTime() + 
-						presentation.getSlides().get(i).getPolygonList().get(x).getDuration()), visible_value_end);
-				System.out.println("polygonCanvas " + x + " duration time: " + presentation.getSlides().get(i).getPolygonList().get(x).getDuration());
+				KeyFrame visible_end_time = new KeyFrame(
+						Duration.millis(presentation.getSlides().get(i).getPolygonList().get(x).getStartTime()
+								+ presentation.getSlides().get(i).getPolygonList().get(x).getDuration()),
+						visible_value_end);
+				System.out.println("polygonCanvas " + x + " duration time: "
+						+ presentation.getSlides().get(i).getPolygonList().get(x).getDuration());
 				timeline.getKeyFrames().add(visible_end_time);
 			}
 
@@ -136,32 +144,37 @@ public class SlideHandler {
 			anchor.getChildren().add(polygonCanvas);
 			slidePane.getChildren().addAll(anchor);
 		}
-		
-		for (int x = 0; x < presentation.getSlides().get(i).getShapeList().size(); x++)
-		{
+
+		for (int x = 0; x < presentation.getSlides().get(i).getShapeList().size(); x++) {
 
 			GraphicsHandler graphicsHandler = new GraphicsHandler();
-			Canvas shapeCanvas = graphicsHandler.drawCanvas(presentation.getSlides().get(i).getShapeList().get(x), width, height);
+			Canvas shapeCanvas = graphicsHandler.drawCanvas(presentation.getSlides().get(i).getShapeList().get(x),
+					width, height);
 
 			// First be not visible;
 			shapeCanvas.setVisible(false);
-			// Ensure the image will be shown, even if there is no start time
-			if(presentation.getSlides().get(i).getShapeList().get(x).getStartTime() == 0)
-			{
+			// Ensure the image will be shown, even if there is no start
+			// time
+			if (presentation.getSlides().get(i).getShapeList().get(x).getStartTime() == 0) {
 				shapeCanvas.setVisible(true);
 			}
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(shapeCanvas.visibleProperty(), true);
-			KeyFrame visible_start_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getShapeList().get(x).getStartTime()), visible_value_start);
-			System.out.println("shapeCanvas "  + x + " start time: " + presentation.getSlides().get(i).getShapeList().get(x).getStartTime());
+			KeyFrame visible_start_time = new KeyFrame(
+					Duration.millis(presentation.getSlides().get(i).getShapeList().get(x).getStartTime()),
+					visible_value_start);
+			System.out.println("shapeCanvas " + x + " start time: "
+					+ presentation.getSlides().get(i).getShapeList().get(x).getStartTime());
 			timeline.getKeyFrames().add(visible_start_time);
 			// Add "Duration" or end time to the timeline
-			if((presentation.getSlides().get(i).getShapeList().get(x).getDuration() > 0))
-			{
+			if ((presentation.getSlides().get(i).getShapeList().get(x).getDuration() > 0)) {
 				KeyValue visible_value_end = new KeyValue(shapeCanvas.visibleProperty(), false);
-				KeyFrame visible_end_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getShapeList().get(x).getStartTime() + 
-						presentation.getSlides().get(i).getShapeList().get(x).getDuration()), visible_value_end);
-				System.out.println("shapeCanvas " + x + " duration time: " + presentation.getSlides().get(i).getShapeList().get(x).getDuration());
+				KeyFrame visible_end_time = new KeyFrame(
+						Duration.millis(presentation.getSlides().get(i).getShapeList().get(x).getStartTime()
+								+ presentation.getSlides().get(i).getShapeList().get(x).getDuration()),
+						visible_value_end);
+				System.out.println("shapeCanvas " + x + " duration time: "
+						+ presentation.getSlides().get(i).getShapeList().get(x).getDuration());
 				timeline.getKeyFrames().add(visible_end_time);
 			}
 
@@ -169,32 +182,36 @@ public class SlideHandler {
 			anchor.getChildren().add(shapeCanvas);
 			slidePane.getChildren().addAll(anchor);
 		}
-		for (int x = 0; x < presentation.getSlides().get(i).getTextList().size(); x++)
-		{
+		for (int x = 0; x < presentation.getSlides().get(i).getTextList().size(); x++) {
 			TextHandler textHandler = new TextHandler();
-			textHandler.setWindowSize(width,height);
+			textHandler.setWindowSize(width, height);
 			TextFlow textFlow = textHandler.setText(presentation.getSlides().get(i).getTextList().get(x));
 			textFlow.setTextAlignment(TextAlignment.JUSTIFY);
 
 			// First be not visible;
 			textFlow.setVisible(false);
-			// Ensure the image will be shown, even if there is no start time
-			if((presentation.getSlides().get(i).getTextList().get(x).getStartTime() <= 0))
-			{
+			// Ensure the image will be shown, even if there is no start
+			// time
+			if ((presentation.getSlides().get(i).getTextList().get(x).getStartTime() <= 0)) {
 				textFlow.setVisible(true);
 			}
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(textFlow.visibleProperty(), true);
-			KeyFrame visible_start_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getTextList().get(x).getStartTime()), visible_value_start);
-			System.out.println("textFlow " + x + " start time: " + presentation.getSlides().get(i).getTextList().get(x).getStartTime());
+			KeyFrame visible_start_time = new KeyFrame(
+					Duration.millis(presentation.getSlides().get(i).getTextList().get(x).getStartTime()),
+					visible_value_start);
+			System.out.println("textFlow " + x + " start time: "
+					+ presentation.getSlides().get(i).getTextList().get(x).getStartTime());
 			timeline.getKeyFrames().add(visible_start_time);
 			// Add "Duration" or end time to the timeline
-			if((presentation.getSlides().get(i).getTextList().get(x).getDuration() > 0))
-			{
+			if ((presentation.getSlides().get(i).getTextList().get(x).getDuration() > 0)) {
 				KeyValue visible_value_end = new KeyValue(textFlow.visibleProperty(), false);
-				KeyFrame visible_end_time = new KeyFrame(Duration.millis(presentation.getSlides().get(i).getTextList().get(x).getStartTime() + 
-						presentation.getSlides().get(i).getTextList().get(x).getDuration()), visible_value_end);
-				System.out.println("textFlow " + x + " duration time: " + presentation.getSlides().get(i).getTextList().get(x).getDuration());
+				KeyFrame visible_end_time = new KeyFrame(
+						Duration.millis(presentation.getSlides().get(i).getTextList().get(x).getStartTime()
+								+ presentation.getSlides().get(i).getTextList().get(x).getDuration()),
+						visible_value_end);
+				System.out.println("textFlow " + x + " duration time: "
+						+ presentation.getSlides().get(i).getTextList().get(x).getDuration());
 				timeline.getKeyFrames().add(visible_end_time);
 			}
 
@@ -203,11 +220,10 @@ public class SlideHandler {
 			slidePane.getChildren().addAll(anchor);
 
 		}
-		for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++)
-		{
-
-			//TODO add timing
-			MediaFx videoPlayer = new MediaFx (presentation.getSlides().get(i).getVideoList().get(x), 0.3, 0.3);
+		for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++) {
+			// Will only allow one video player (but width and Height
+			// TODO add timing and catch for two videos made
+			videoPlayer = new MediaFx(presentation.getSlides().get(i).getVideoList().get(x), 0.3, 0.3);
 			AnchorPane anchor = new AnchorPane();
 			Group group = new Group();
 			anchor.getChildren().add(group);
@@ -215,21 +231,40 @@ public class SlideHandler {
 
 			slidePane.getChildren().addAll(anchor);
 		}
-		for (int x = 0; x < presentation.getSlides().get(i).getAudioList().size(); x++)
-		{
-			//TODO add timing
-			MediaFx audioPlayer = new MediaFx(presentation.getSlides().get(i).getAudioList().get(x));
+		for (int x = 0; x < presentation.getSlides().get(i).getAudioList().size(); x++) {
+			// TODO add timing
+			audioPlayer = new MediaFx(presentation.getSlides().get(i).getAudioList().get(x));
 			Group group = new Group();
 			AnchorPane anchor = new AnchorPane();
 			group.getChildren().add(audioPlayer.createContent(scene));
 			anchor.getChildren().add(group);
 			slidePane.getChildren().addAll(anchor);
 		}
-		
+
 		timeline.play();
+
 
 
 		return slidePane;
 	}
+
+	public void stop(){
+
+		try{
+			videoPlayer.stop();
+			audioPlayer.stop();
+			audioPlayer.getMediaPlayer().dispose();
+			audioPlayer.getMediaPlayer().pause();
+			audioPlayer.getMediaPlayer().stop();
+
+		}
+		catch(Exception e)
+		{
+			System.out.println("No media");
+		}
+
+		return;
+	}
+
 }
 

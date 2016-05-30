@@ -11,7 +11,6 @@
 * Description: This class tests functions to compress, decompress, delete  and copy files.
 */
 
-
 package zipping;
 
 public class ZipTest
