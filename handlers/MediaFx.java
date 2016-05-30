@@ -119,7 +119,8 @@ public class MediaFx {
 	 * static boolean <tt>AUDIO</tt>.
 	 * 
 	 * @param startTime time at which the audio player appears on screen.
-	 * @param duration duration of the audio player on screen.
+	 * @param duration duration of the 
+ player on screen.
 	 * @param sourceFile name of the .wav file to be played.
 	 * @param loop boolean to control auto-replay of the media.
 	 */
@@ -402,9 +403,8 @@ public class MediaFx {
 	 * Stops the media in the player.
 	 */
 	public void stop() {
-		//if (mediaType == VIDEO) 
-			//vc.stop();
-		//else
+			vc.stop();
+			
 			vc.dispose();
 	}
 	/**

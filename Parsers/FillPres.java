@@ -18,10 +18,10 @@ public class FillPres {
 		super();
 	}
 	
-	public Presentation fillPresentation(Presentation pres, String user, SlideItem slide) {
+	public Presentation fillPresentation(Presentation pres, String user, SlideItem slide, String titleCreated) {
 		
 		ArrayList<SlideItem> xmlSlideList = new ArrayList<SlideItem>();
-		DocumentInfo docInfo = new DocumentInfo("title",user,"1.0","Created presentation by: " + user);
+		DocumentInfo docInfo = new DocumentInfo(titleCreated ,user ,"1.0" ,"Created presentation by: " + user);
 		DefaultsItem defaults = new DefaultsItem();
 		ImageItem backgroundImage = new ImageItem(0,0,0f,0f,1f,1f);
 		

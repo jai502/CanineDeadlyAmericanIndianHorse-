@@ -219,7 +219,12 @@ public class Zipper{
 		try
 		{
 			inputStream = new FileInputStream(sourceFile);
-			outputStream = new FileOutputStream(destFile);
+			try {
+				outputStream = new FileOutputStream(destFile);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			byte[] buffer = new byte[1024];
 			int bytesToRead;
@@ -234,6 +239,15 @@ public class Zipper{
 			inputStream.close();
 			outputStream.close();
 		}
+	}
+	
+	//a method to scan for a file extension
+	public static String scan(String filepath)
+	{
+		String extension;
+		extension = filepath.substring(filepath.lastIndexOf(".")+1,filepath.length());
+		return extension;
+		
 	}
 	
 	//a simple method to create a folder

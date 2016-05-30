@@ -3,18 +3,21 @@
  * First version created by: Callum Silver
  * Date of first version: 26th May 2016
  * 
- * Last version by: Callum Silver
- * Date of last update: 26th May 2016
+ * Last version by: Callum Silver & Joseph Ingleby
+ * Date of last update: 29th May 2016
  * Version number: 1.0
  * 
  * Commit date: 26th May 2016
  * Description: This class creates a presentation xml file
  * from user inputs
+ * Update: now stores all media in a new folder along with the presentation XML
  */
 
 package Parsers;
 
 import java.io.File;
+import java.io.IOException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,9 +33,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Objects.Presentation;
+import zipping.Zipper;
 
 public class XMLCreator {
 
+	private static String temp = "temp";
+	private static String media = "media";
+	private static String createdPres = "createdPres";
+	private String audioLoc, videoLoc, imageLoc, csvLoc;
+	
+	
 	public XMLCreator() {
 	}
 
@@ -41,6 +51,8 @@ public class XMLCreator {
 			boolean containsText, boolean containsVideo, boolean containsAudio) 
 	{
 		try {
+			
+			
 
 			// Create document builder
 			DocumentBuilderFactory builderFac = DocumentBuilderFactory.newInstance();
@@ -137,7 +149,20 @@ public class XMLCreator {
 					for (int x = 0; x < presentation.getSlides().get(i).getImageList().size(); x++) 
 					{
 						Element image = presentationDoc.createElement("image");
-
+						imageLoc = (presentation.getSlides().get(i).getImageList().get(x).getSourceFile());
+						
+						try {
+							Zipper.makeFolder(temp + File.separator + createdPres);
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
+							Zipper.copyFile(imageLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "image"+i+"."+Zipper.scan(imageLoc));
+							imageLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "image" + i + "." + Zipper.scan(imageLoc));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println(imageLoc);
+						presentation.getSlides().get(i).getImageList().get(x).setSourceFile(imageLoc);
+						
 						// Image Attributes (height, ystart, xstart, sourcefile,
 						// width, startTime, Duration)
 						Attr imageHeight = presentationDoc.createAttribute("height");
@@ -273,6 +298,19 @@ public class XMLCreator {
 					{
 						Element polygon = presentationDoc.createElement("polygon");
 
+						csvLoc = (presentation.getSlides().get(i).getPolygonList().get(x).getSourceFile());
+						
+						try {
+							Zipper.makeFolder(temp + File.separator + createdPres);
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
+							Zipper.copyFile(csvLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "csv"+i+"."+Zipper.scan(csvLoc));
+							csvLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "csv" + i + "." + Zipper.scan(csvLoc));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						presentation.getSlides().get(i).getPolygonList().get(x).setSourceFile(csvLoc);
 						// polygon Attributes (Source, start time, duration,
 						// fill colour, line colour)
 						Attr polySource = presentationDoc.createAttribute("sourceFile");
@@ -391,7 +429,21 @@ public class XMLCreator {
 					for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++)
 					{
 						Element video = presentationDoc.createElement("video");
-
+						videoLoc = (presentation.getSlides().get(i).getVideoList().get(x).getSourceFile());
+						
+						try {
+							Zipper.makeFolder(temp + File.separator + createdPres);
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
+							Zipper.copyFile(videoLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "video"+i+"."+Zipper.scan(videoLoc));
+							videoLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "video" + i + "." + Zipper.scan(videoLoc));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						presentation.getSlides().get(i).getVideoList().get(x).setSourceFile(videoLoc);
+						
+						
 						// video Attributes (ystart, xstart, sourcefile,
 						// duration, startTime, loop)
 
@@ -432,7 +484,20 @@ public class XMLCreator {
 					for (int x = 0; x < presentation.getSlides().get(i).getAudioList().size(); x++)
 					{
 						Element audio = presentationDoc.createElement("audio");
-
+						audioLoc = (presentation.getSlides().get(i).getAudioList().get(x).getSourceFile());
+						
+						try {
+							Zipper.makeFolder(temp + File.separator + createdPres);
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
+							Zipper.copyFile(audioLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "audio"+i+"."+Zipper.scan(audioLoc));
+							videoLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "audio" + i + "." + Zipper.scan(audioLoc));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						presentation.getSlides().get(i).getAudioList().get(x).setSourceFile(audioLoc);
+						
 						// audio Attributes (sourcefile, duration, startTime,
 						// loop)
 						Attr audioSource = presentationDoc.createAttribute("sourceFile");
@@ -453,7 +518,6 @@ public class XMLCreator {
 						audio.setAttributeNode(audioStart);
 						audio.setAttributeNode(audioDuration);
 						audio.setAttributeNode(audioLoop);
-
 						slide.appendChild(audio);
 					}
 				}
@@ -466,9 +530,11 @@ public class XMLCreator {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			DOMSource source = new DOMSource(presentationDoc);
-			StreamResult result = new StreamResult(new File("C:/Users/Callum/Desktop/pres.xml"));
+			StreamResult result = new StreamResult(new File(temp + File.separator + createdPres + File.separator + "presentation.xml"));
 			transformer.transform(source, result);
-
+			
+			
+			
 			System.out.println("created XML file");
 
 		} catch (ParserConfigurationException pce) {

@@ -58,6 +58,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -93,6 +94,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -195,8 +197,8 @@ public class MainGuiPagination extends Application {
 	private Presentation createdPres;
 	private BorderPane createPresentationScreenLayout;
 	private Button btnNext, btnCreate, btnOpenMediaDty;
-	private Label mediaLanguage, mediaTranslation, startTime, endTime;
-	private TextField startTimeField, endTimeField;
+	private Label titleLabel, languageLabel, mediaLanguage, mediaTranslation, startTime, endTime;
+	private TextField titleField, languageField, startTimeField, endTimeField;
 	private TextArea mediaLanguageText, mediaTranslationText;
 	private VideoItem videoItem = new VideoItem();
 	private AudioItem audioItem = new AudioItem();
@@ -207,6 +209,7 @@ public class MainGuiPagination extends Application {
 	private String mediaPathname;
 	private boolean containsVideo = false;
 	private boolean containsAudio = false;
+	private String titleCreated;
 
 	/* variables for the commentsMenu */
 	private BorderPane commentsScreenLayout;
@@ -538,68 +541,72 @@ public class MainGuiPagination extends Application {
 	/*
 	 * Method which will add the panes (each slide) to the presentation screen
 	 */
-//	private StackPane presentationCanvas() throws IOException {
-//
-//		Image img = new Image(getClass().getResource("animal1.jpg").openStream());
-//		Canvas canvas = new Canvas(presentationLayout.getWidth(), presentationLayout.getHeight());
-//		GraphicsContext gc = canvas.getGraphicsContext2D();
-//		// Draw the image to the canvas
-//		gc.drawImage(img, 0, 0, presentationLayout.getWidth(), presentationLayout.getHeight());
-//
-//		/**** Binding and Resize attributes to the canvas ****/
-//		canvas.widthProperty().bind(presentationLayout.widthProperty());
-//		canvas.heightProperty().bind(presentationLayout.heightProperty());
-//
-//		final ResizeChangeListener resizeChangeListener = new ResizeChangeListener(presentationLayout, gc, img);
-//
-//		canvas.widthProperty().addListener(resizeChangeListener);
-//		canvas.heightProperty().addListener(resizeChangeListener);
-//
-//		/******************************************************/
-//
-//		// Make a new root node
-//		StackPane pane = new StackPane();
-//		// Add the canvas to the root node
-//		pane.getChildren().add(canvas);
-//
-//		return pane;
-//	}
+	// private StackPane presentationCanvas() throws IOException {
+	//
+	// Image img = new
+	// Image(getClass().getResource("animal1.jpg").openStream());
+	// Canvas canvas = new Canvas(presentationLayout.getWidth(),
+	// presentationLayout.getHeight());
+	// GraphicsContext gc = canvas.getGraphicsContext2D();
+	// // Draw the image to the canvas
+	// gc.drawImage(img, 0, 0, presentationLayout.getWidth(),
+	// presentationLayout.getHeight());
+	//
+	// /**** Binding and Resize attributes to the canvas ****/
+	// canvas.widthProperty().bind(presentationLayout.widthProperty());
+	// canvas.heightProperty().bind(presentationLayout.heightProperty());
+	//
+	// final ResizeChangeListener resizeChangeListener = new
+	// ResizeChangeListener(presentationLayout, gc, img);
+	//
+	// canvas.widthProperty().addListener(resizeChangeListener);
+	// canvas.heightProperty().addListener(resizeChangeListener);
+	//
+	// /******************************************************/
+	//
+	// // Make a new root node
+	// StackPane pane = new StackPane();
+	// // Add the canvas to the root node
+	// pane.getChildren().add(canvas);
+	//
+	// return pane;
+	// }
 
 	/* Method which will create extra controls for the presentation screen */
-//	private HBox controls() {
-//		HBox controls = new HBox(8); // Spacing of 8
-//
-//		Button next = new Button("Next");
-//		next.setPrefSize(100, 50);
-//		next.setId("Next"); // String ID for gui_style.css
-//
-//		Button previous = new Button("Previous");
-//		previous.setPrefSize(100, 50);
-//		previous.setId("Previous"); // String ID for gui_style.css
-//
-//		// Add the buttons to the HBox
-//		controls.getChildren().addAll(next, previous);
-//
-//		// Event handler for the Next Button
-//		next.setOnAction(new EventHandler<ActionEvent>() {
-//			@Override
-//			public void handle(ActionEvent e) {
-//				// Increase PageIndex by 1
-//				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() + 1);
-//			}
-//		});
-//
-//		// Event handler for the Previous Button
-//		previous.setOnAction(new EventHandler<ActionEvent>() {
-//			@Override
-//			public void handle(ActionEvent e) {
-//				// Decrease PageIndex by 1
-//				pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() - 1);
-//			}
-//		});
-//
-//		return controls;
-//	}
+	// private HBox controls() {
+	// HBox controls = new HBox(8); // Spacing of 8
+	//
+	// Button next = new Button("Next");
+	// next.setPrefSize(100, 50);
+	// next.setId("Next"); // String ID for gui_style.css
+	//
+	// Button previous = new Button("Previous");
+	// previous.setPrefSize(100, 50);
+	// previous.setId("Previous"); // String ID for gui_style.css
+	//
+	// // Add the buttons to the HBox
+	// controls.getChildren().addAll(next, previous);
+	//
+	// // Event handler for the Next Button
+	// next.setOnAction(new EventHandler<ActionEvent>() {
+	// @Override
+	// public void handle(ActionEvent e) {
+	// // Increase PageIndex by 1
+	// pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() + 1);
+	// }
+	// });
+	//
+	// // Event handler for the Previous Button
+	// previous.setOnAction(new EventHandler<ActionEvent>() {
+	// @Override
+	// public void handle(ActionEvent e) {
+	// // Decrease PageIndex by 1
+	// pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() - 1);
+	// }
+	// });
+	//
+	// return controls;
+	// }
 
 	/* Method to add menu items and buttons for all GUIs */
 	public MenuBar menuItems() {
@@ -830,11 +837,14 @@ public class MainGuiPagination extends Application {
 			@Override
 			public Node call(Integer pageIndex) {
 				try {
-					// TODO
+					// TODO stopping the media (it still plays when you close the pres too
+						sh.stop();
+						System.out.println("media Stopped");
+						
 					if ((pagination.getCurrentPageIndex() + 1) == pagination.getPageCount()) {
 						System.out.println("You have reached the end of the presentation");
 					}
-
+					
 					slidePane = sh.getSlideStack(tempPres, pageIndex, width, height - 100, presentationMenu);
 
 					/* Mouse event handler for the canvas */
@@ -844,9 +854,11 @@ public class MainGuiPagination extends Application {
 						@Override
 						public void handle(MouseEvent mouseEvent) {
 							if (mouseEvent.isPrimaryButtonDown()) {
+								sh.stop();
 								pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() + 1);
 							}
 							if (mouseEvent.isSecondaryButtonDown()) {
+								sh.stop();
 								pagination.setCurrentPageIndex(pagination.getCurrentPageIndex() - 1);
 							}
 
@@ -869,35 +881,30 @@ public class MainGuiPagination extends Application {
 	 */
 	private File openSelectedFile(File xmlFile) {
 
-		if (xmlFile != null) 
-		{
-			
+		if (xmlFile != null) {
+
 			// Temporary folder clearing
-			
-			if (oldSelected == null){
+
+			if (oldSelected == null) {
 				delete = false;
-			}
-			else if (xmlFile.getAbsolutePath() != oldSelected.getAbsolutePath()){
+			} else if (xmlFile.getAbsolutePath() != oldSelected.getAbsolutePath()) {
 				System.out.println(oldSelected.getAbsolutePath());
 				System.out.println(xmlFile.getAbsolutePath());
 				delete = true;
-			}
-			else
-			{
+			} else {
 				System.out.println(oldSelected.getAbsolutePath());
 				System.out.println(xmlFile.getAbsolutePath());
 				delete = false;
 			}
-			
-			if (delete == true)
-			{
-				if (oldSelected.getParent().contains("temp") && (presentationIdOld != null)){
+
+			if (delete == true) {
+				if (oldSelected.getParent().contains("temp") && (presentationIdOld != null)) {
 					Zipper.deleteFolder("temp" + File.separator + presentationIdOld);
 					System.out.println("DELETED");
 					delete = false;
-				}		
+				}
 			}
-			
+
 			window.setTitle("Presentation");
 			// Change scene to presentationMenu
 			window.setScene(presentationMenu);
@@ -933,9 +940,8 @@ public class MainGuiPagination extends Application {
 			presentationLayout.setCenter(pagination);
 			window.setTitle("Presentation");
 			window.setScene(presentationMenu);
-			
+
 			oldSelected = xmlFile;
-			
 
 		} else {
 			System.out.println("File selection cancelled!");
@@ -1187,8 +1193,7 @@ public class MainGuiPagination extends Application {
 
 		// Event handler to get text from the text field
 		// when button is pressed.
-		btnLogIn.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnLogIn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				sUsernameLogin = textFieldName.getText();
@@ -1236,16 +1241,13 @@ public class MainGuiPagination extends Application {
 				}
 			}
 		});
-		
+
 		// Event handler to get text from the text field
 		// when button is pressed.
-		textFieldPassword1.setOnKeyPressed(new EventHandler<KeyEvent>() 
-		{
+		textFieldPassword1.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(KeyEvent ke) 
-			{
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
+			public void handle(KeyEvent ke) {
+				if (ke.getCode().equals(KeyCode.ENTER)) {
 					sUsernameLogin = textFieldName.getText();
 					sPasswordLogin = textFieldPassword1.getText();
 
@@ -1258,7 +1260,8 @@ public class MainGuiPagination extends Application {
 						response1.setFill(Color.RED);
 					}
 
-					// Store the data and send to mysql database to check validity
+					// Store the data and send to mysql database to check
+					// validity
 					else {
 						// Set the username and password fields in local
 						// LoginDetails class
@@ -1596,20 +1599,18 @@ public class MainGuiPagination extends Application {
 			}
 
 		});
-		
-		textFieldTitle.setOnKeyPressed(new EventHandler<KeyEvent>()
-		{
+
+		textFieldTitle.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(KeyEvent ke)
-			{
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
+			public void handle(KeyEvent ke) {
+				if (ke.getCode().equals(KeyCode.ENTER)) {
 
 					title = textFieldTitle.getText();
 					author = textFieldAuthor.getText();
 					language = textFieldLanguage.getText();
 
-					// Set the username and password fields in local SignUpDetails class
+					// Set the username and password fields in local
+					// SignUpDetails class
 					presentationShell.setTitle(title);
 					presentationShell.setAuthor(author);
 					presentationShell.setLanguage(language);
@@ -1621,51 +1622,38 @@ public class MainGuiPagination extends Application {
 					response3.setText("Searching for results");
 					response3.setFill(Color.ALICEBLUE);
 
-					//ArrayList<String> searchList = new ArrayList<String>();
+					// ArrayList<String> searchList = new ArrayList<String>();
 					searchList.clear();
 					idList.clear();
 
-					for (int i = 0; i < searchResults.size(); i++)
-					{
-						for(int x = 0; x < searchResults.get(i).length; x++)
-						{
-							if (x == 0)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						for (int x = 0; x < searchResults.get(i).length; x++) {
+							if (x == 0) {
 								idList.add(searchResults.get(i)[x]);
-							}
-							else if (x == 1)
-							{
+							} else if (x == 1) {
 								searchList.add("Title: " + searchResults.get(i)[x] + "\n");
-							}
-							else if (x == 2)
-							{	
-								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x]+ "\n");
+							} else if (x == 2) {
+								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x] + "\n");
 								searchList.remove(i);
-							}
-							else if (x == 3)
-							{
+							} else if (x == 3) {
 								searchList.add(searchList.get(i) + "Language: " + searchResults.get(i)[x]);
 								searchList.remove(i);
 							}
 						}
 					}
 
-					//				userScreenLayout.setRight(searchDetails());
+					// userScreenLayout.setRight(searchDetails());
 					System.out.println(searchList);
 
 					observableListSearch = FXCollections.observableList(searchList);
 
-
-					for(int i = 0; i<searchResults.size(); i++)
-					{
-						System.out.print("Presentation " + (i+1) + " is: ");
-						for (int j = 0; j < 4; j++)
-						{
-							switch(j)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						System.out.print("Presentation " + (i + 1) + " is: ");
+						for (int j = 0; j < 4; j++) {
+							switch (j) {
 							case 0:
 								System.out.print(" '" + searchResults.get(i)[j] + "' ");
-								//listView.setItems(searchResults.get(i)[j]);
+								// listView.setItems(searchResults.get(i)[j]);
 								break;
 							case 1:
 								System.out.print("by " + searchResults.get(i)[j] + " ");
@@ -1685,21 +1673,19 @@ public class MainGuiPagination extends Application {
 				}
 			}
 
-		}); 
+		});
 
-		textFieldAuthor.setOnKeyPressed(new EventHandler<KeyEvent>()
-		{
+		textFieldAuthor.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(KeyEvent ke)
-			{
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
+			public void handle(KeyEvent ke) {
+				if (ke.getCode().equals(KeyCode.ENTER)) {
 
 					title = textFieldTitle.getText();
 					author = textFieldAuthor.getText();
 					language = textFieldLanguage.getText();
 
-					// Set the username and password fields in local SignUpDetails class
+					// Set the username and password fields in local
+					// SignUpDetails class
 					presentationShell.setTitle(title);
 					presentationShell.setAuthor(author);
 					presentationShell.setLanguage(language);
@@ -1711,51 +1697,38 @@ public class MainGuiPagination extends Application {
 					response3.setText("Searching for results");
 					response3.setFill(Color.ALICEBLUE);
 
-					//ArrayList<String> searchList = new ArrayList<String>();
+					// ArrayList<String> searchList = new ArrayList<String>();
 					searchList.clear();
 					idList.clear();
 
-					for (int i = 0; i < searchResults.size(); i++)
-					{
-						for(int x = 0; x < searchResults.get(i).length; x++)
-						{
-							if (x == 0)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						for (int x = 0; x < searchResults.get(i).length; x++) {
+							if (x == 0) {
 								idList.add(searchResults.get(i)[x]);
-							}
-							else if (x == 1)
-							{
+							} else if (x == 1) {
 								searchList.add("Title: " + searchResults.get(i)[x] + "\n");
-							}
-							else if (x == 2)
-							{	
-								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x]+ "\n");
+							} else if (x == 2) {
+								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x] + "\n");
 								searchList.remove(i);
-							}
-							else if (x == 3)
-							{
+							} else if (x == 3) {
 								searchList.add(searchList.get(i) + "Language: " + searchResults.get(i)[x]);
 								searchList.remove(i);
 							}
 						}
 					}
 
-					//				userScreenLayout.setRight(searchDetails());
+					// userScreenLayout.setRight(searchDetails());
 					System.out.println(searchList);
 
 					observableListSearch = FXCollections.observableList(searchList);
 
-
-					for(int i = 0; i<searchResults.size(); i++)
-					{
-						System.out.print("Presentation " + (i+1) + " is: ");
-						for (int j = 0; j < 4; j++)
-						{
-							switch(j)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						System.out.print("Presentation " + (i + 1) + " is: ");
+						for (int j = 0; j < 4; j++) {
+							switch (j) {
 							case 0:
 								System.out.print(" '" + searchResults.get(i)[j] + "' ");
-								//listView.setItems(searchResults.get(i)[j]);
+								// listView.setItems(searchResults.get(i)[j]);
 								break;
 							case 1:
 								System.out.print("by " + searchResults.get(i)[j] + " ");
@@ -1775,21 +1748,19 @@ public class MainGuiPagination extends Application {
 				}
 			}
 
-		}); 
+		});
 
-		textFieldLanguage.setOnKeyPressed(new EventHandler<KeyEvent>()
-		{
+		textFieldLanguage.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
-			public void handle(KeyEvent ke)
-			{
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
+			public void handle(KeyEvent ke) {
+				if (ke.getCode().equals(KeyCode.ENTER)) {
 
 					title = textFieldTitle.getText();
 					author = textFieldAuthor.getText();
 					language = textFieldLanguage.getText();
 
-					// Set the username and password fields in local SignUpDetails class
+					// Set the username and password fields in local
+					// SignUpDetails class
 					presentationShell.setTitle(title);
 					presentationShell.setAuthor(author);
 					presentationShell.setLanguage(language);
@@ -1801,51 +1772,38 @@ public class MainGuiPagination extends Application {
 					response3.setText("Searching for results");
 					response3.setFill(Color.ALICEBLUE);
 
-					//ArrayList<String> searchList = new ArrayList<String>();
+					// ArrayList<String> searchList = new ArrayList<String>();
 					searchList.clear();
 					idList.clear();
 
-					for (int i = 0; i < searchResults.size(); i++)
-					{
-						for(int x = 0; x < searchResults.get(i).length; x++)
-						{
-							if (x == 0)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						for (int x = 0; x < searchResults.get(i).length; x++) {
+							if (x == 0) {
 								idList.add(searchResults.get(i)[x]);
-							}
-							else if (x == 1)
-							{
+							} else if (x == 1) {
 								searchList.add("Title: " + searchResults.get(i)[x] + "\n");
-							}
-							else if (x == 2)
-							{	
-								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x]+ "\n");
+							} else if (x == 2) {
+								searchList.add(searchList.get(i) + "Author: " + searchResults.get(i)[x] + "\n");
 								searchList.remove(i);
-							}
-							else if (x == 3)
-							{
+							} else if (x == 3) {
 								searchList.add(searchList.get(i) + "Language: " + searchResults.get(i)[x]);
 								searchList.remove(i);
 							}
 						}
 					}
 
-					//				userScreenLayout.setRight(searchDetails());
+					// userScreenLayout.setRight(searchDetails());
 					System.out.println(searchList);
 
 					observableListSearch = FXCollections.observableList(searchList);
 
-
-					for(int i = 0; i<searchResults.size(); i++)
-					{
-						System.out.print("Presentation " + (i+1) + " is: ");
-						for (int j = 0; j < 4; j++)
-						{
-							switch(j)
-							{
+					for (int i = 0; i < searchResults.size(); i++) {
+						System.out.print("Presentation " + (i + 1) + " is: ");
+						for (int j = 0; j < 4; j++) {
+							switch (j) {
 							case 0:
 								System.out.print(" '" + searchResults.get(i)[j] + "' ");
-								//listView.setItems(searchResults.get(i)[j]);
+								// listView.setItems(searchResults.get(i)[j]);
 								break;
 							case 1:
 								System.out.print("by " + searchResults.get(i)[j] + " ");
@@ -1865,14 +1823,12 @@ public class MainGuiPagination extends Application {
 				}
 			}
 
-		}); 
+		});
 
 		// Event handler for btnLoadPres
-		btnLoadPres.setOnAction(new EventHandler<ActionEvent>() 
-		{
+		btnLoadPres.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) 
-			{
+			public void handle(ActionEvent e) {
 				presentationIndex = searchView.getSelectionModel().getSelectedIndex();
 				presentationID = idList.get(presentationIndex);
 				System.out.println("Presentation ID is: " + presentationID);
@@ -1883,35 +1839,32 @@ public class MainGuiPagination extends Application {
 				presentationLoad.setTitle(searchResults.get(presentationIndex)[1]);
 				presentationLoad.setAuthor(searchResults.get(presentationIndex)[2]);
 				presentationLoad.setLanguage(searchResults.get(presentationIndex)[3]);
-				
+
 				// TODO loadng downloaded pres
 				File download = new File("temp" + File.separator + presentationLoad.getId().toString() + ".pws");
-				if (!download.exists()) 
-				{
-					
+				if (!download.exists()) {
+
 					/************* Client/Server Communication ***************/
 					com.getPresentation(presentationLoad, "temp" + File.separator);
 					/*********************************************************/
 				}
-					// Unzip file
-					try {
-						Zipper.unzip(("temp" + File.separator + presentationLoad.getId().toString() + ".pws"), 
-								"temp" + File.separator + presentationLoad.getId()+File.separator);
-					} catch (IOException e1) {
-						System.out.println("Unable to unzip...");
-						e1.printStackTrace();
-					}
+				// Unzip file
+				try {
+					Zipper.deleteFolder("temp" + File.separator + "tempPres");
+					Zipper.unzip(("temp" + File.separator + presentationLoad.getId().toString() + ".pws"),
+							"temp" + File.separator + "tempPres" + File.separator);
+				} catch (IOException e1) {
+					System.out.println("Unable to unzip...");
+					e1.printStackTrace();
+				}
 
-				
-				
 				xmlPathname = "temp" + File.separator + "presentation.xml";
-				
-				File xmlFile = new File("temp" + File.separator + presentationLoad.getId()+ File.separator + "presentation.xml");
+
+				File xmlFile = new File("temp" + File.separator + "tempPres" + File.separator + "presentation.xml");
 				selectedFile = xmlFile;
-				
-				
+
 				openSelectedFile(selectedFile);
-				// presentation ID Old for deleting temp folders 
+				// presentation ID Old for deleting temp folders
 				presentationIdOld = presentationLoad.getId();
 			}
 		});
@@ -2005,18 +1958,35 @@ public class MainGuiPagination extends Application {
 		// Add padding
 		grid.setPadding(new Insets(25, 25, 25, 25));
 
+		titleField = new TextField();
+		titleField.setPrefSize(250, 10);
+		titleField.setPromptText("Enter The Title of the Presentation");
+		
+		languageField = new TextField();
+		languageField.setPrefSize(180, 10);
+		languageField.setPromptText("Enter The Language Used");
+		
+		titleLabel = new Label("Title:");
+		titleLabel.setId("titleLabel"); // Id for gui_style.css
+		// grid.add(startTime, 0, 2);
+		languageLabel = new Label("Language:");
+		languageLabel.setId("languageLabel"); // Id for gui_style.css
+		
+//		grid.add(titleField, 1, 0);
+//		grid.add(languageField, 3, 0);
+		
 		// Create the Default message
 		mediaLanguage = new Label("Video Language");
 		// mediaLanguage.setTextFill(Color.web("#0076a3"));
 		mediaLanguage.setId("mediaLanguage"); // Id for gui_style.css
 		// videoLanguage.setFill(Color.ALICEBLUE);
 		mediaLanguage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		grid.add(mediaLanguage, 0, 0, 3, 1);
+		grid.add(mediaLanguage, 0, 1, 3, 1);
 
 		mediaLanguageText = new TextArea();
 		mediaLanguageText.setPromptText("Enter Video Language Text");
 		mediaLanguageText.setPrefSize(400, 250);
-		grid.add(mediaLanguageText, 0, 1);
+		grid.add(mediaLanguageText, 0, 2);
 
 		startTime = new Label("Start Time:");
 		startTime.setId("startTime"); // Id for gui_style.css
@@ -2067,12 +2037,12 @@ public class MainGuiPagination extends Application {
 		mediaTranslation.setId("mediaTranslation"); // Id for gui_style.css
 		// videoLanguage.setFill(Color.ALICEBLUE);
 		mediaTranslation.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		// grid.add(videoTranslation, 0,3, 3, 1);
+		grid.add(mediaTranslation, 0, 4, 3, 1);
 
 		mediaTranslationText = new TextArea();
 		mediaTranslationText.setPromptText("Enter Video Translation Text");
 		mediaTranslationText.setPrefSize(400, 250);
-		grid.add(mediaTranslationText, 0, 4);
+		grid.add(mediaTranslationText, 0, 5);
 
 		btnNext = new Button("Next");
 		btnNext.setId("btnNext");
@@ -2084,34 +2054,47 @@ public class MainGuiPagination extends Application {
 		btnCreate.setId("btnCreate");
 		// grid.add(btnCreate, 2, 5);
 
+		HBox hbFirst = new HBox(10);
+		hbFirst.setAlignment(Pos.CENTER_LEFT);
+//		hbFirst.getChildren().addAll(titleLabel, titleField, languageLabel, languageField);
+		hbFirst.getChildren().addAll(titleField, languageField);
+		
 		// Creating a HBox area to add the labels and textfields
 		HBox hbText = new HBox(10);
-		hbText.setAlignment(Pos.BOTTOM_RIGHT);
+		hbText.setAlignment(Pos.CENTER_RIGHT);
 		hbText.getChildren().addAll(startTime, startTimeField, endTime, endTimeField);
 
 		// Creating a HBox area to add the labels and textfields
 		HBox hbButtons = new HBox(10);
-		hbButtons.setAlignment(Pos.BOTTOM_LEFT);
+		hbButtons.setAlignment(Pos.CENTER_LEFT);
 		hbButtons.getChildren().addAll(btnNext, btnOpenMediaDty, btnCreate);
 
-		grid.add(hbText, 0, 2);
-		grid.add(hbButtons, 0, 5);
+		grid.add(hbFirst, 0, 0);
+		grid.add(hbText, 0, 3);
+		grid.add(hbButtons, 0, 6);
 
 		// Event handler for btnNext
 		btnNext.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) {
-				if ((startTimeField.getText().isEmpty() || endTimeField.getText().isEmpty()
-						|| mediaLanguageText.getText().isEmpty() || mediaTranslationText.getText().isEmpty())) {
+			public void handle(ActionEvent e) 
+			{
+				if ((titleField.getText().isEmpty() || languageField.getText().isEmpty() || 
+						startTimeField.getText().isEmpty() || endTimeField.getText().isEmpty() 
+						|| mediaLanguageText.getText().isEmpty() || mediaTranslationText.getText().isEmpty())) 
+				{
 					// Do Nothing!!
 					System.out.println("You have empty fields, please fill in");
 				} else {
 					// More stuff here for saving!!!!!!!!!!
+					titleField.getText();
+					languageField.getText();
 					mediaLanguageText.getText();
 					mediaTranslationText.getText();
 					startTimeField.getText();
 					endTimeField.getText();
 
+					System.out.println("Your title is: " + titleField.getText());
+					System.out.println("Your language is: " + languageField.getText());
 					System.out.println("Your video text is: " + mediaLanguageText.getText());
 					System.out.println("Your translation text is: " + mediaTranslationText.getText());
 					System.out.println("Start time is: " + startTimeField.getText());
@@ -2119,6 +2102,8 @@ public class MainGuiPagination extends Application {
 
 					TextItem videoText = new TextItem();
 					TextItem transText = new TextItem();
+					
+					titleCreated = titleField.getText();
 
 					videoText.setText(mediaLanguageText.getText());
 					transText.setText(mediaTranslationText.getText());
@@ -2212,7 +2197,7 @@ public class MainGuiPagination extends Application {
 				}
 
 				FillPres fp = new FillPres();
-				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide);
+				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide, titleCreated);
 
 				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio);
 			}

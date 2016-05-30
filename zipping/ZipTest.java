@@ -26,9 +26,9 @@ public class ZipTest
         try 
         {
             Zipper.unzip("zipping/presentation.pws", "temp/");
-            Zipper.makeFolder("zipping/foldertest");
+            Zipper.makeFolder("zipping/temp");
             Zipper.zip("temp/", "zipping/test.pws");
-            Zipper.copyFile("zipping/test.pws", "zipping/test2.pws");
+            Zipper.copyFile("C:/Users/Callum/Desktop/test.pws", "zipping/temp/test3.pws" );
         }
         catch (Exception e) 
         {
