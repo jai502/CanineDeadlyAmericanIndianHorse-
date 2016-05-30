@@ -19,9 +19,10 @@ package server;
 import SQL.*;
 import com.*;
 
-
+import java.io.File;
 // java imports
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
@@ -89,200 +90,6 @@ public class StammtischServer {
 	
 	
 	
-	// sets up responses
-	public static void setUpRequests(){
-		// set up blank request array list
-		responses = new ArrayList<Response>();
-		responses.clear();
-		
-		// response to a ping
-		responses.add(new Response("PING"){
-			@Override public void respond(ClientRequestHandler handler){ 
-				handler.sendResponse(new RequestObject("PONG", null, handler.getOrder()));
-			}
-		});
-		
-		// response to a disconnect request
-		responses.add(new Response("DISCONNECT"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.log(true, "Disconnected");
-				handler.stop();
-			}
-		});
-	
-		// respond to login request
-		responses.add(new Response("REQUEST_LOGIN"){
-			@Override public void respond(ClientRequestHandler handler){
-				// get required objects from calling handler
-				RequestObject thisRequest = handler.getCurrentRequest();
-				SQLHandler SQLHandler = handler.getSQLHandler();
-				
-				// get the user object
-				User thisUser;
-				try {
-					thisUser = (User)thisRequest.param;
-				} catch (Exception e){
-					handler.respondFail("Malformed request");
-					return;
-				}
-				
-				// check that user exists 
-				if(SQLHandler.checkLoginDetails(thisUser)){
-					handler.log(handler.isLogging(), "Logged in as user: %s", thisUser.getUsername());
-					
-					// set handler user to this user
-					handler.setUser(thisUser);	
-					handler.respondOk(null);
-				}
-				
-				// invalid login, respond with failure message
-				else handler.respondFail("invalid login");
-			}
-		});
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_LOGOUT"){
-			@Override public void respond(ClientRequestHandler handler){
-				User thisUser = handler.getUser();
-				if (thisUser == null) {
-					// failed to log out (not logged in)
-					handler.respondFail("not logged in");
-				} else {
-					// logout successful
-					handler.respondOk(null);
-				}
-				
-				// log user out of server
-				handler.log(handler.isLogging(), "User '%s' logged out\n", thisUser.getUsername());
-				handler.setUser(null);
-			}
-		});	
-		
-		// respond to signup request
-		responses.add(new Response("REQUEST_SIGNUP"){
-			@Override public void respond(ClientRequestHandler handler){
-				// get required objects from calling handler
-				RequestObject thisRequest = handler.getCurrentRequest();
-				SQLHandler SQLHandler = handler.getSQLHandler();
-				
-				// request object for response
-				User thisUser = (User)thisRequest.param;
-				
-				// check that user doesn't already exist
-				if(SQLHandler.checkUser(thisUser)) 
-					handler.respondFail(new String("username already in use!"));
-				
-				// check that user object is valid for signup
-				else if(!thisUser.validForSignup()) 
-					handler.respondFail(new String("invalid signup information"));
-				
-				// Success! add user to the database & notify client
-				else{
-					SQLHandler.addUser(thisUser);
-					handler.respondOk(null);
-				}
-			}
-		});
-		
-		// search request handler
-		responses.add(new Response("REQUEST_SEARCH"){
-			@Override public void respond(ClientRequestHandler handler){
-				// get current request and sql handler
-				RequestObject thisRequest = handler.getCurrentRequest();
-				SQLHandler SQLHandler = handler.getSQLHandler();
-				PresentationShell presentation = null;
-				
-				// get the presentation object to respond with
-				try {
-					presentation = (PresentationShell)thisRequest.param;
-				} catch (Exception e){
-					handler.respondFail("malformed request");
-					e.printStackTrace();
-					return;
-				}
-				
-				// query the presentation database
-				ArrayList<String[]> searchResults = SQLHandler.searchPresentation(presentation);
-				
-				// generate request object
-				handler.respondOk(searchResults);
-			}
-		});
-		
-		// request download of presentation
-		responses.add(new Response("REQUEST_PRES"){
-			@Override public void respond(ClientRequestHandler handler){
-				// get current request and SQL handler
-				RequestObject thisRequest = handler.getCurrentRequest();
-				SQLHandler sql = handler.getSQLHandler();
-				PresentationShell presentation = null;
-				
-				// get presentation shell object
-				try {
-					presentation = (PresentationShell)thisRequest.param;
-				} catch (Exception e) {
-					handler.respondFail("malformed request");
-					e.printStackTrace();
-					return;
-				}
-				
-				// mark presentation as having being accessed by the user
-				sql.userFirstAccess(handler.getUser(), presentation);
-				
-				// get ID of the presentation that the client wants
-				Integer presId = presentation.getId();
-				
-				// open the file for transfer
-				String transferFailureReason = handler.sendFile("presentations/" + presId.toString() + ".zip");		
-				
-				// respond with failure of file transfer did not success
-				if(transferFailureReason != null){
-					handler.respondFail(transferFailureReason);
-					return;
-				} else {
-					handler.respondOk(null);
-				}
-			}
-		});
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_UPLOAD"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.respondFail(new String("not implemented!"));
-			}
-		});		
-
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_SET_VOTE"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.respondFail(new String("not implemented!"));
-			}
-		});	
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_GET_VOTE"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.respondFail(new String("not implemented!"));
-			}
-		});	
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_SET_COMMENT"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.respondFail(new String("not implemented!"));
-			}
-		});	
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_GET_COMMENT"){
-			@Override public void respond(ClientRequestHandler handler){
-				handler.respondFail(new String("not implemented!"));
-			}
-		});
-	}
-	
-	
-	
 	// Connection listener thread
 	// waits for incoming connection
 	Thread connectionListener = new Thread("Stammtish connection listener") {
@@ -313,7 +120,7 @@ public class StammtischServer {
 					handlers.add(thisHandler);
 					
 					// start request handler thread
-					Thread thread = new Thread(handlers.get(handlers.size()-1));					
+					Thread thread = new Thread(thisHandler);					
 					thisHandler.log(true, "Connected");
 					nextInstance++;
 					thread.start();
@@ -323,6 +130,295 @@ public class StammtischServer {
 			}
 		}
 	};
+	
+	
+	
+	// sets up responses
+	public static void setUpRequests(){
+		// set up blank request array list
+		responses = new ArrayList<Response>();
+		responses.clear();
+		
+		// response to a ping
+		responses.add(new Response("PING"){
+			@Override public void respond(ClientRequestHandler handler){ 
+				// log request
+				handler.log(handler.isLogging(), "Recieved PING, responding PONG");
+				try {
+					handler.sendResponse(new RequestObject("PONG", null, handler.getOrder()));
+				} catch (IOException e) {
+					handler.logErr(handler.isLogging(), "Exception on PING reply");
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		// response to a disconnect request
+		responses.add(new Response("DISCONNECT"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(true, "Recieved diconnect request, stopping handler");
+				handler.stop();
+			}
+		});
+	
+		// respond to login request
+		responses.add(new Response("REQUEST_LOGIN"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received login request, validating credentials...");
+				
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// get the user object
+				User thisUser;
+				try {
+					thisUser = (User)thisRequest.param;
+				} catch (Exception e){
+					handler.respondFail("Request object malformed");
+					return;
+				}
+				
+				// check that user exists 
+				if(SQLHandler.checkLoginDetails(thisUser)){
+					handler.log(handler.isLogging(), "'%s' logged in successfully, responding ok", thisUser.getUsername());
+					
+					// set handler user to this user
+					handler.setUser(thisUser);	
+					handler.respondOk(null);
+				}
+				
+				// invalid login, respond with failure message
+				else handler.respondFail("Invalid login credentials");
+			}
+		});
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_LOGOUT"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received logout request");
+				
+				User thisUser = handler.getUser();
+				if (thisUser == null) {
+					// failed to log out (not logged in)
+					handler.respondFail("User not logged in");
+					return;
+				} 
+				
+				// log user out of server
+				handler.log(handler.isLogging(), "User '%s' logged out\n", thisUser.getUsername());
+				handler.setUser(null);
+				handler.respondOk(null);
+			}
+		});	
+		
+		// respond to signup request
+		responses.add(new Response("REQUEST_SIGNUP"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Recieved signup request");
+				
+				// get required objects from calling handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				
+				// request object for response
+				User thisUser = (User)thisRequest.param;
+				
+				// check that user doesn't already exist
+				if(SQLHandler.checkUser(thisUser)) 
+					handler.respondFail("Username already in use");
+				
+				// check that user object is valid for signup
+				else if(!thisUser.validForSignup()) 
+					handler.respondFail("Insufficient signup information");
+				
+				// Success! add user to the database & notify client
+				else{
+					handler.log(handler.isLogging(), "User '%s' signed up successfully", thisUser.getUsername());
+					SQLHandler.addUser(thisUser);
+					handler.respondOk(null);
+				}
+			}
+		});
+		
+		// search request handler
+		responses.add(new Response("REQUEST_SEARCH"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received search request");
+				
+				// get current request and sql handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler SQLHandler = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				
+				// get the presentation object to respond with
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e){
+					handler.respondFail("Search request malformed");
+					e.printStackTrace();
+					return;
+				}
+				
+				// query the presentation database
+				ArrayList<String[]> searchResults = SQLHandler.searchPresentation(presentation);
+				
+				// generate request object
+				handler.log(handler.isLogging(), "Search returned %d results", searchResults.size());
+				handler.respondOk(searchResults);
+			}
+		});
+		
+		// request download of presentation
+		responses.add(new Response("REQUEST_PRES"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received presentation download request");
+				
+				// get current request and SQL handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				
+				// get presentation shell object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					handler.respondFail("Malformed presentation metadata object");
+					e.printStackTrace();
+					return;
+				}
+				
+				// mark presentation as having being accessed by the user
+				sql.userFirstAccess(handler.getUser(), presentation);
+				
+				// get ID of the presentation that the client wants
+				Integer presId = presentation.getId();
+				
+				// open the file for transfer
+				String transferFailureReason = handler.sendFile("presentations/" + presId.toString() + ".zip");		
+				
+				// respond with failure of file transfer did not success
+				if(transferFailureReason != null){
+					handler.respondFail(transferFailureReason);
+					return;
+				} else {
+					handler.respondOk(null);
+				}
+			}
+		});
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_UPLOAD"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received upload request");
+				
+				// get current request and SQL handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				
+				// get the presentation shell object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					e.printStackTrace();
+					handler.respondFail("Malformed upload request");
+					return;
+				}
+				
+				// check that presentation is valid for signup
+				if (!presentation.validForUpload()){
+					handler.respondFail("Insufficient metadata for upload");
+					return;
+				}
+				
+				// create entry in the SQL database
+				sql.addPresentation(presentation);
+				Integer presId = sql.getPresId(presentation);
+				
+				// get the file stream
+				FileOutputStream fs = null;
+				String path = "presentations" + File.separator + presId.toString() + ".zip";
+				try {
+					fs = new FileOutputStream(path);
+				} catch (Exception e) {
+					handler.respondFail("Server failed to create filestream");
+					sql.removePresentation(presId);
+					e.printStackTrace();
+					return;
+				}
+				
+				// tell client to continue with transfer
+				handler.log(handler.isLogging(), "Presentation metadata valid for upload, informing client");
+				handler.respondOk(null);
+				
+				// get the file
+				String transferFailureReason = handler.getFile(fs);
+				
+				// if there was a failure, print it
+				if(transferFailureReason != null) {
+					sql.removePresentation(presId);
+					handler.respondFail(transferFailureReason);
+					sql.removePresentation(presId);
+				} else {
+					handler.log(handler.isLogging(), "File transfer successful!");
+					handler.respondOk(null);
+				}
+				
+			}
+		});		
+
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_SET_VOTE"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received submit vote request");
+				
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_GET_VOTE"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received recall vote request");
+				
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_SET_COMMENT"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received submit comment request");
+				
+				handler.respondFail(new String("not implemented!"));
+			}
+		});	
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_GET_COMMENT"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received recall comment request");
+				
+				handler.respondFail(new String("not implemented!"));
+			}
+		});
+	}
+	
+	
+	
+	
 	
 	
 	
@@ -715,7 +811,7 @@ public class StammtischServer {
 				}
 				
 				// parse first parameter as an integer
-				Integer p1 = parseAsInt(params.get(0), 0, handlers.size());
+				Integer p1 = parseAsInt(params.get(0), 0, handlers.size() - 1);
 				if(p1 == null) return;
 				
 				// set logging status of just this handler

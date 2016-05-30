@@ -102,6 +102,54 @@ public class SQLHandler
 	}
 	
 	//======================================================================================================================
+	// Method for removing 
+	//======================================================================================================================
+	public final void removePresentation(Integer id)
+	{
+		Statement command = null;
+		
+		String sqlDeletePres = "DELETE FROM " + presTable + " WHERE id = " + id;
+		
+		try 
+		{
+			command.executeQuery(sqlDeletePres);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally 
+		{
+			if (command != null)
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					// Failed to close command
+					e.printStackTrace();
+				} 
+			}
+		}
+		
+	}
+		
+	//======================================================================================================================
+	// Method for getting the position of a presentation in the presentation table
+	//======================================================================================================================
+	public final Integer getPresId(PresentationShell pres)
+	{
+		Integer presId = null;
+		
+		if ((presId = SQLTools.checkPresID(presCon, pres)) != null) 
+		{
+			return presId;
+		}
+		
+		else return null;
+	}
+	
+	//======================================================================================================================
 	// Method for creating user comments table linked to each new presentation creation
 	//======================================================================================================================
 	public final void createUserCommentsTable(int presID)
@@ -132,7 +180,7 @@ public class SQLHandler
 					// Failed to close command
 					e.printStackTrace();
 				} 
-      }
+			}
 		}
 	}
 	

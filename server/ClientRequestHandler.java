@@ -4,7 +4,7 @@
 * Date of first version: 28/01/2016
 * 
 * Last version by: Alexander Cramb (ac1362)
-* Date of last update: 28/05/2016
+* Date of last update: 30/05/2016
 * Version number: 1.5.12
 * 
 * Commit date: 28/05/2016
@@ -21,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -86,7 +87,7 @@ public class ClientRequestHandler implements Runnable {
 			outputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
 			outputStream.flush();
 		} catch (Exception e) {
-			logErr("Failed to open output stream! Handler terminating.");
+			logErr(doLogging, "Failed to open output stream! Handler terminating.");
 			e.printStackTrace();
 			done = true;
 		}
@@ -95,7 +96,7 @@ public class ClientRequestHandler implements Runnable {
 		try {
 			inputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 		} catch (Exception e) {
-			logErr("Failed to open input stream! Handler terminating.");
+			logErr(doLogging, "Failed to open input stream! Handler terminating.");
 			e.printStackTrace();
 			done = true;
 		}
@@ -107,8 +108,8 @@ public class ClientRequestHandler implements Runnable {
 			while(currentRequest == null){
 				try {
 					currentRequest = getRequest();
-				} catch (IOException e) {
-					logErr("IO exception on request recieve");
+				} catch (Exception e) {
+					logErr(doLogging, "Exception on request recieve");
 					e.printStackTrace();
 					done = true;
 					break;
@@ -126,20 +127,13 @@ public class ClientRequestHandler implements Runnable {
 			if(currentResponse != null){
 				if(reqAllowed(currentRequest.id, user) && !blocked){
 					// respond to request
-					log(doLogging, "Recieved req '%s' responding...", currentRequest.id);
 					currentResponse.respond(this);
 				} else {
-					if(!blocked){
-						respondFail("not logged in");
-						log(doLogging, "Recieved req '%s' blocked, not logged in", currentRequest.id);
-					} else {
-						respondFail("action blocked");
-						log(doLogging, "Recieved req '%s' blocked, handler blocked", currentRequest.id);
-					}
+					if(blocked) respondFail("Permission denied: request blocked");
+					else respondFail("Permission denied: not logged in");
 				}
 			} else {
-				log(doLogging, "Recieved req '%s' not recognised", currentRequest.id);
-				respondFail(String.format("Request '%s' not recongised"));
+				respondFail(String.format("'%s' not recongised"));
 			}
 		}
 		
@@ -147,7 +141,7 @@ public class ClientRequestHandler implements Runnable {
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
-			logErr("Exception on socket close");
+			logErr(doLogging, "Exception on socket close");
 			e.printStackTrace();
 		}
 		
@@ -180,7 +174,7 @@ public class ClientRequestHandler implements Runnable {
 			thisRequest = (RequestObject)inputStream.readObject();
 			return thisRequest;
 		} catch (ClassNotFoundException e1) {
-			logErr("Malformed request object recieved");
+			logErr(doLogging, "Malformed request object recieved, parameter cast failure");
 			e1.printStackTrace();
 		}
 		return null;
@@ -189,16 +183,11 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// method for sending a response to the client
-	public void sendResponse(RequestObject thisRequest) {
-		// instantiate request object
-		try {
-			outputStream.reset();
-			outputStream.writeObject(thisRequest);
-			outputStream.flush();
-		} catch(IOException e) {
-			logErr("Exception sending response");
-			e.printStackTrace();
-		} 
+	public void sendResponse(RequestObject thisRequest) throws IOException {
+		// reset socket, send request object
+		outputStream.reset();
+		outputStream.writeObject(thisRequest);
+		outputStream.flush();
 	}
 	
 	
@@ -213,7 +202,12 @@ public class ClientRequestHandler implements Runnable {
 		);
 		
 		// send response
-		sendResponse(thisRequest);
+		try {
+			sendResponse(thisRequest);
+		} catch (IOException e) {
+			logErr(doLogging, "Exception respoding 'RESPONSE_OK'");
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -227,11 +221,16 @@ public class ClientRequestHandler implements Runnable {
 			order
 		);
 		
-		//print to console
-		logErr("Response failure: %s", reason);
+		// print out fail response
+		log(doLogging, "Responding fail: %s", reason);
 		
 		// send response
-		sendResponse(thisRequest);		
+		try {
+			sendResponse(thisRequest);	
+		} catch (IOException e) {
+			logErr(doLogging, "Exception on response: 'RESPONSE_FAIL'");
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -273,7 +272,10 @@ public class ClientRequestHandler implements Runnable {
 			}
 			
 			// put block of data into file transfer object
-			if ((count < 0) || (!doTransfer)) break;
+			if ((count < 0) || (!doTransfer)) {
+				log(doLogging, "Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
+				break;
+			}
 			
 			// create data block
 			blockData = new FileBlock(buffer, count);
@@ -281,21 +283,113 @@ public class ClientRequestHandler implements Runnable {
 			RequestObject responseData = new RequestObject("RESPOND_DATA", (Object)blockData, order);
 			
 			// send the response object with the data in it to client
-			sendResponse(responseData);
+			try {
+				sendResponse(responseData);
+			} catch (IOException e) {
+				logErr(doLogging, "Exception sending file block, halting transfer");
+				e.printStackTrace();
+			}
+			
+			// count the number of transmitted file blocks
 			blockCount++;
 		}
-		
-		// display number of transmitted blocks
-		log(doLogging, "Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
 		
 		// close file
 		try {
 			file.close();
 		} catch (IOException e) {
+			logErr(doLogging, "Exception on file close, path: %s", path);
 			e.printStackTrace();
 		}
 		
 		// indicate state of transfer
+		return rString;
+	}
+	
+	
+	
+	// gets the file
+	public String getFile(FileOutputStream fs){
+		// get the file size data
+		RequestObject thisRequest = null;
+		FileBlock blockData;
+		long bytesRemaining;
+		boolean doTransfer = true;
+		String rString = null;
+		
+		// get size request
+		try {
+			thisRequest = getRequest();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Malformed request on file transfer begin";
+		}
+		
+		// check that appropriate id has been received
+		if(!thisRequest.id.equals("SIZE")) {
+			return "Expected size of file before transfer. With ID: 'SIZE'";
+		}
+		
+		// get file size
+		try {
+			bytesRemaining = (long)thisRequest.param;
+		} catch (Exception e) {
+			return "Malformed filesize parameter";
+		}
+		
+		// check that size makes sense
+		// respond ok if things are ok
+		log(doLogging, "File size received. notifying client");
+		respondOk(null);
+		
+		// do the file transfer
+		while (doTransfer) {
+			// get the file block data
+			try {
+				thisRequest = getRequest();
+			} catch (IOException e) {
+				e.printStackTrace();
+				rString = "Exception during file block recieve";
+			}
+			
+			// if the transfer has not ended
+			if(!thisRequest.id.equals("FILE_DATA")) break;
+			
+			// get the block data
+			blockData = null;
+			try {
+				blockData = (FileBlock)thisRequest.param;
+			} catch (Exception e) {
+				e.printStackTrace();
+				rString = "file data block malformed";
+			}
+			
+			// write the block data to file
+			try {
+				fs.write(blockData.getData(), 0, blockData.size());
+				fs.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+				rString = "Exception writing file block to disk";
+			}
+			
+			// update bytes remaining
+			bytesRemaining -= blockData.size();
+		}
+		
+		// check for over/under-runs
+		if (bytesRemaining > 0) rString = String.format("file stransfer underran by %d bytes", bytesRemaining);
+		if (bytesRemaining < 0) rString = String.format("file stransfer overran by %d bytes", 0 - bytesRemaining);
+		
+		// close the file stream
+		try {	
+			fs.close();
+		} catch (Exception e) {
+			logErr(doLogging, "Error closing file stream");
+			e.printStackTrace();
+		}
+		
+		// everything was successful
 		return rString;
 	}
 	
@@ -317,11 +411,12 @@ public class ClientRequestHandler implements Runnable {
 	// get info string
 	public String getInfoString(){
 		return String.format(
-			"Handler: %d, ip: %s, reqs: %d, running: %b",
+			"Handler: %d, ip: %s, reqs: %d, running: %b, logging: %b",
 			getNum(),
 			getIp(),
 			getReqCount(),
-			!threadDone
+			!threadDone,
+			doLogging
 		);
 	}
 	
@@ -346,12 +441,12 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// print stuff, if printing is enabled
-	public void logErr(String format, Object... args){
+	public void logErr(boolean doLog, String format, Object... args){
 		String outputStr;	// string to output after the handler identifier
 		String idStr;		// [H-#] etc
 		
 		// only print if 
-		if (doLogging) {
+		if (doLog) {
 			// format output string
 			outputStr = String.format(format, args);
 			idStr = String.format("[H-%d-ERR] ", handlerInstance);

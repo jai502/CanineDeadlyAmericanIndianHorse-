@@ -75,7 +75,7 @@ public class SQLTools
 		finally 
 		{
 			if (command != null)
-      {
+		{
       	try
       	{
       		command.close();

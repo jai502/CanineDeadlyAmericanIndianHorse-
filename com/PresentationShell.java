@@ -1,15 +1,15 @@
 /**
  * (C) Stammtisch
- * First version created by: Jonathan Bones & Peter Mills
+ * First version created by: Jonathan Bones, Peter Mills, ALexander cramb
  * Date of first version: 17/05/2016
  * 
- * Last version by: Jonathan Bones & Peter Mills
- * Date of last update: 17/05/2016
- * Version number: 1.0
+ * Last version by: Peter Mills, Alexander cramb
+ * Date of last update: 30/05/2016
+ * Version number: 1.1.0
  * 
  * Commit date: 18/06/2015
- * Description: Simple class to simulate presentation data
- *
+ * Description: 
+ * 	Simple class to contain presentation meta-data
  */
 
 package com;
@@ -165,5 +165,15 @@ public class PresentationShell implements Serializable
 	public void setTagFive(String tagFive) 
 	{
 		this.tagFive = tagFive;
+	}
+	
+	// returns true
+	public boolean validForUpload()
+	{
+		if (this.author == null) return false;
+		if (this.title == null) return false;
+		if (this.language == null) return false;
+		
+		return true;
 	}
 }
