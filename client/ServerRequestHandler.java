@@ -3,9 +3,9 @@
  * First version created by: J.Bones & P.Mills
  * Date of first version: 16.05.2016
  * 
- * Last version by: J.Bones & A.Cramb
- * Date of last update: 23.05.2016
- * Version number: 1.3
+ * Last version by: P.Mills
+ * Date of last update: 30.05.2016
+ * Version number: 1.7
  * 
  * Commit date:
  * Description: Threading to enable network communications
@@ -16,6 +16,7 @@ package client;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import com.*;
+import com.sun.corba.se.spi.orbutil.fsm.FSM;
 
 //=========================================================================
 // Class for handling server requests
@@ -283,12 +285,152 @@ public class ServerRequestHandler
 		try {
 			fs.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}       
 		// return the request object that terminated the stream
 		return response;
 	}
+	
+	
+	public final String uploadPresentation(PresentationShell pres, String path)
+	{
+		String result = null;
+				
+		File file = new File(path);
+		// Check if file exists before proceed
+		if(file.exists())
+		{
+			RequestObject requestUpload = new RequestObject("REQUEST_UPLOAD", (Object) pres, order);
+			System.out.println("Sending " + requestUpload.id + " with order " + requestUpload.order + "...");
+			sendRequest(requestUpload);
+			RequestObject response = getResponse();
+
+			switch(response.id)
+			{
+			case "RESPONSE_OK":
+				break;
+			case "RESPONSE_FAIL":
+				result = "Server: " + (String) response.param;
+				// Exit from method with failure reason
+				return result;
+			default:
+				result = "Internal Server Error: " + response.id;
+				// Exit from method with failure reason
+				return result;
+			}
+			
+			//Attempt to send file
+			RequestObject sendFileResponse = sendFile(file);
+				
+		}
+		else
+		{
+			result = "File does not exit at path: " + path;
+		}
+		
+		return result;
+	}
+	
+	public final RequestObject sendFile(File file)
+	{
+		RequestObject result = null;
+		// Buffer variables
+		int bufSize = 80000;
+		int blockCount = 0;
+		byte[] buffer = new byte[bufSize];
+		
+		// File transfer variables
+		FileInputStream fs = null;
+		boolean doTransfer = true;
+	
+		long fileSize = file.length();
+		
+		RequestObject sendSize = new RequestObject("SIZE", (Object) fileSize, order);
+		System.out.println("Sending " + sendSize.id + " with order " + sendSize.order + "...");
+		sendRequest(sendSize);
+		RequestObject sendSizeResponse = getResponse();
+		
+		switch(sendSizeResponse.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Server terminated file transfer affirmitively");
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Return failed: " + (String) sendSizeResponse.param);
+			// Exit, sending RequestObject from sendSize request
+			return sendSizeResponse;
+		default:
+			System.out.println("Unknown response: " + sendSizeResponse.id);
+			// Exit, sending RequestObject from sendSize request
+			return sendSizeResponse;
+		}
+		
+		try {
+			fs = new FileInputStream(file.getPath());
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found at path: " + file.getPath());
+			e.printStackTrace();
+		}
+		
+		int count = 0;
+		FileBlock blockData = null;
+		
+		while(doTransfer)
+		{
+			try {
+				count = fs.read(buffer);
+			} catch (IOException e) {
+				System.out.println("Error with file read");
+				e.printStackTrace();
+				doTransfer = false;
+			}
+			
+			// Put block of data into file transfer object
+			if((count < 0) || (!doTransfer)) break;
+			
+			// Create data block
+			blockData = new FileBlock(buffer, count);
+			
+			RequestObject sendData = new RequestObject("FILE_DATA", (Object) blockData, order);
+			
+			// Send the response object with data to the server
+			sendRequest(sendData);
+			blockCount++;
+		}
+		
+		String transferMessage = "Sent " + file.getPath() + " in " + blockCount + " blocks";
+		
+		RequestObject sendFileEnd = new RequestObject("FILE_END", (Object)transferMessage, order);
+		
+		sendRequest(sendFileEnd);
+		
+		System.out.println(transferMessage);
+		
+		switch(sendFileEnd.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Server terminated file transfer affirmitively");
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Return failed: " + (String) sendFileEnd.param);
+			// Exit, sending RequestObject from sendSize request
+			return sendFileEnd;
+		default:
+			System.out.println("Unknown response: " + sendFileEnd.id);
+			// Exit, sending RequestObject from sendSize request
+			return sendFileEnd;
+		}
+		
+		// Close the fileStream
+		try {
+			fs.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
 
 	public final String ping()
 	{

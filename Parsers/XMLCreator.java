@@ -32,7 +32,10 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.PresentationShell;
+
 import Objects.Presentation;
+import client.ServerRequestHandler;
 import zipping.Zipper;
 
 public class XMLCreator {
@@ -41,14 +44,18 @@ public class XMLCreator {
 	private static String media = "media";
 	private static String createdPres = "createdPres";
 	private String audioLoc, videoLoc, imageLoc, csvLoc;
+	private ServerRequestHandler com;
+	private String createdLoc = ("temp"+File.separator+"createdPres.pws");
 	
 	
-	public XMLCreator() {
+	public XMLCreator(ServerRequestHandler com) {
+		this.com = com;
 	}
 
-	public void createXML(Presentation presentation, boolean containsDefaults ,boolean containsImage, 
+	public void createXML(Presentation presentation,boolean containsDefaults ,boolean containsImage, 
 			boolean containsShape,boolean shapeShade, boolean containsPoly,
-			boolean containsText, boolean containsVideo, boolean containsAudio) 
+			boolean containsText, boolean containsVideo, boolean containsAudio,
+			PresentationShell presShell) 
 	{
 		try {
 			
@@ -533,15 +540,29 @@ public class XMLCreator {
 			StreamResult result = new StreamResult(new File(temp + File.separator + createdPres + File.separator + "presentation.xml"));
 			transformer.transform(source, result);
 			
-			
-			
-			System.out.println("created XML file");
+			Thread zipperThread = new Thread(){
+				public void run(){
+					try {
+						// TODO THIS IS TEMPORARY
+						Zipper.zip(temp + File.separator + createdPres + File.separator, createdLoc);
+						System.out.println(com.uploadPresentation(presShell, createdLoc));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					System.out.println("created XML file");
+				}
+			};
+		
+		zipperThread.start();
+		
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (TransformerException tfe) {
 			tfe.printStackTrace();
 		}
-
+		
 	}
 }

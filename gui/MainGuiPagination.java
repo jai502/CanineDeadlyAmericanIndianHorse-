@@ -204,6 +204,8 @@ public class MainGuiPagination extends Application {
 	private ArrayList<SlideItem> xmlSlideList = new ArrayList<SlideItem>();
 	private SlideItem xmlSlide = new SlideItem();
 	private FileChooser browseMediaFiles = new FileChooser();
+	
+	
 	//private File selectedMediaFile;
 	private String mediaPathname;
 	private boolean containsVideo = false;
@@ -273,6 +275,7 @@ public class MainGuiPagination extends Application {
 	@Override
 	public void init() {
 		System.out.println("Setting up/initialising GUI now");
+		Zipper.makeFolder("temp");
 		com = new ServerRequestHandler(serverPort, serverHost);
 		com.start();
 
@@ -2050,7 +2053,7 @@ public class MainGuiPagination extends Application {
 		mediaTranslationText.setPrefSize(100, 250);
 		gridForCreation.add(mediaTranslationText, 0, 5);
 
-		btnNext = new Button("Next");
+		btnNext = new Button("Set ");
 		btnNext.setId("btnNext");
 		// grid.add(btnNext, 0, 5);
 		btnOpenMediaDty = new Button("Add Media");
@@ -2229,7 +2232,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				createdPres = new Presentation();
 
-				XMLCreator creator = new XMLCreator();
+				XMLCreator creator = new XMLCreator(com);
 
 				if (containsVideo == true) {
 					xmlSlide.addVideo(videoItem);
@@ -2239,8 +2242,17 @@ public class MainGuiPagination extends Application {
 
 				FillPres fp = new FillPres();
 				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide, titleCreated);
+				
 
-				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio);
+				PresentationShell presShell = new PresentationShell();
+				presShell.setAuthor(sUsernameLogin);
+				presShell.setLanguage(languageField.getText());
+				presShell.setTitle(titleField.getText());
+
+				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
+				
+				
+				
 			}
 		});
 
