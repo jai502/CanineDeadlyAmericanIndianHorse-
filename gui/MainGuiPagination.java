@@ -845,7 +845,7 @@ public class MainGuiPagination extends Application {
 						System.out.println("You have reached the end of the presentation");
 					}
 					
-					slidePane = sh.getSlideStack(tempPres, pageIndex, width, height - 100, presentationMenu);
+					slidePane = sh.getSlideStack(tempPres, pageIndex, width, height, presentationMenu);
 
 					/* Mouse event handler for the canvas */
 					slidePane.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {

@@ -121,6 +121,7 @@ public class XMLParser extends DefaultHandler {
 			currentSlide.setDuration(attributes.getValue("duration"));
 			
 			slideID = Integer.parseInt(attributes.getValue("slideID"));
+			System.out.println(slideID);
 		}
 
 		if (qName.equalsIgnoreCase("Text"))

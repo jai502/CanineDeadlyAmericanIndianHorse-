@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Presentation>
+    <documentInfo>
+        <Title>hello</Title>
+        <Author>Peter</Author>
+        <Version>1.0</Version>
+        <Comment>Created presentation by: Peter</Comment>
+    </documentInfo>
+    <defaults>
+        <backgroundColour>0x000000ff</backgroundColour>
+        <font>SansSerif</font>
+        <fontSize>16</fontSize>
+        <fontColour>0x000000ff</fontColour>
+        <lineColour>0x000000ff</lineColour>
+        <fillColour>0xffffffff</fillColour>
+    </defaults>
+    <slide duration="0" nextSlide="0" slideID="0">
+        <image duration="0" height="1.0" sourceFile="temp\tempPres\media\image0.jpg" starttime="0" width="1.0" xstart="0.0" ystart="0.0"/>
+        <shape duration="0" fillColour="0xffffffff" height="0.3" lineColour="0x000000ff" starttime="0" type="rectangle" width="0.4" xstart="0.1" ystart="0.1"/>
+        <shape duration="0" fillColour="0xffffffff" height="0.3" lineColour="0x000000ff" starttime="0" type="rectangle" width="0.4" xstart="0.1" ystart="0.6"/>
+        <shape duration="0" fillColour="0xffffffff" height="1.0" lineColour="0x000000ff" starttime="0" type="rectangle" width="0.01" xstart="0.595" ystart="0.0"/>
+        <text duration="5000" font="SansSerif" fontcolour="null" fontsize="0" starttime="0" xstart="0.1" ystart="0.1">hello</text>
+        <text duration="5000" font="SansSerif" fontcolour="null" fontsize="0" starttime="0" xstart="0.1" ystart="0.6">gejh</text>
+        <text duration="3000" font="SansSerif" fontcolour="null" fontsize="0" starttime="6000" xstart="0.1" ystart="0.1">4445</text>
+        <text duration="3000" font="SansSerif" fontcolour="null" fontsize="0" starttime="6000" xstart="0.1" ystart="0.6">5555</text>
+        <video duration="0" loop="false" sourceFile="temp\tempPres\media\video0.mp4" starttime="0" xstart="0.6" ystart="0.1"/>
+    </slide>
+</Presentation>

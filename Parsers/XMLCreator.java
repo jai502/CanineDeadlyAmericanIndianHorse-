@@ -535,13 +535,15 @@ public class XMLCreator {
 			
 			
 			
-			System.out.println("created XML file");
+			System.out.println("created a presentation file");
+			
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (TransformerException tfe) {
 			tfe.printStackTrace();
 		}
+		
 
 	}
 }
