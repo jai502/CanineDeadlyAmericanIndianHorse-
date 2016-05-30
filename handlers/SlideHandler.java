@@ -49,7 +49,6 @@ public class SlideHandler {
 	}
 
 	public StackPane getSlideStack(Presentation presentation, int i, double myWidth, double myHeight, Scene scene) throws IOException {
-		
 		StackPane slidePane = new StackPane();
 		this.pres = presentation;
 		double reducedHeight = (myHeight - 60);
@@ -60,6 +59,9 @@ public class SlideHandler {
 
 		// Adding a TimeLine
 		Timeline timeline = new Timeline();
+
+
+
 
 		// Slide background
 
@@ -81,9 +83,11 @@ public class SlideHandler {
 			imageCanvas.setVisible(false);
 			// Ensure the image will be shown, even if there is no start
 			// time
-			if (presentation.getSlides().get(i).getImageList().get(x).getStartTime() == 0) {
+			if ((presentation.getSlides().get(i).getImageList().get(x).getStartTime() == 0) 
+					|| (presentation.getSlides().get(i).getImageList().get(x).getDuration() == -1)){
 				imageCanvas.setVisible(true);
 			}
+		
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(imageCanvas.visibleProperty(), true);
 			KeyFrame visible_start_time = new KeyFrame(
@@ -117,9 +121,12 @@ public class SlideHandler {
 			polygonCanvas.setVisible(false);
 			// Ensure the image will be shown, even if there is no start
 			// time
-			if (presentation.getSlides().get(i).getPolygonList().get(x).getStartTime() == 0) {
+			if ((presentation.getSlides().get(i).getPolygonList().get(x).getStartTime() == 0) 
+					|| (presentation.getSlides().get(i).getPolygonList().get(x).getDuration() == -1))
+			{
 				polygonCanvas.setVisible(true);
 			}
+
 			// Add start time to the timeline
 			KeyValue visible_value_start = new KeyValue(polygonCanvas.visibleProperty(), true);
 			KeyFrame visible_start_time = new KeyFrame(
@@ -155,7 +162,8 @@ public class SlideHandler {
 			shapeCanvas.setVisible(false);
 			// Ensure the image will be shown, even if there is no start
 			// time
-			if (presentation.getSlides().get(i).getShapeList().get(x).getStartTime() == 0) {
+			if ((presentation.getSlides().get(i).getShapeList().get(x).getStartTime() == 0) 
+					|| presentation.getSlides().get(i).getShapeList().get(x).getDuration() == -1)  {
 				shapeCanvas.setVisible(true);
 			}
 			// Add start time to the timeline
@@ -267,3 +275,4 @@ public class SlideHandler {
 	}
 
 }
+

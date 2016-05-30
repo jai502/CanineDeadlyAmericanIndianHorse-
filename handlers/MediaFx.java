@@ -404,8 +404,7 @@ public class MediaFx {
 	 */
 	public void stop() {
 			vc.stop();
-			
-			vc.dispose();
+			//vc.dispose();
 	}
 	/**
 	 * Disposes of the media player object

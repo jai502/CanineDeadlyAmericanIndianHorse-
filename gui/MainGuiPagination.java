@@ -204,12 +204,13 @@ public class MainGuiPagination extends Application {
 	private ArrayList<SlideItem> xmlSlideList = new ArrayList<SlideItem>();
 	private SlideItem xmlSlide = new SlideItem();
 	private FileChooser browseMediaFiles = new FileChooser();
-	private File selectedMediaFile;
+	//private File selectedMediaFile;
 	private String mediaPathname;
 	private boolean containsVideo = false;
 	private boolean containsAudio = false;
 	private String titleCreated;
 	private MediaFx videoPlayer;
+	private AnchorPane anchorForMedia;
 
 	/* variables for the commentsMenu */
 	private BorderPane commentsScreenLayout;
@@ -686,7 +687,9 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				System.out.println("Please select a file to open...");
-
+				
+				destroyVid();
+				
 				// Set extension filters
 				FileChooser.ExtensionFilter extFilterXML = new FileChooser.ExtensionFilter("PWS files (*.XML)",
 						"*.XML");
@@ -715,7 +718,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				System.out.println("Please create a presentation...");
 				tempPres = null;
-				createdPres = null;
+				//createdPres = null;
 				window.setTitle("Create Presentation Menu");
 				window.setScene(createPresentationMenu);
 			}
@@ -792,8 +795,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 
 				//createPresentationMenu
-				videoPlayer.stop();
-				gridForCreation.getChildren().remove(videoPlayer);
+				destroyVid();
 				window.setTitle("User Screen Menu");
 				window.setScene(userScreenMenu);
 			}
@@ -1948,8 +1950,8 @@ public class MainGuiPagination extends Application {
 		gridForCreation.setHgap(10);
 		gridForCreation.setVgap(10);
 		
-		AnchorPane anchorForMedia = new AnchorPane();
-		gridForCreation.add(anchorForMedia, 1, 2);
+//		anchorForMedia = new AnchorPane();
+//		gridForCreation.add(anchorForMedia, 1, 2);
 		
 		VBox vBox1 = new VBox(10);
 		VBox vBox2 = new VBox(10);
@@ -2192,12 +2194,18 @@ public class MainGuiPagination extends Application {
 
 				// Assign a File object as the file chooser - open the system
 				// dialogue
-				selectedMediaFile = browseMediaFiles.showOpenDialog(window);
+				File selectedMediaFile = browseMediaFiles.showOpenDialog(window);
 
 				// Open the PWS selected xml file and change the scene to
 				// presentation scene
 				// with a pagination layout
 				openSelectedMediaFile(selectedMediaFile);
+				
+				destroyVid();
+				
+				anchorForMedia = new AnchorPane();
+				gridForCreation.add(anchorForMedia, 1, 2);
+				
 				VideoItem videoLoad = new VideoItem();
 				videoLoad = videoItem;
 				videoLoad.setxStart(0);
@@ -2374,6 +2382,16 @@ public class MainGuiPagination extends Application {
 		// commentsToWrite.setPrefWidth(commentsScreenLayout.getWidth()/2);
 
 		return commentsToWrite;
+	}
+	public void destroyVid()
+	{
+		try{
+		videoPlayer.stop();
+		gridForCreation.getChildren().remove(anchorForMedia);
+		}
+		catch(Exception e){
+			System.out.println("No media to destroy");
+		}
 	}
 
 }
