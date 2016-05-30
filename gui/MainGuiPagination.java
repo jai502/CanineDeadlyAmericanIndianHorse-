@@ -36,6 +36,7 @@ import SQL.SQLHandler;
 import client.ServerRequestHandler;
 import encryptionRSA.RSAEncryptDecrypt;
 import encryptionRSA.Serializer;
+import handlers.MediaFx;
 import handlers.SlideHandler;
 
 import java.awt.Desktop;
@@ -74,9 +75,6 @@ import com.User;
 import com.PresentationShell;
 
 import javafx.scene.*;
-
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -431,13 +429,8 @@ public class MainGuiPagination extends Application {
 		showCreatePresMenuBar = true;
 		showUserMenuBar = true;
 
-		createPresentationScreenLayout.setId("createPresentationScreenLayout"); // rootNode
-																				// id
-																				// for
-																				// Presentation
-																				// Scene
-																				// in
-																				// gui_style.css
+		createPresentationScreenLayout.setId("createPresentationScreenLayout"); 
+		
 		// Add the root node to the scene
 		createPresentationMenu = new Scene(createPresentationScreenLayout, width, height, Color.BLACK);
 		// Load style.ccs from same directory to provide the styling for the
@@ -464,9 +457,7 @@ public class MainGuiPagination extends Application {
 		showCreatePresMenuBar = false;
 		showUserMenuBar = true;
 
-		presentationLayout.setId("presentationLayout"); // rootNode id for
-														// Presentation Scene in
-														// gui_style.css
+		presentationLayout.setId("presentationLayout"); 
 
 		// Add the root node to the scene
 		presentationMenu = new Scene(presentationLayout, width, height, Color.BLACK);
@@ -1893,6 +1884,7 @@ public class MainGuiPagination extends Application {
 		searchView.setPrefHeight(userScreenLayout.getHeight());
 		searchView.setPrefWidth(userScreenLayout.getWidth() / 2);
 		System.out.println(observableListSearch);
+		searchView.setOpacity(0.7);
 
 		final StringProperty hoveredItem = new SimpleStringProperty(null);
 
@@ -1961,16 +1953,18 @@ public class MainGuiPagination extends Application {
 		titleField = new TextField();
 		titleField.setPrefSize(250, 10);
 		titleField.setPromptText("Enter The Title of the Presentation");
+		grid.add(titleField, 0, 0);
 		
 		languageField = new TextField();
 		languageField.setPrefSize(180, 10);
 		languageField.setPromptText("Enter The Language Used");
+		grid.add(languageField, 1, 0);
 		
-		titleLabel = new Label("Title:");
-		titleLabel.setId("titleLabel"); // Id for gui_style.css
-		// grid.add(startTime, 0, 2);
-		languageLabel = new Label("Language:");
-		languageLabel.setId("languageLabel"); // Id for gui_style.css
+//		titleLabel = new Label("Title:");
+//		titleLabel.setId("titleLabel"); // Id for gui_style.css
+//		// grid.add(startTime, 0, 2);
+//		languageLabel = new Label("Language:");
+//		languageLabel.setId("languageLabel"); // Id for gui_style.css
 		
 //		grid.add(titleField, 1, 0);
 //		grid.add(languageField, 3, 0);
@@ -1985,7 +1979,7 @@ public class MainGuiPagination extends Application {
 
 		mediaLanguageText = new TextArea();
 		mediaLanguageText.setPromptText("Enter Video Language Text");
-		mediaLanguageText.setPrefSize(400, 250);
+		mediaLanguageText.setPrefSize(100, 250);
 		grid.add(mediaLanguageText, 0, 2);
 
 		startTime = new Label("Start Time:");
@@ -2041,7 +2035,7 @@ public class MainGuiPagination extends Application {
 
 		mediaTranslationText = new TextArea();
 		mediaTranslationText.setPromptText("Enter Video Translation Text");
-		mediaTranslationText.setPrefSize(400, 250);
+		mediaTranslationText.setPrefSize(100, 250);
 		grid.add(mediaTranslationText, 0, 5);
 
 		btnNext = new Button("Next");
@@ -2049,29 +2043,31 @@ public class MainGuiPagination extends Application {
 		// grid.add(btnNext, 0, 5);
 		btnOpenMediaDty = new Button("Add Media");
 		btnOpenMediaDty.setId("btnOpenMediaDty");
+		btnOpenMediaDty.setPrefSize(200, 200);
 		// grid.add(btnOpenVideoDty, 1, 5);
 		btnCreate = new Button("Create");
 		btnCreate.setId("btnCreate");
 		// grid.add(btnCreate, 2, 5);
 
-		HBox hbFirst = new HBox(10);
-		hbFirst.setAlignment(Pos.CENTER_LEFT);
+		HBox hBox1 = new HBox(10);
+		hBox1.setAlignment(Pos.CENTER_LEFT);
 //		hbFirst.getChildren().addAll(titleLabel, titleField, languageLabel, languageField);
-		hbFirst.getChildren().addAll(titleField, languageField);
+		hBox1.getChildren().addAll(startTime, startTimeField);
 		
 		// Creating a HBox area to add the labels and textfields
-		HBox hbText = new HBox(10);
-		hbText.setAlignment(Pos.CENTER_RIGHT);
-		hbText.getChildren().addAll(startTime, startTimeField, endTime, endTimeField);
+		HBox hBox2 = new HBox(10);
+		hBox2.setAlignment(Pos.CENTER_RIGHT);
+		hBox2.getChildren().addAll(endTime, endTimeField);
 
 		// Creating a HBox area to add the labels and textfields
-		HBox hbButtons = new HBox(10);
-		hbButtons.setAlignment(Pos.CENTER_LEFT);
-		hbButtons.getChildren().addAll(btnNext, btnOpenMediaDty, btnCreate);
+		HBox hBox3 = new HBox(10);
+		hBox3.setAlignment(Pos.CENTER_LEFT);
+		hBox3.getChildren().addAll(btnNext, btnCreate);
 
-		grid.add(hbFirst, 0, 0);
-		grid.add(hbText, 0, 3);
-		grid.add(hbButtons, 0, 6);
+		grid.add(btnOpenMediaDty, 2, 3);
+		grid.add(hBox1, 0, 3);
+		grid.add(hBox2, 1, 3);
+		grid.add(hBox3, 0, 6);
 
 		// Event handler for btnNext
 		btnNext.setOnAction(new EventHandler<ActionEvent>() {
@@ -2084,8 +2080,9 @@ public class MainGuiPagination extends Application {
 				{
 					// Do Nothing!!
 					System.out.println("You have empty fields, please fill in");
-				} else {
-					// More stuff here for saving!!!!!!!!!!
+				} 
+				else 
+				{
 					titleField.getText();
 					languageField.getText();
 					mediaLanguageText.getText();
@@ -2102,7 +2099,7 @@ public class MainGuiPagination extends Application {
 
 					TextItem videoText = new TextItem();
 					TextItem transText = new TextItem();
-					
+
 					titleCreated = titleField.getText();
 
 					videoText.setText(mediaLanguageText.getText());
@@ -2111,11 +2108,11 @@ public class MainGuiPagination extends Application {
 					transText.setStartTime(Integer.parseInt(startTimeField.getText()) * 1000);
 					videoText.setDuration(
 							(Integer.parseInt(endTimeField.getText()) - (Integer.parseInt(startTimeField.getText())))
-									* 1000);
+							* 1000);
 					System.out.println("Video Text Duration: " + videoText.getDuration());
 					transText.setDuration(
 							(Integer.parseInt(endTimeField.getText()) - (Integer.parseInt(startTimeField.getText())))
-									* 1000);
+							* 1000);
 					System.out.println("Video TranslationText Duration: " + transText.getDuration());
 
 					videoText.setHeight(0.3f);
@@ -2170,6 +2167,8 @@ public class MainGuiPagination extends Application {
 				// Add extension files to the file chooser
 				browseMediaFiles.getExtensionFilters().addAll(extFilterMP4, extFiltermp4, extFilterWAV, extFilterwav,
 						extFilterMP3, extFiltermp3);
+				
+				
 
 				// Assign a File object as the file chooser - open the system
 				// dialogue
@@ -2179,6 +2178,13 @@ public class MainGuiPagination extends Application {
 				// presentation scene
 				// with a pagination layout
 				openSelectedMediaFile(selectedMediaFile);
+				
+				MediaFx videoPlayer = new MediaFx(videoItem, 0.3, 0.3);
+				AnchorPane anchor = new AnchorPane();
+				Group group = new Group();
+				anchor.getChildren().add(group);
+				group.getChildren().add(videoPlayer.createContent(createPresentationMenu));
+				grid.add(group, 2, 0);
 			}
 		});
 		//
@@ -2319,6 +2325,7 @@ public class MainGuiPagination extends Application {
 		commentsView.setId("listView");
 		commentsView.setPrefHeight(commentsScreenLayout.getHeight() * 0.75);
 		commentsView.setPrefWidth(commentsScreenLayout.getWidth() / 2);
+		commentsView.setOpacity(0.7);
 		// System.out.println(observableList);
 
 		// searchView.getSelectionModel().getSelectedIndex();
