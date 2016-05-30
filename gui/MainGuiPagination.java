@@ -1411,8 +1411,8 @@ public class MainGuiPagination extends Application {
 					System.out.println("Signup was successful");
 					response2.setText("");
 					logout = false;
-					window.setTitle("User Menu Screen");
-					window.setScene(userScreenMenu);
+					window.setTitle("Login Screen");
+					window.setScene(logInMenu);
 				} else {
 					System.out.println(signUpSuccessful);
 					logout = true;
@@ -2232,7 +2232,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				createdPres = new Presentation();
 
-				XMLCreator creator = new XMLCreator(com);
+				//XMLCreator creator = new XMLCreator(com);
 
 				if (containsVideo == true) {
 					xmlSlide.addVideo(videoItem);
@@ -2249,7 +2249,7 @@ public class MainGuiPagination extends Application {
 				presShell.setLanguage(languageField.getText());
 				presShell.setTitle(titleField.getText());
 
-				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
+				//creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
 				
 				
 				
@@ -2395,6 +2395,7 @@ public class MainGuiPagination extends Application {
 
 		return commentsToWrite;
 	}
+	
 	public void destroyVid()
 	{
 		try{

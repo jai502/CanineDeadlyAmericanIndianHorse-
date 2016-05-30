@@ -544,8 +544,8 @@ public class XMLCreator {
 				public void run(){
 					try {
 						// TODO THIS IS TEMPORARY
-						Zipper.zip(temp + File.separator + createdPres + File.separator, createdLoc);
-						System.out.println(com.uploadPresentation(presShell, createdLoc));
+						//Zipper.zip(temp + File.separator + createdPres + File.separator, createdLoc);
+						//System.out.println(com.uploadPresentation(presShell, createdLoc));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
