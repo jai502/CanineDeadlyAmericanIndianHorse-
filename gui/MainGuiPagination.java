@@ -193,6 +193,7 @@ public class MainGuiPagination extends Application {
 
 	/* variables for the createPresentationMenu */
 	private Presentation createdPres;
+	private GridPane gridForCreation;
 	private BorderPane createPresentationScreenLayout;
 	private Button btnNext, btnCreate, btnOpenMediaDty;
 	private Label titleLabel, languageLabel, mediaLanguage, mediaTranslation, startTime, endTime;
@@ -208,6 +209,7 @@ public class MainGuiPagination extends Application {
 	private boolean containsVideo = false;
 	private boolean containsAudio = false;
 	private String titleCreated;
+	private MediaFx videoPlayer;
 
 	/* variables for the commentsMenu */
 	private BorderPane commentsScreenLayout;
@@ -789,7 +791,9 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 
-				tempPres = null;
+				//createPresentationMenu
+				videoPlayer.stop();
+				gridForCreation.getChildren().remove(videoPlayer);
 				window.setTitle("User Screen Menu");
 				window.setScene(userScreenMenu);
 			}
@@ -1940,25 +1944,31 @@ public class MainGuiPagination extends Application {
 
 		// Create a root node called grid. In this case a grid pane layout
 		// is used, with vertical and horizontal gaps of 10
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
+		gridForCreation = new GridPane();
+		gridForCreation.setHgap(10);
+		gridForCreation.setVgap(10);
+		
+		AnchorPane anchorForMedia = new AnchorPane();
+		gridForCreation.add(anchorForMedia, 1, 2);
+		
+		VBox vBox1 = new VBox(10);
+		VBox vBox2 = new VBox(10);
 
 		// Centre the controls in the scene
-		grid.setAlignment(Pos.CENTER);
+		gridForCreation.setAlignment(Pos.TOP_CENTER);
 
 		// Add padding
-		grid.setPadding(new Insets(25, 25, 25, 25));
+		gridForCreation.setPadding(new Insets(25, 25, 25, 25));
 
 		titleField = new TextField();
 		titleField.setPrefSize(250, 10);
 		titleField.setPromptText("Enter The Title of the Presentation");
-		grid.add(titleField, 0, 0);
+		//grid.add(titleField, 0, 0);
 		
 		languageField = new TextField();
 		languageField.setPrefSize(180, 10);
 		languageField.setPromptText("Enter The Language Used");
-		grid.add(languageField, 1, 0);
+		//grid.add(languageField, 1, 0);
 		
 //		titleLabel = new Label("Title:");
 //		titleLabel.setId("titleLabel"); // Id for gui_style.css
@@ -1975,12 +1985,12 @@ public class MainGuiPagination extends Application {
 		mediaLanguage.setId("mediaLanguage"); // Id for gui_style.css
 		// videoLanguage.setFill(Color.ALICEBLUE);
 		mediaLanguage.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		grid.add(mediaLanguage, 0, 1, 3, 1);
+		gridForCreation.add(mediaLanguage, 0, 1, 3, 1);
 
 		mediaLanguageText = new TextArea();
 		mediaLanguageText.setPromptText("Enter Video Language Text");
 		mediaLanguageText.setPrefSize(100, 250);
-		grid.add(mediaLanguageText, 0, 2);
+		gridForCreation.add(mediaLanguageText, 0, 2);
 
 		startTime = new Label("Start Time:");
 		startTime.setId("startTime"); // Id for gui_style.css
@@ -2031,24 +2041,29 @@ public class MainGuiPagination extends Application {
 		mediaTranslation.setId("mediaTranslation"); // Id for gui_style.css
 		// videoLanguage.setFill(Color.ALICEBLUE);
 		mediaTranslation.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		grid.add(mediaTranslation, 0, 4, 3, 1);
+		gridForCreation.add(mediaTranslation, 0, 4, 3, 1);
 
 		mediaTranslationText = new TextArea();
 		mediaTranslationText.setPromptText("Enter Video Translation Text");
 		mediaTranslationText.setPrefSize(100, 250);
-		grid.add(mediaTranslationText, 0, 5);
+		gridForCreation.add(mediaTranslationText, 0, 5);
 
 		btnNext = new Button("Next");
 		btnNext.setId("btnNext");
 		// grid.add(btnNext, 0, 5);
 		btnOpenMediaDty = new Button("Add Media");
 		btnOpenMediaDty.setId("btnOpenMediaDty");
-		btnOpenMediaDty.setPrefSize(200, 200);
+		//btnOpenMediaDty.setPrefSize(200, 200);
 		// grid.add(btnOpenVideoDty, 1, 5);
 		btnCreate = new Button("Create");
 		btnCreate.setId("btnCreate");
 		// grid.add(btnCreate, 2, 5);
 
+		vBox1.setAlignment(Pos.CENTER_LEFT);
+//		hbFirst.getChildren().addAll(titleLabel, titleField, languageLabel, languageField);
+		vBox1.getChildren().addAll(titleField, languageField);
+		gridForCreation.add(vBox1, 0, 0);
+		
 		HBox hBox1 = new HBox(10);
 		hBox1.setAlignment(Pos.CENTER_LEFT);
 //		hbFirst.getChildren().addAll(titleLabel, titleField, languageLabel, languageField);
@@ -2062,12 +2077,17 @@ public class MainGuiPagination extends Application {
 		// Creating a HBox area to add the labels and textfields
 		HBox hBox3 = new HBox(10);
 		hBox3.setAlignment(Pos.CENTER_LEFT);
-		hBox3.getChildren().addAll(btnNext, btnCreate);
+		hBox3.getChildren().addAll(btnNext, btnCreate, btnOpenMediaDty);
+		
+		vBox2.setAlignment(Pos.CENTER_LEFT);
+//		hbFirst.getChildren().addAll(titleLabel, titleField, languageLabel, languageField);
+		vBox2.getChildren().addAll(hBox1, hBox2);
+		gridForCreation.add(vBox2, 0, 3);
 
-		grid.add(btnOpenMediaDty, 2, 3);
-		grid.add(hBox1, 0, 3);
-		grid.add(hBox2, 1, 3);
-		grid.add(hBox3, 0, 6);
+		//grid.add(btnOpenMediaDty, 1, 3);
+		//grid.add(hBox1, 0, 3);
+		//grid.add(hBox2, 1, 3);
+		gridForCreation.add(hBox3, 0, 6);
 
 		// Event handler for btnNext
 		btnNext.setOnAction(new EventHandler<ActionEvent>() {
@@ -2178,13 +2198,20 @@ public class MainGuiPagination extends Application {
 				// presentation scene
 				// with a pagination layout
 				openSelectedMediaFile(selectedMediaFile);
-				
-				MediaFx videoPlayer = new MediaFx(videoItem, 0.3, 0.3);
-				AnchorPane anchor = new AnchorPane();
+				VideoItem videoLoad = new VideoItem();
+				videoLoad = videoItem;
+				videoLoad.setxStart(0);
+				videoLoad.setyStart(0);
+				videoPlayer = new MediaFx(videoLoad, 0.3, 0.3);
+				//AnchorPane anchor = new AnchorPane();
 				Group group = new Group();
-				anchor.getChildren().add(group);
+				//anchor.getChildren().add(group);
 				group.getChildren().add(videoPlayer.createContent(createPresentationMenu));
-				grid.add(group, 2, 0);
+				AnchorPane.setTopAnchor(group, 0.0);
+				AnchorPane.setBottomAnchor(group, 1.0);
+				AnchorPane.setLeftAnchor(group, 1.0);
+				AnchorPane.setRightAnchor(group, 0.0);
+				anchorForMedia.getChildren().add(group);
 			}
 		});
 		//
@@ -2209,7 +2236,7 @@ public class MainGuiPagination extends Application {
 			}
 		});
 
-		return grid;
+		return gridForCreation;
 	}
 
 	/* Method for GridPane items for User Screen Menu */
