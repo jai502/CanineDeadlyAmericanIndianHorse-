@@ -48,7 +48,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.animation.FadeTransition;
 import javafx.application.*;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 //import javafx.beans.InvalidationListener;
@@ -58,14 +61,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.stage.*;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import searchDetails.SearchDetails;
+import gui.MainGuiPagination.InitCompletionHandler;
 import zipping.Zipper;
 
 import com.RequestObject;
@@ -78,15 +86,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Pagination;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.PerspectiveTransform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -112,8 +112,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import Objects.Presentation;
 import Parsers.XMLParser;
@@ -138,8 +136,7 @@ public class MainGuiPagination extends Application {
 
 	/* variables for the primary stage */
 	private Stage window;
-	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu,
-			commentsMenu;
+	private Scene mainMenu, logInMenu, signUpMenu, userScreenMenu, presentationMenu, createPresentationMenu, commentsMenu;
 	private int width = 880;
 	private int height = 660;
 	private MenuItem exit;
@@ -183,14 +180,8 @@ public class MainGuiPagination extends Application {
 	private int presentationIndex, toolTipIndex;
 	private String presentationID;
 	private PresentationShell loadPresentation = new PresentationShell();
-	private ArrayList<String[]> searchResults = new ArrayList<String[]>(); // Define
-																			// an
-																			// arraylist
-																			// for
-																			// the
-																			// search
-																			// results
-
+	private ArrayList<String[]> searchResults = new ArrayList<String[]>(); 
+	
 	/* variables for the createPresentationMenu */
 	private Presentation createdPres;
 	private BorderPane createPresentationScreenLayout;
@@ -255,11 +246,141 @@ public class MainGuiPagination extends Application {
 	// private ImageView image;
 	// private boolean x = false;
 
+	/************* Splash Stuff **********************************/
+	public static final String APPLICATION_ICON =
+			"files/icon.png";
+	public static final String SPLASH_IMAGE =
+			"files/splash.png";
+
+	private VBox splashLayout;
+	private ProgressBar loadProgress;
+	private Label progressText;
+	private Stage mainStage;
+	private static final int SPLASH_WIDTH = 676;
+	private static final int SPLASH_HEIGHT = 227;
+	
 	// Constructor
 	public MainGuiPagination() {
 
 	}
+	
+	public interface InitCompletionHandler {
+		void complete();
+	}
+	
+//	private void splash() 
+//	{
+//		Thread splashThread = new Thread("splash")
+//		{
+//			public void run() 
+//			{
+//				try 
+//				{
+//					Stage init = new Stage();
+//					runSplash(init);
+//				}
+//				catch (IOException e) 
+//				{
+//					e.printStackTrace();
+//				}
+//
+//			}
+//			
+//
+//		};
+//		
+//		splashThread.start();
+//	}
 
+	private void runSplash(Stage initStage)
+	{
+		
+		ImageView splash = new ImageView(new Image(SPLASH_IMAGE));
+		loadProgress = new ProgressBar();
+		loadProgress.setPrefWidth(SPLASH_WIDTH - 20);
+		progressText = new Label("Will find friends for peanuts . . .");
+		splashLayout = new VBox();
+		splashLayout.getChildren().addAll(splash, loadProgress, progressText);
+		progressText.setAlignment(Pos.CENTER);
+		splashLayout.setStyle(
+				"-fx-padding: 5; " +
+				"-fx-background-color: cornsilk; " +
+				"-fx-border-width:5; " +
+				"-fx-border-color: " +
+				"linear-gradient(" +
+				"to bottom, " +
+				"chocolate, " +
+				"derive(chocolate, 50%)" +
+						");"
+				);
+		splashLayout.setEffect(new DropShadow());
+		
+		Scene splashScene = new Scene(splashLayout, Color.TRANSPARENT);
+		final Rectangle2D bounds = Screen.getPrimary().getBounds();
+		initStage.setScene(splashScene);
+		initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
+		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+		initStage.initStyle(StageStyle.TRANSPARENT);
+		initStage.setAlwaysOnTop(true);
+		initStage.show();
+	}
+	
+	private void showSplash(final Stage initStage, Task<?> task, InitCompletionHandler initCompletionHandler) 
+	{
+		//progressText.textProperty().bind(task.messageProperty());
+		loadProgress.progressProperty().bind(task.progressProperty());
+		task.stateProperty().addListener((observableValue, oldState, newState) -> {
+			if (newState == Worker.State.SUCCEEDED) {
+				loadProgress.progressProperty().unbind();
+				loadProgress.setProgress(1);
+				initStage.toFront();
+				FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.2), splashLayout);
+				fadeSplash.setFromValue(1.0);
+				fadeSplash.setToValue(0.0);
+				fadeSplash.setOnFinished(actionEvent -> initStage.hide());
+				fadeSplash.play();
+
+				initCompletionHandler.complete();
+			} // todo add code to gracefully handle other task states.
+		});
+
+		Scene splashScene = new Scene(splashLayout, Color.TRANSPARENT);
+		final Rectangle2D bounds = Screen.getPrimary().getBounds();
+		initStage.setScene(splashScene);
+		initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
+		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+		initStage.initStyle(StageStyle.TRANSPARENT);
+		initStage.setAlwaysOnTop(true);
+		initStage.show();
+	}
+
+	
+	private void splashGUI() {
+		
+		ImageView splash = new ImageView(new Image(SPLASH_IMAGE));
+		loadProgress = new ProgressBar();
+		loadProgress.setPrefWidth(SPLASH_WIDTH - 20);
+		progressText = new Label("Will find friends for peanuts . . .");
+		splashLayout = new VBox();
+		splashLayout.getChildren().addAll(splash, loadProgress, progressText);
+		progressText.setAlignment(Pos.CENTER);
+		splashLayout.setStyle(
+				"-fx-padding: 5; " +
+				"-fx-background-color: cornsilk; " +
+				"-fx-border-width:5; " +
+				"-fx-border-color: " +
+				"linear-gradient(" +
+				"to bottom, " +
+				"chocolate, " +
+				"derive(chocolate, 50%)" +
+						");"
+				);
+		splashLayout.setEffect(new DropShadow());
+	}
+	
+	/**************************************************************************/
+	
+	
 	public static void main(String[] args) {
 		// Required for JavaFX to run
 		launch(args);
@@ -267,7 +388,10 @@ public class MainGuiPagination extends Application {
 
 	// Override the init() method
 	@Override
-	public void init() {
+	public void init() throws InterruptedException {
+		
+		splashGUI();
+		
 		System.out.println("Setting up/initialising GUI now");
 		com = new ServerRequestHandler(serverPort, serverHost);
 		com.start();
@@ -275,10 +399,40 @@ public class MainGuiPagination extends Application {
 	}
 
 	// Required method to run the JavaFX code
-	@Override
-	public void start(Stage primaryStage) throws IOException {
-		initialiseGUI(primaryStage);
-	}
+//	@Override
+//	public void start(final Stage primaryStage) throws IOException 
+//	{
+//		
+//		Task<ReadOnlyObjectProperty<BorderPane>> splash = new Task<ReadOnlyObjectProperty<BorderPane>>() {
+//	         @Override protected ReadOnlyObjectProperty<BorderPane> call() throws Exception {
+//	             int i;
+//	             BorderPane borderPane = new BorderPane();
+////	             for (i = 0; i < 10000000; i++) {
+////	                 if (isCancelled()) {
+////	                     updateMessage("Cancelled");
+////	                     break;
+////	                 }
+////	                 updateMessage("Iteration " + i);
+////	                 updateProgress(i, 10000000);
+////	             }
+//	             return borderPane;
+//	         }
+//	     };
+//		
+//		//showSplash(primaryStage, splash, () -> initialiseGUI(splash.valueProperty()));
+//		new Thread(splash).start();
+		
+		
+		
+		
+		
+		
+		
+		
+		//splashGUI(primaryStage);
+		//Thread.wait(5000);
+		//initialiseGUI(primaryStage);
+	//}
 
 	// Override the stop() method
 	@Override
@@ -289,11 +443,13 @@ public class MainGuiPagination extends Application {
 	}
 
 	/* Method which initialises and creates all the GUI */
-	private boolean initialiseGUI(Stage stage) throws IOException {
+	private boolean initialiseGUI(ReadOnlyObjectProperty<BorderPane> layout) throws IOException {
 
 		// Assign window variable as the primary stage
-		window = stage;
+		//window = stage;
+		window = new Stage();
 
+		
 		window.getIcons().add(new Image("files/icon.png"));
 
 		// Create menu bar objects ready to add to the Scenes - Crashes if
@@ -310,6 +466,7 @@ public class MainGuiPagination extends Application {
 
 		// Create a root node called menuLayout which uses BorderPane
 		BorderPane menuLayout = new BorderPane();
+		menuLayout.centerProperty().bind(layout);
 
 		showCommentsMenuBar = false;
 		showCreatePresMenuBar = false;
