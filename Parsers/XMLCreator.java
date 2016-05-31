@@ -46,21 +46,20 @@ public class XMLCreator {
 	private String audioLoc, videoLoc, imageLoc, csvLoc;
 	private ServerRequestHandler com;
 	private String createdLoc = ("temp"+File.separator+"createdPres.pws");
+	private PresentationShell presShell = null;
 	
 	
-	public XMLCreator(ServerRequestHandler com) {
+	public XMLCreator(ServerRequestHandler com, PresentationShell presShell) {
 		this.com = com;
+		this.presShell = presShell;
 	}
 
 	public void createXML(Presentation presentation,boolean containsDefaults ,boolean containsImage, 
 			boolean containsShape,boolean shapeShade, boolean containsPoly,
-			boolean containsText, boolean containsVideo, boolean containsAudio,
-			PresentationShell presShell) 
+			boolean containsText, boolean containsVideo, boolean containsAudio) 
 	{
 		try {
 			
-			
-
 			// Create document builder
 			DocumentBuilderFactory builderFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFac.newDocumentBuilder();

@@ -1834,6 +1834,8 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				//Zipper.deleteFolder("temp"+ File.separator);
+				
+				// get index of selected presentation in search pane
 				presentationIndex = searchView.getSelectionModel().getSelectedIndex();
 				presentationID = idList.get(presentationIndex);
 				System.out.println("Presentation ID is: " + presentationID);
@@ -1847,22 +1849,24 @@ public class MainGuiPagination extends Application {
 
 				// TODO loadng downloaded pres
 				//File download = new File("temp" + File.separator + presentationLoad.getId().toString() + ".pws");
-			//	if (!download.exists()) {
+				//if (!download.exists()) {
 
-					/************* Client/Server Communication ***************/
-					com.getPresentation(presentationLoad, "temp" + File.separator);
-					/*********************************************************/
-			//	}
+				/************* Client/Server Communication ***************/
+				com.getPresentation(presentationLoad, "temp" + File.separator);
+				/*********************************************************/
+				
+				//}
 				// Unzip file
 				try {
-					Zipper.deleteFolder("temp" + File.separator + "tempPres" + File.separator);
+					Zipper.deleteFolder("temp" + File.separator + "tempPres");
+					System.out.println("Deleted temp folder contents");
 				} catch (Exception e1) {
 					System.out.println("Unable to delete folder...");
 					e1.printStackTrace();
 				}
 				try {
 					Zipper.makeFolder("temp" + File.separator + "tempPres");
-					
+					System.out.println("Deleted temp folder contents");
 				}
 				catch (Exception e1){
 					System.out.println("Unable to create folder...");
@@ -2251,7 +2255,12 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				createdPres = new Presentation();
 
-				XMLCreator creator = new XMLCreator(com);
+				PresentationShell presShell = new PresentationShell();
+				presShell.setAuthor(sUsernameLogin);
+				presShell.setLanguage(languageField.getText());
+				presShell.setTitle(titleField.getText());
+				
+				XMLCreator creator = new XMLCreator(com, presShell);
 
 				if (containsVideo == true) {
 					xmlSlide.addVideo(videoItem);
@@ -2261,17 +2270,11 @@ public class MainGuiPagination extends Application {
 
 				FillPres fp = new FillPres();
 				createdPres = fp.fillPresentation(createdPres, sUsernameLogin, xmlSlide, titleCreated);
-				
 
-				PresentationShell presShell = new PresentationShell();
-				presShell.setAuthor(sUsernameLogin);
-				presShell.setLanguage(languageField.getText());
-				presShell.setTitle(titleField.getText());
-
-				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
+				// create the XML 
+				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio);
 				
-				
-				
+				// upload the presentation to the server
 			}
 		});
 
