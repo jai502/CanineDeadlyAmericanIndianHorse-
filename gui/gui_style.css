@@ -309,7 +309,7 @@
 }
 
 #mediaLanguage{
-	-fx-text-fill: white;
+	-fx-text-fill: black;
 }
 
 #mediaTranslation{
@@ -317,7 +317,8 @@
 }
 
 #startTime{
-	-fx-text-fill: white;
+	-fx-text-fill: black;
+
 }
 
 #endTime{

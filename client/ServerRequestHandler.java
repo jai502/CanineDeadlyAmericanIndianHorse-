@@ -434,7 +434,7 @@ public class ServerRequestHandler
 	//=========================================================================
 	// Send a user presentation vote to the server
 	//=========================================================================
-	public final boolean sendVote(PresentationShell pres, int vote)
+	public final boolean sendVote(PresentationShell pres, Integer vote)
 	{
 		boolean voteRegistered = false;
 		
@@ -443,7 +443,7 @@ public class ServerRequestHandler
 		sendRequest(addVote);
 		System.out.println("Successfully sent id, now sending vote");
 		
-		RequestObject sendVote = new RequestObject("SEND_INT", (int) vote, order);
+		RequestObject sendVote = new RequestObject("SEND_INT", (Object) vote, order);
 		sendRequest(sendVote);
 		System.out.println("Vote sent to server");
 		
@@ -469,13 +469,17 @@ public class ServerRequestHandler
 	//=========================================================================
 	// Send a comment to the server
 	//=========================================================================
-	public final boolean addComment(PresentationShell pres)
+	public final boolean addComment(PresentationShell pres, String comment)
 	{
 		boolean commentAdded = false;
 		
-		RequestObject comment = new RequestObject("REQUEST_SET_COMMENT", (Object) pres, order);
+		RequestObject commentPres = new RequestObject("REQUEST_SET_COMMENT", (Object) pres, order);
 		System.out.println("Adding comment to database with order " + order);
-		sendRequest(comment);
+		sendRequest(commentPres);
+		
+		
+		RequestObject attachComment = new RequestObject("", (String) comment, order);
+		sendRequest(attachComment);
 		System.out.println("Successfully sent, waiting for response...");
 		
 		RequestObject response = getResponse();
@@ -497,11 +501,11 @@ public class ServerRequestHandler
 		return commentAdded;
 	}
 	
-	public final ArrayList getComments(PresentationShell pres)
+	public final ArrayList<String[]> getComments(PresentationShell pres)
 	{
-		ArrayList commentList = null;
+		ArrayList<String[]> commentList = null;
 		
-		RequestObject comments = new RequestObject("REQUEST_GET_COMMENT", (Object) pres, order);
+		RequestObject comments = new RequestObject("REQUEST_GET_COMMENTS", (Object) pres, order);
 		System.out.println("Requesting comments list from server with order " + order);
 		sendRequest(comments);
 		System.out.println("Successfully sent, waiting for response...");
@@ -512,7 +516,7 @@ public class ServerRequestHandler
 		{
 		case "RESPONSE_OK":
 			System.out.println("Comments recieved from server");
-			commentList = (ArrayList) response.param;
+			commentList = (ArrayList<String[]>) response.param;
 			break;
 		case "RESPONSE_FAIL":
 			System.out.println("Response failed " + (String) response.param);

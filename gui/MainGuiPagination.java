@@ -515,18 +515,19 @@ public class MainGuiPagination extends Application {
 				.add(MainGuiPagination.class.getResource("gui_style.css").toExternalForm());
 
 		GridPane commentsGrid = addCommentScreenGridItems();
-		Group commentsResults = commentsDetails();
-		TextArea inputComments = commentsEdit();
-
-		VBox vBox = new VBox();
-		vBox.getChildren().addAll(commentsResults, inputComments);
+//		Group commentsResults = commentsDetails();
+//		TextArea inputComments = commentsEdit();
+//
+//		VBox vBox = new VBox();
+//		vBox.getChildren().addAll(commentsResults, inputComments);
 
 		// Add menu bar to User screen
 		MenuBar commentsMenuBar = menuItems(); // Presentation Menu
 
 		commentsScreenLayout.setTop(commentsMenuBar);
 		commentsScreenLayout.setLeft(commentsGrid);
-		commentsScreenLayout.setRight(vBox);
+		//commentsScreenLayout.setRight(vBox);
+		//commentsScreenLayout.setRight(commentsDetails());
 
 		/**************************************************************/
 
@@ -745,43 +746,42 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 
-				// /************* Client/Server Communication ***************/
-				// commentResults =
-				// com.searchForPresentation(presentationShell);
-				// /*********************************************************/
-				//
-				// int x = 0;
-				//
-				// for (int i = 0; i < commentResults.size(); i++)
-				// {
-				// for(x = 0; x < commentResults.get(i).length; x++)
-				// {
-				// if (x == 0)
-				// {
-				// commentsList.add("Title: " + commentResults.get(i)[x] +
-				// "\n");
-				// }
-				// else if (x == 1)
-				// {
-				// commentsList.add(commentsList.get(i) + "Author: " +
-				// commentResults.get(i)[x]+ "\n");
-				// commentsList.remove(i);
-				// }
-				// else if (x == 2)
-				// {
-				// commentsList.add(commentsList.get(i) + "Language: " +
-				// commentResults.get(i)[x]);
-				// commentsList.remove(i);
-				// }
-				// }
-				// }
-				//
-				// // userScreenLayout.setRight(searchDetails());
-				// System.out.println(commentsList);
-				//
-				// observableListSearch =
-				// FXCollections.observableList(commentsList);
+				 /************* Client/Server Communication ***************/
+				 commentResults = com.getComments(presentationLoad);
+				 /*********************************************************/
 
+				 int x = 0;
+				 
+				 if(commentResults.isEmpty())
+				 {
+					 System.out.println("There are no comments");
+				 }
+				 else
+				 {
+					 for (int i = 0; i < commentResults.size(); i++) 
+					 {
+						 commentsList.add("Username: " + commentResults.get(i)[0] + "\n");
+						 commentsList.add("Comment: " + commentResults.get(i)[1] + "\n");
+						 //commentsList.remove(i);
+						 commentsList.add(commentResults.get(i)[2]);
+						 //commentsList.remove(i); 
+					 }
+				 }
+
+				 // userScreenLayout.setRight(searchDetails());
+				 System.out.println(commentsList);
+
+				observableListComments = FXCollections.observableList(commentsList);
+				
+				Group commentsResults = commentsDetails();
+				TextArea inputComments = commentsEdit();
+
+				VBox vBox = new VBox();
+				vBox.getChildren().addAll(commentsResults, inputComments);
+
+				
+				commentsScreenLayout.setRight(vBox);
+				
 				tempPres = null;
 				window.setTitle("Comments Menu");
 				window.setScene(commentsMenu);
@@ -2352,6 +2352,7 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				rating = 1;
+				com.sendVote(presentationLoad, rating);
 				// Need to assign this rating value to some
 				// kind of presentation object
 			}
@@ -2362,6 +2363,7 @@ public class MainGuiPagination extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				rating = -1;
+				com.sendVote(presentationLoad, rating);
 				// Need to assign this rating value to some
 				// kind of presentation object
 			}
@@ -2373,6 +2375,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				writtenComments = commentsToWrite.getText();
 				System.out.println(writtenComments);
+				com.addComment(presentationLoad, writtenComments);
 				// Need to assign the text to the presentation
 				// object and send that to the server
 			}
@@ -2396,12 +2399,11 @@ public class MainGuiPagination extends Application {
 		commentsView.setPrefHeight(commentsScreenLayout.getHeight() * 0.75);
 		commentsView.setPrefWidth(commentsScreenLayout.getWidth() / 2);
 		commentsView.setOpacity(0.7);
-		// System.out.println(observableList);
+		System.out.println(observableListComments);
 
-		// searchView.getSelectionModel().getSelectedIndex();
-		commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-		// commentsView.setItems(observableListComments);
+		//searchView.getSelectionModel().getSelectedIndex();
+		commentsView.setItems(observableListComments);
+		//commentsView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		listGroup.getChildren().add(commentsView);
 		return listGroup;
