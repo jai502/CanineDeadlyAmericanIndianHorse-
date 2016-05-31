@@ -1833,6 +1833,7 @@ public class MainGuiPagination extends Application {
 		btnLoadPres.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
+				//Zipper.deleteFolder("temp"+ File.separator);
 				presentationIndex = searchView.getSelectionModel().getSelectedIndex();
 				presentationID = idList.get(presentationIndex);
 				System.out.println("Presentation ID is: " + presentationID);
@@ -1845,13 +1846,13 @@ public class MainGuiPagination extends Application {
 				presentationLoad.setLanguage(searchResults.get(presentationIndex)[3]);
 
 				// TODO loadng downloaded pres
-				File download = new File("temp" + File.separator + presentationLoad.getId().toString() + ".pws");
-				if (!download.exists()) {
+				//File download = new File("temp" + File.separator + presentationLoad.getId().toString() + ".pws");
+			//	if (!download.exists()) {
 
 					/************* Client/Server Communication ***************/
 					com.getPresentation(presentationLoad, "temp" + File.separator);
 					/*********************************************************/
-				}
+			//	}
 				// Unzip file
 				try {
 					Zipper.deleteFolder("temp" + File.separator + "tempPres" + File.separator);
