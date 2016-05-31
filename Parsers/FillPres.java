@@ -30,7 +30,7 @@ public class FillPres {
 		Color textBox = new Color(1,1,1,1);
 		Color line = new Color(0,0,0,1);
 		
-		ShapeItem centreLine  = new ShapeItem(0,0,0.595f,0f,0.01f,1f,"rectangle",line , textBox);
+		ShapeItem centreLine  = new ShapeItem(0,0,0.52f,0f,0.01f,1f,"rectangle",line , textBox);
 		ShapeItem textBoxOne = new ShapeItem(0,0,0.1f,0.1f,0.4f,0.3f,"rectangle",line , textBox);
 		ShapeItem textBoxTwo = new ShapeItem(0,0,0.1f,0.6f,0.4f,0.3f,"rectangle",line , textBox);
 		

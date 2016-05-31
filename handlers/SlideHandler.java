@@ -231,7 +231,7 @@ public class SlideHandler {
 		for (int x = 0; x < presentation.getSlides().get(i).getVideoList().size(); x++) {
 			// Will only allow one video player (but width and Height
 			// TODO add timing and catch for two videos made
-			videoPlayer = new MediaFx(presentation.getSlides().get(i).getVideoList().get(x), 0.3, 0.3);
+			videoPlayer = new MediaFx(presentation.getSlides().get(i).getVideoList().get(x), 0.32, 0.32);
 			AnchorPane anchor = new AnchorPane();
 			Group group = new Group();
 			anchor.getChildren().add(group);

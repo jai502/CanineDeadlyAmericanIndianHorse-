@@ -14,21 +14,25 @@
 
 package zipping;
 
+import java.io.IOException;
+
 public class ZipTest
 {
-    public static void main(String[] args) 
+    public static void main(String[] args) throws IOException 
     {
     	//delete existing folders
-        Zipper.deleteFolder("temp/");
-        Zipper.deleteFolder("zipping/foldertest");
+       // Zipper.deleteFolder("temp");
+        //Zipper.deleteFolder("zipping/foldertest");
         
         //run file operations
         try 
         {
-            Zipper.unzip("zipping/presentation.pws", "temp/");
-            Zipper.makeFolder("zipping/temp");
-            Zipper.zip("temp/", "zipping/test.pws");
-            Zipper.copyFile("C:/Users/Callum/Desktop/test.pws", "zipping/temp/test3.pws" );
+        	Zipper.makeFolder("zipping/temp");
+        	Zipper.makeFolder("temp/temptest");
+//            Zipper.unzip("zipping/presentation.pws", "temp/temptest");
+            Zipper.deleteFolder("zipping.temp");
+     //       Zipper.zip("temp/", "zipping/test.pws");
+    //        Zipper.copyFile("C:/Users/Callum/Desktop/test.pws", "zipping/temp/test3.pws" );
         }
         catch (Exception e) 
         {

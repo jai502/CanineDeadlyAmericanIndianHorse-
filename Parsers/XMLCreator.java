@@ -160,8 +160,9 @@ public class XMLCreator {
 						
 						try {
 							Zipper.makeFolder(temp + File.separator + createdPres);
-							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
-							Zipper.copyFile(imageLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "image"+i+"."+Zipper.scan(imageLoc));
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres");
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres" + File.separator + media);
+							Zipper.copyFile(imageLoc, temp + File.separator + createdPres + File.separator + "tempPres"+ File.separator + media + File.separator + "image"+i+"."+Zipper.scan(imageLoc));
 							imageLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "image" + i + "." + Zipper.scan(imageLoc));
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -309,8 +310,9 @@ public class XMLCreator {
 						
 						try {
 							Zipper.makeFolder(temp + File.separator + createdPres);
-							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
-							Zipper.copyFile(csvLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "csv"+i+"."+Zipper.scan(csvLoc));
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres");
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres" + File.separator + media);
+							Zipper.copyFile(csvLoc, temp + File.separator + createdPres + File.separator + "tempPres"+ File.separator + media + File.separator + "csv"+i+"."+Zipper.scan(csvLoc));
 							csvLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "csv" + i + "." + Zipper.scan(csvLoc));
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -429,7 +431,7 @@ public class XMLCreator {
 
 					}
 				}
-
+				// TODO REMOVE HARD CODED VALUES FOR COMPLETEION
 				// Video
 				if (containsVideo == true)
 				{
@@ -440,8 +442,9 @@ public class XMLCreator {
 						
 						try {
 							Zipper.makeFolder(temp + File.separator + createdPres);
-							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
-							Zipper.copyFile(videoLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "video"+i+"."+Zipper.scan(videoLoc));
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres");
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres" + File.separator + media);
+							Zipper.copyFile(videoLoc, temp + File.separator + createdPres + File.separator + "tempPres"+ File.separator + media + File.separator + "video"+i+"."+Zipper.scan(videoLoc));
 							videoLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "video" + i + "." + Zipper.scan(videoLoc));
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -462,10 +465,8 @@ public class XMLCreator {
 						Attr videoLoop = presentationDoc.createAttribute("loop");
 
 						// Set video attributes
-						videoYstart.setValue(
-								String.valueOf(presentation.getSlides().get(i).getVideoList().get(x).getyStart()));
-						videoXstart.setValue(
-								String.valueOf(presentation.getSlides().get(i).getVideoList().get(x).getxStart()));
+						videoYstart.setValue("0.1");
+						videoXstart.setValue("0.6");
 						videoSource.setValue(presentation.getSlides().get(i).getVideoList().get(x).getSourceFile());
 						videoDuration.setValue(
 								String.valueOf(presentation.getSlides().get(i).getVideoList().get(x).getDuration()));
@@ -495,8 +496,9 @@ public class XMLCreator {
 						
 						try {
 							Zipper.makeFolder(temp + File.separator + createdPres);
-							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + media);
-							Zipper.copyFile(audioLoc, temp + File.separator + createdPres + File.separator + media + File.separator + "audio"+i+"."+Zipper.scan(audioLoc));
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres");
+							Zipper.makeFolder(temp + File.separator + createdPres + File.separator + "tempPres"+ File.separator + media);
+							Zipper.copyFile(audioLoc, temp + File.separator + createdPres + File.separator + "tempPres"+ File.separator + media + File.separator + "audio"+i+"."+Zipper.scan(audioLoc));
 							videoLoc = (temp + File.separator + "tempPres" + File.separator + media + File.separator + "audio" + i + "." + Zipper.scan(audioLoc));
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -537,15 +539,15 @@ public class XMLCreator {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			DOMSource source = new DOMSource(presentationDoc);
-			StreamResult result = new StreamResult(new File(temp + File.separator + createdPres + File.separator + "presentation.xml"));
+			StreamResult result = new StreamResult(new File(temp + File.separator + createdPres + File.separator + "tempPres" + File.separator + "presentation.xml"));
 			transformer.transform(source, result);
 			
 			Thread zipperThread = new Thread(){
 				public void run(){
 					try {
 						// TODO THIS IS TEMPORARY
-						//Zipper.zip(temp + File.separator + createdPres + File.separator, createdLoc);
-						//System.out.println(com.uploadPresentation(presShell, createdLoc));
+						Zipper.zip(temp + File.separator + createdPres + File.separator + "tempPres", createdLoc);
+						System.out.println(com.uploadPresentation(presShell, createdLoc));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

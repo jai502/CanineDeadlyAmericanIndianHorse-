@@ -275,7 +275,7 @@ public class MainGuiPagination extends Application {
 	@Override
 	public void init() {
 		System.out.println("Setting up/initialising GUI now");
-		Zipper.makeFolder("temp");
+		Zipper.makeFolder("temp/");
 		com = new ServerRequestHandler(serverPort, serverHost);
 		com.start();
 
@@ -290,6 +290,7 @@ public class MainGuiPagination extends Application {
 	// Override the stop() method
 	@Override
 	public void stop() {
+		Zipper.deleteFolder("temp" + File.separator);
 		com.stop();
 		System.out.println("Stopping/Closing GUI Now!");
 		System.exit(0);
@@ -670,6 +671,9 @@ public class MainGuiPagination extends Application {
 
 		exit.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
+				
+				Zipper.deleteFolder("temp" + File.separator);
+				
 				com.logoutFromServer();
 				com.stop();
 				System.exit(0);
@@ -882,28 +886,28 @@ public class MainGuiPagination extends Application {
 	private File openSelectedFile(File xmlFile) {
 
 		if (xmlFile != null) {
-
-			// Temporary folder clearing
-
-			if (oldSelected == null) {
-				delete = false;
-			} else if (xmlFile.getAbsolutePath() != oldSelected.getAbsolutePath()) {
-				System.out.println(oldSelected.getAbsolutePath());
-				System.out.println(xmlFile.getAbsolutePath());
-				delete = true;
-			} else {
-				System.out.println(oldSelected.getAbsolutePath());
-				System.out.println(xmlFile.getAbsolutePath());
-				delete = false;
-			}
-
-			if (delete == true) {
-				if (oldSelected.getParent().contains("temp") && (presentationIdOld != null)) {
-					Zipper.deleteFolder("temp" + File.separator + presentationIdOld);
-					System.out.println("DELETED");
-					delete = false;
-				}
-			}
+//
+//			// Temporary folder clearing
+//
+//			if (oldSelected == null) {
+//				delete = false;
+//			} else if (xmlFile.getAbsolutePath() != oldSelected.getAbsolutePath()) {
+//				System.out.println(oldSelected.getAbsolutePath());
+//				System.out.println(xmlFile.getAbsolutePath());
+//				delete = true;
+//			} else {
+//				System.out.println(oldSelected.getAbsolutePath());
+//				System.out.println(xmlFile.getAbsolutePath());
+//				delete = false;
+//			}
+//
+//			if (delete == true) {
+//				if (oldSelected.getParent().contains("temp") && (presentationIdOld != null)) {
+//					Zipper.deleteFolder("temp" + File.separator + presentationIdOld);
+//					System.out.println("DELETED");
+//					delete = false;
+//				}
+//			}
 
 			window.setTitle("Presentation");
 			// Change scene to presentationMenu
@@ -1850,11 +1854,25 @@ public class MainGuiPagination extends Application {
 				}
 				// Unzip file
 				try {
-					Zipper.deleteFolder("temp" + File.separator + "tempPres");
+					Zipper.deleteFolder("temp" + File.separator + "tempPres" + File.separator);
+				} catch (Exception e1) {
+					System.out.println("Unable to delete folder...");
+					e1.printStackTrace();
+				}
+				try {
+					Zipper.makeFolder("temp" + File.separator + "tempPres");
+					
+				}
+				catch (Exception e1){
+					System.out.println("Unable to create folder...");
+				}
+				try {
+					System.out.println("temp" + File.separator + presentationLoad.getId().toString() + ".pws");
 					Zipper.unzip(("temp" + File.separator + presentationLoad.getId().toString() + ".pws"),
-							"temp" + File.separator + "tempPres" + File.separator);
-				} catch (IOException e1) {
-					System.out.println("Unable to unzip...");
+							"temp");
+				}
+				catch (Exception e1){
+					System.out.println("Unable to zip folder...");
 					e1.printStackTrace();
 				}
 
@@ -2232,7 +2250,7 @@ public class MainGuiPagination extends Application {
 			public void handle(ActionEvent e) {
 				createdPres = new Presentation();
 
-				//XMLCreator creator = new XMLCreator(com);
+				XMLCreator creator = new XMLCreator(com);
 
 				if (containsVideo == true) {
 					xmlSlide.addVideo(videoItem);
@@ -2249,7 +2267,7 @@ public class MainGuiPagination extends Application {
 				presShell.setLanguage(languageField.getText());
 				presShell.setTitle(titleField.getText());
 
-				//creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
+				creator.createXML(createdPres, true, true, true, false, false, true, containsVideo, containsAudio, presShell);
 				
 				
 				
@@ -2278,6 +2296,7 @@ public class MainGuiPagination extends Application {
 		messageRating = new Text("Please give your rating");
 		messageRating.setId("messageRating"); // Id for gui_style.css
 		// messageRating.setFill(Color.color(0.443, 0.196, 1.0));
+		
 		messageRating.setFill(Color.ALICEBLUE);
 		messageRating.setFont(Font.font("Arial", FontWeight.BOLD, 40));
 		grid.add(messageRating, 1, 0, 1, 1);

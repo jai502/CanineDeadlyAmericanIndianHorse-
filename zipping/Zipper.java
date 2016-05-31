@@ -1,247 +1,236 @@
-/*
-* (C) Stammtisch
-* First version created by: Joseph Ingleby
-* Date of first version: 2nd May 2016
-* 
-* Last version by: Joseph Ingleby
-* Date of last update: 28th May 2016
-* Version number: 2.1
-* 
-* Commit date: 28thMay 2016
-* Description: This class has functions to compress, decompress,delete  and copy files.
-*/
-
 package zipping;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class Zipper{
 
-	//create a buffer for the input stream data to be temporarily stored
-	private static final int BUFFER_SIZE = 4096;
-
-	public static void unzip(String input, String outputLocation)	throws IOException 
-	{
-		//create the output file
-		File output = new File(outputLocation);
-		//if the output file/directory does not already exist, make the output
-		if (!output.exists()) 
-			output.mkdir();
-		
-		//create an input stream from to read the zip file
-		ZipInputStream inputStream = new ZipInputStream(new FileInputStream(input));
-		//create an object to store the zip item for extraction
-		ZipEntry currentFile = inputStream.getNextEntry();
-		
-		//loop through until the end of the zip file is reached
-		while (currentFile != null)
-		{
-			//configure output location
-			String filePath = outputLocation + File.separator + currentFile.getName();
-			//check if the current file is a file or a directory
-			if (!currentFile.isDirectory()) 
-			{
-				extract(inputStream, filePath);
-				System.out.println("Extracted file to:		 " + filePath);
-			} 
-			else
-			{
-				File file = new File(filePath);
-				file.mkdir();
-			}
-			//once extracted, move to the next file
-			inputStream.closeEntry();
-			currentFile = inputStream.getNextEntry();
-		}
-		//stop extracting
-		inputStream.close();
-	}
-
-	private static void extract(ZipInputStream inputStream, String input)throws IOException
-	{
-		//create an outputstream and add a buffer to improve performance and reduce overhead during extraction
-		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(input));
-		//create an array to store the buffered data
-		byte[] bytesToRead = new byte[BUFFER_SIZE];
-		
-		//extract the file by reading a buffer from the input stream and writing to new files 
-		int beingRead = 0;
-		while((beingRead=inputStream.read(bytesToRead))>0)
-		{
-			outputStream.write(bytesToRead,0,beingRead);
-		}
-		
-		outputStream.close();
-	}
+public class Zipper 
+{
+	static int BUFFER = 2048;
 	
-	public static void deleteFolder(String outputLocation)
+	public static void unzip(String sourceFile, String destination)
 	{
-		//check if the location to delete exists and if it does, delete it
-		File toDelete = new File(outputLocation);
-		if(!toDelete.exists())
+		
+		makeFolder(destination);
+		try 
 		{
-			System.out.println("Nothing to delete");
-		}
-		else
-		{
-			try{
-				delete(toDelete);
-			}
-			catch(IOException e)
+			BufferedOutputStream dest = null;
+			FileInputStream fis = new FileInputStream(sourceFile);
+			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+			ZipEntry entry;
+			while((entry = zis.getNextEntry()) != null) 
 			{
-				e.printStackTrace();
-				System.out.println("An error occured while deleting");
-			}
-		}
-	}
-	
-	private static void delete(File toDelete) throws IOException
-	{
-		//check if the file to delete is a directory or a file
-		if(toDelete.isDirectory())
-		{
-			//if the directory is empty, delete it 
-			if(toDelete.list().length==0)
-			{
-				toDelete.delete();
-				System.out.println("Deleted directory: 		"+toDelete.getAbsolutePath());
-			}
-			else
-			{
-				//if the directory is not empty, recursively loop through and delete everything in the folder until it is empty
-				String filesToDelete[] = toDelete.list();
-				for (String temp: filesToDelete)
+				String filePath = destination + File.separator + entry.getName();
+				makeFolder(destination+File.separator+entry.getName().substring(0,entry.getName().lastIndexOf(File.separator)+1));
+				System.out.println("woolloongabba:" + destination+File.separator+entry.getName().substring(0,entry.getName().lastIndexOf(File.separator)+1));
+				
+				System.out.println("Extracting: " +entry);
+				int count;
+				byte data[] = new byte[BUFFER];
+				
+				
+				// write the files to the disk
+				if(!new File(filePath).isDirectory())
 				{
-					File deleteThis = new File(toDelete, temp);
-					delete(deleteThis);
+					System.out.println("filepath = "+ filePath);
+					FileOutputStream fos = new FileOutputStream(filePath);
+					dest = new BufferedOutputStream(fos, BUFFER);
+					while ((count = zis.read(data, 0, BUFFER)) > -1) 
+					{
+						dest.write(data, 0, count);
+					}
+					dest.flush();
+					dest.close();	
 				}
-				if(toDelete.list().length==0)
+				else
 				{
-					toDelete.delete();
-					System.out.println("Deleted directory: 		"+toDelete.getAbsolutePath());
+					File file = new File(filePath);
+					file.mkdirs();
 				}
-			}	
-		}
-		//if only a single file exists, delete it
-		else
-		{
-			toDelete.delete();
-			System.out.println("Deleted file: 			"+toDelete.getAbsolutePath());
-		}
-	}
-	
-	//a method to compress a folder to a destination folder
-	public static void zip(String sourceFolder, String destinationFile) throws Exception
-	{
-		//two streams for reading the files and compressing
-		ZipOutputStream zipStream = null;
-		FileOutputStream fileStream = null;
-
-		//assign values
-		fileStream = new FileOutputStream(destinationFile);
-		zipStream = new ZipOutputStream(fileStream);
-
-		//call the zipFolder function
-		zipFolder("", sourceFolder, zipStream);
-		zipStream.flush();
-		zipStream.close();
-		fileStream.flush();
-		fileStream.close();
-	}
-
-	//a method to zip individual files
-	public static void zipFile(String filePath, String sourceFile, ZipOutputStream zipStream) throws Exception 
-	{
-		//create a file to manipulate and assign it
-		File folder = new File(sourceFile);
-		
-		//if the file is a folder, use the zipfolder method
-		if (folder.isDirectory()) 
-		{
-			zipFolder(filePath, sourceFile, zipStream);
-		}
-		
-		//else create a buffer, fill it from the filestream and write it to the zip file
-		else 
-		{
-			byte[] buffer = new byte[1024];
-			int write;
-			FileInputStream fileStream = new FileInputStream(sourceFile);
-			zipStream.putNextEntry(new ZipEntry(filePath + File.separator + folder.getName()));
-			
-			while ((write = fileStream.read(buffer)) > 0)
-			{
-				zipStream.write(buffer, 0, write);
+				
 			}
-			
-			fileStream.close();
+			zis.close();
+			System.out.println("Extraction finished");
 		}
+		
+		catch (FileNotFoundException e) 
+		{
+			e.printStackTrace();
+		} catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+
 	}
 
-	//a method to zip a folder
-	private static void zipFolder(String filePath, String sourceFolder,ZipOutputStream zipStream) throws Exception 
+	public static void zip(String toZip, String destination)
 	{
-		File folder = new File(sourceFolder);
-		//loop through the folder and call the zip file method for all files found. This will run recursively
-		for (String fileName : folder.list()) 
-		{
-			if (filePath.equals("")) 
+		FileOutputStream dest;
+		try {
+			dest = new FileOutputStream(destination);
+			ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+			File fileToZip = new File(toZip);
+			addToZip(out,fileToZip,null);
+			out.flush();
+			out.close();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	} 
+	
+	private static void addToZip(ZipOutputStream zos, File toZip, String folderName)
+	{
+		try {
+			if(toZip == null || !toZip.exists())
 			{
-				zipFile(folder.getName(), sourceFolder + File.separator + fileName, zipStream);
+				return;
+			}
+			String entry  = toZip.getName();
+
+			if(folderName!=null && !folderName.isEmpty())
+			{
+				entry = folderName + File.separator + toZip.getName();
+			}
+
+			if(toZip.isDirectory())
+			{
+				File[] listFiles = toZip.listFiles();
+				for (int i = 0; i < listFiles.length; i++) {
+					File file = listFiles[i];
+					addToZip(zos, file, entry);
+					System.out.println(entry);
+				}
 			}
 			else
 			{
-				zipFile(filePath + File.separator + folder.getName(), sourceFolder + File.separator
-						+ fileName, zipStream);
+				System.out.println("Adding to zip:" + entry);
+				byte[] buffer = new byte[BUFFER];
+
+				FileInputStream fis = new FileInputStream(toZip);
+				zos.putNextEntry(new ZipEntry(entry));
+				int length;
+				
+				while((length = fis.read(buffer))> -1)
+				{
+					zos.write(buffer,0,length);
+				}
+				zos.closeEntry();
+				fis.close();		
 			}
 		}
+		
+		catch (FileNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		
 	}
 
-	//a method to copy a file using two streams.
-	public static void copyFile(String source, String dest) throws IOException 
+	public static void copyFile( String source, String destination) throws IOException 
 	{
 		File sourceFile = new File(source);
-		File destFile = new File(dest);
-		
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-		
-		//fill a buffer from the input stream and write it to the output file 
-		try
-		{
-			inputStream = new FileInputStream(sourceFile);
-			try {
-				outputStream = new FileOutputStream(destFile);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			byte[] buffer = new byte[1024];
-			int bytesToRead;
-
-			while ((bytesToRead = inputStream.read(buffer)) > 0) 
-			{
-				outputStream.write(buffer, 0, bytesToRead);
-			}
-		} 
-		finally 
-		{
-			inputStream.close();
-			outputStream.close();
-		}
+		File destFile = new File(destination);
+		Files.copy( sourceFile.toPath(), destFile.toPath() );
 	}
 	
-	//a method to scan for a file extension
+//	public static void deleteFolder(String locToDel) throws IOException
+//	{
+//		File toDelete = new File(locToDel);
+//		if(toDelete.exists())
+//		{
+//			File[] files = toDelete.listFiles();
+//			if(files!=null)
+//			{
+//				for(int i=0; i<files.length; i++)
+//				{
+//	                if(files[i].isDirectory()) 
+//	                {
+//	                    deleteFolder(files[i].getPath());
+//	                }
+//	                else 
+//	                {
+//	                    files[i].delete();
+//	                    System.out.println(files[i].getPath());
+//	                }
+//	            }
+//			}
+//		}
+//	}
+	
+	public static void deleteFolder(String outputLocation)
+    {
+        //check if the location to delete exists and if it does, delete it
+        File toDelete = new File(outputLocation);
+        if(!toDelete.exists())
+        {
+            System.out.println("Nothing to delete");
+        }
+        else
+        {
+            try{
+                delete(toDelete);
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+                System.out.println("An error occured while deleting");
+            }
+        }
+    }
+	
+	private static void delete(File toDelete) throws IOException
+    {
+        //check if the file to delete is a directory or a file
+        if(toDelete.isDirectory())
+        {
+            //if the directory is empty, delete it 
+            if(toDelete.list().length==0)
+            {
+                toDelete.delete();
+                System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
+            }
+            else
+            {
+                //if the directory is not empty, recursively loop through and delete everything in the folder until it is empty
+                String filesToDelete[] = toDelete.list();
+                for (String temp: filesToDelete)
+                {
+                    File deleteThis = new File(toDelete, temp);
+                    delete(deleteThis);
+                }
+                if(toDelete.list().length==0)
+                {
+                    toDelete.delete();
+                    System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
+                }
+            }    
+        }
+        //if only a single file exists, delete it
+        else
+        {
+            toDelete.delete();
+            System.out.println("Deleted file:             "+toDelete.getAbsolutePath());
+        }
+    }
+	
 	public static String scan(String filepath)
 	{
 		String extension;
@@ -249,11 +238,12 @@ public class Zipper{
 		return extension;
 		
 	}
-	
-	//a simple method to create a folder
-	public static void makeFolder(String folderName)
+
+	public static void makeFolder(String toMake)
 	{
-		File folder = new File(folderName);
-		folder.mkdir();
+		File folderMaker = new File(toMake);
+		if(!folderMaker.exists())
+			folderMaker.mkdirs();
 	}
+
 }
