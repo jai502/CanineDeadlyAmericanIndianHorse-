@@ -431,7 +431,101 @@ public class ServerRequestHandler
 		return result;
 	}
 	
-
+	//=========================================================================
+	// Send a user presentation vote to the server
+	//=========================================================================
+	public final boolean sendVote(PresentationShell pres, int vote)
+	{
+		boolean voteRegistered = false;
+		
+		RequestObject addVote = new RequestObject("REQUEST_SET_VOTE", (Object) pres, order);
+		System.out.println("Adding vote to existing ratings id:"+ addVote.id + " with order " + order);
+		sendRequest(addVote);
+		System.out.println("Successfully sent id, now sending vote");
+		
+		RequestObject sendVote = new RequestObject("SEND_INT", (int) vote, order);
+		sendRequest(sendVote);
+		System.out.println("Vote sent to server");
+		
+		RequestObject response = getResponse();
+		System.out.println("Response received with id:" + response.id);
+		
+		switch(response.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Vote registered on server");
+			voteRegistered = true;
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Response failed " + (String) response.param);
+			break;
+		default:
+			System.out.println("Unknown response: " + response.id);
+			break;
+		}
+		return voteRegistered;
+	}
+	
+	//=========================================================================
+	// Send a comment to the server
+	//=========================================================================
+	public final boolean addComment(PresentationShell pres)
+	{
+		boolean commentAdded = false;
+		
+		RequestObject comment = new RequestObject("REQUEST_SET_COMMENT", (Object) pres, order);
+		System.out.println("Adding comment to database with order " + order);
+		sendRequest(comment);
+		System.out.println("Successfully sent, waiting for response...");
+		
+		RequestObject response = getResponse();
+		
+		switch(response.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Comment added to server database");
+			commentAdded = true;
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Response failed " + (String) response.param);
+			break;
+		default:
+			System.out.println("Unknown response: " + response.id);
+			break;
+		}
+		
+		return commentAdded;
+	}
+	
+	public final ArrayList getComments(PresentationShell pres)
+	{
+		ArrayList commentList = null;
+		
+		RequestObject comments = new RequestObject("REQUEST_GET_COMMENT", (Object) pres, order);
+		System.out.println("Requesting comments list from server with order " + order);
+		sendRequest(comments);
+		System.out.println("Successfully sent, waiting for response...");
+		
+		RequestObject response = getResponse();
+		
+		switch(response.id)
+		{
+		case "RESPONSE_OK":
+			System.out.println("Comments recieved from server");
+			commentList = (ArrayList) response.param;
+			break;
+		case "RESPONSE_FAIL":
+			System.out.println("Response failed " + (String) response.param);
+			break;
+		default:
+			System.out.println("Unknown response: " + response.id);
+			break;
+		}
+		
+		return commentList;
+	}
+	
+	
 	public final String ping()
 	{
 		// Don't ask...
