@@ -157,7 +157,7 @@ public class StammtischServer {
 		responses.add(new Response("DISCONNECT"){
 			@Override public void respond(ClientRequestHandler handler){
 				// log request
-				handler.log(true, "Recieved diconnect request, stopping handler");
+				handler.log(true, "Recieved disconnect request, stopping handler");
 				handler.stop();
 			}
 		});
@@ -369,6 +369,8 @@ public class StammtischServer {
 					sql.removePresentation(presId);
 				} else {
 					handler.log(handler.isLogging(), "File transfer successful!");
+					// make the presentation available (upload complete)
+					sql.makePresentationAvailable(presId);
 					handler.respondOk(null);
 				}
 				
@@ -381,17 +383,48 @@ public class StammtischServer {
 				// log request
 				handler.log(handler.isLogging(), "Received submit vote request");
 				
-				handler.respondFail(new String("not implemented!"));
-			}
-		});	
-		
-		// Request upload of presentation
-		responses.add(new Response("REQUEST_GET_VOTE"){
-			@Override public void respond(ClientRequestHandler handler){
-				// log request
-				handler.log(handler.isLogging(), "Received recall vote request");
+				// get current request and SQL handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
+				User thisUser = handler.getUser();
+				PresentationShell presentation = null;
+				Integer voteValue = null;
 				
-				handler.respondFail(new String("not implemented!"));
+				// get the presentation object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					handler.respondFail("Malformed presentation metadata");
+					e.printStackTrace();
+				}
+				
+				// get the vote 
+				try {
+					RequestObject voteValueRequestObject = handler.getRequest();
+					voteValue = (Integer)voteValueRequestObject.param;
+				} catch (Exception e) {
+					e.printStackTrace();
+					handler.respondFail("Malformed vote request object");
+				}
+				
+				// clamp vote value to +/- 1
+				if (voteValue > 0) voteValue = 1;
+				else if (voteValue < 0) voteValue = -1;
+				else voteValue = 0;
+				
+				// send vote to SQL server
+				if (!sql.setUserRating(thisUser, presentation, voteValue)) {
+					handler.respondFail("Failed to apply vote");
+				}
+				
+				// respond ok & log
+				handler.respondOk(null);					
+				handler.log(handler.isLogging(), 
+					"User '%s' cast vote %d on %s", 
+					thisUser.getUsername(),
+					voteValue,
+					presentation.getTitle()
+				);
 			}
 		});	
 		
@@ -399,21 +432,88 @@ public class StammtischServer {
 		responses.add(new Response("REQUEST_SET_COMMENT"){
 			@Override public void respond(ClientRequestHandler handler){
 				// log request
-				handler.log(handler.isLogging(), "Received submit comment request");
+				handler.log(handler.isLogging(), "Received set comment request");
 				
-				handler.respondFail(new String("not implemented!"));
+				// get current request and SQL handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
+				User thisUser = handler.getUser();
+				PresentationShell presentation = null;
+				String comment = null;
+				
+				// get the presentation object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					handler.respondFail("Malformed presentation metadata");
+					e.printStackTrace();
+				}
+				
+				// get the comment 
+				try {
+					RequestObject commentRequestObject = handler.getRequest();
+					comment = (String)commentRequestObject.param;
+				} catch (Exception e) {
+					e.printStackTrace();
+					handler.respondFail("Malformed comment request object");
+				}
+				
+				// sendvoteValue vote to SQL server
+				int presId = sql.getPresId(presentation);
+				sql.addComment(presId, thisUser, comment);
+				
+				// respond ok & log
+				handler.respondOk(null);					
+				handler.log(handler.isLogging(), 
+					"User '%s' commented on '%s'",
+					thisUser.getUsername(),
+					presentation.getTitle()
+				);
 			}
 		});	
 		
 		// Request upload of presentation
-		responses.add(new Response("REQUEST_GET_COMMENT"){
+		responses.add(new Response("REQUEST_GET_COMMENTS"){
 			@Override public void respond(ClientRequestHandler handler){
 				// log request
 				handler.log(handler.isLogging(), "Received recall comment request");
 				
-				handler.respondFail(new String("not implemented!"));
+				// get the currentRequest & sql handler
+				RequestObject thisRequest = handler.getCurrentRequest();
+				SQLHandler sql = handler.getSQLHandler();
+				PresentationShell presentation = null;
+				ArrayList<String[]> comments = null;
+				
+				// get the presentation shell object
+				try {
+					presentation = (PresentationShell)thisRequest.param;
+				} catch (Exception e) {
+					handler.respondFail("Malformed presentation shell object");
+					e.printStackTrace();
+				}
+				
+				// get the comments from the SQL server
+				int presId = sql.getPresId(presentation);
+				comments = sql.searchComments(presId);
+				handler.log(handler.isLogging(), "Found %d comments for presentation '%s'", comments.size(), presentation.getTitle());
+				
+				// respond OK with the arraylist of comments
+				handler.respondOk((Object)comments);
 			}
 		});
+		
+		// Request upload of presentation
+		responses.add(new Response("REQUEST_GET_VOTE"){
+			@Override public void respond(ClientRequestHandler handler){
+				// log request
+				handler.log(handler.isLogging(), "Received recall vote request");
+				
+				// get the currentRequest
+				RequestObject currentRequest = handler.getCurrentRequest();
+				
+				handler.respondFail(String.format("%s not implemented!", currentRequest.id));
+			}
+		});	
 	}
 	
 	
@@ -987,7 +1087,7 @@ public class StammtischServer {
 		// start the stammtisch server connection listener
 		new StammtischServer(port);
 		
-		// "scanner" object for reading from command line (javawtf?)
+		// "scanner" object for reading from command
 		String line = null;
 		Scanner lineScanner = new Scanner(System.in);
 		

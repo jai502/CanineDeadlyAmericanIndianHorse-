@@ -133,7 +133,7 @@ public class ClientRequestHandler implements Runnable {
 					else respondFail("Permission denied: not logged in");
 				}
 			} else {
-				respondFail(String.format("'%s' not recongised"));
+				respondFail(String.format("'%s' not recongised", currentRequest.id));
 			}
 		}
 		
@@ -168,7 +168,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// Thread local request retrieval method
-	private RequestObject getRequest() throws IOException {
+	public RequestObject getRequest() throws IOException {
 		RequestObject thisRequest;
 		try {
 			thisRequest = (RequestObject)inputStream.readObject();
@@ -288,6 +288,7 @@ public class ClientRequestHandler implements Runnable {
 			} catch (IOException e) {
 				logErr(doLogging, "Exception sending file block, halting transfer");
 				e.printStackTrace();
+				doTransfer = false;
 			}
 			
 			// count the number of transmitted file blocks

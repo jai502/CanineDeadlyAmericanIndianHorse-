@@ -112,6 +112,7 @@ public class SQLHandler
 		
 		try 
 		{
+			command = presCon.createStatement();
 			command.executeQuery(sqlDeletePres);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -233,14 +234,15 @@ public class SQLHandler
 		Statement command = null;
 		
 		String sqlSearch = "SELECT ID, title, author, languagetype, totalrating FROM " + presTable
-				+ " WHERE title = COALESCE(" + SQLTools.testNull(pres.getTitle()) + ", title)"
+				+ " WHERE (title = COALESCE(" + SQLTools.testNull(pres.getTitle()) + ", title)"
 				+ " OR author = COALESCE(" + SQLTools.testNull(pres.getAuthor()) + ", author)"
 				+ " OR languagetype = COALESCE(" + SQLTools.testNull(pres.getLanguage()) + ", languagetype)"
 				+ " OR tagone = COALESCE(" + SQLTools.testNull(pres.getTagOne()) + ", tagone)"
 				+ " OR tagtwo = COALESCE(" + SQLTools.testNull(pres.getTagTwo()) + ", tagtwo)"
 				+ " OR tagthree = COALESCE(" + SQLTools.testNull(pres.getTagThree()) + ", tagthree)"
 				+ " OR tagfour = COALESCE(" + SQLTools.testNull(pres.getTagFour()) + ", tagfour)"
-				+ " OR tagfive = COALESCE(" + SQLTools.testNull(pres.getTagFive()) + ", tagfive)";
+				+ " OR tagfive = COALESCE(" + SQLTools.testNull(pres.getTagFive()) + ", tagfive))"
+				+ " AND isavailable = 1";
 		
 		ArrayList<String[]> searchResults = new ArrayList<String[]>();
 		ResultSet data;
@@ -775,7 +777,6 @@ public class SQLHandler
 			// Get number of rows in result set
 			data.last(); 
 			int numRows = data.getRow();
-			System.out.println(numRows);
 			
 			// If number of rows is 0, then the presentation has not been previously accessed by the user
 			if(numRows == 0)
@@ -811,12 +812,53 @@ public class SQLHandler
 	}
 	
 	//======================================================================================================================
+	//Makes the presentation available
+	//======================================================================================================================
+	public Boolean makePresentationAvailable(int id)
+	{
+		boolean result = false;
+		Statement command = null;
+		
+		String sqlMakeAvailable = "UPDATE " + presTable + " SET isavailable = 1 WHERE ID = " + id;
+		
+		try 
+		{
+			command = presCon.createStatement();
+			command.executeUpdate(sqlMakeAvailable);
+			result = true;
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			result = false;
+		}
+		finally 
+		{
+			if (command != null)
+			{
+				try
+				{
+					command.close();
+				} 
+				catch (SQLException e) 
+				{
+					e.printStackTrace();
+				} 
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	//======================================================================================================================
 	// Method for updating user rating of the specified presentation
 	//======================================================================================================================
-	public final void setUserRating(User user, PresentationShell pres, int userRating)
+	public final boolean setUserRating(User user, PresentationShell pres, int userRating)
 	{
 		Statement userCommand = null;
 		Statement presCommand = null;
+		boolean hasSucceeded = true;
 		
 		int presID = SQLTools.checkPresID(presCon, pres);
 		
@@ -882,20 +924,21 @@ public class SQLHandler
 		catch (SQLException e) 
 		{
 			e.printStackTrace();
+      		hasSucceeded = false;
 		}
 		finally 
 		{
 			if (userCommand != null)
-      {
-      	try
-      	{
-      		userCommand.close();
-      	} 
-      	catch (SQLException e) 
-      	{
-      		e.printStackTrace();
-      	} 
-      }
+	      {
+	      	try
+	      	{
+	      		userCommand.close();
+	      	} 
+	      	catch (SQLException e) 
+	      	{
+	      		e.printStackTrace();
+	      	} 
+	      }
 		}
 		
 		String updateGlobalRating = "UPDATE " + presTable + " SET totalrating = totalrating+" + newUserRating + " WHERE id = " + presID;
@@ -909,6 +952,7 @@ public class SQLHandler
 		catch (SQLException e)
 		{
 			e.printStackTrace();
+      		hasSucceeded = false;
 		}
 		finally 
 		{
@@ -924,6 +968,7 @@ public class SQLHandler
       	} 
       }
 		}
+		return hasSucceeded;
 	}
 	
 	/**
