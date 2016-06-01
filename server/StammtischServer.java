@@ -59,7 +59,8 @@ public class StammtischServer {
 	static ArrayList<ClientRequestHandler> boundHandlers;
 	
 	// signal variable for ending server operation
-	static boolean done = false;			
+	static boolean done = false;		
+	static boolean defaultLoggingState = true;
 	
 	
 	
@@ -113,7 +114,8 @@ public class StammtischServer {
 							nextInstance,
 							responses,
 							sqlInterface,
-							transferBlockSize
+							transferBlockSize,
+							defaultLoggingState
 						);
 					
 					// add handler to handler list
@@ -895,7 +897,7 @@ public class StammtischServer {
 					// loop though all handlers and disconnect them
 					System.out.printf("Set logging status for %d handlers\n", handlers.size());
 					for(int i = 0; i < handlers.size(); i++){
-						handlers.get(0).doLogging(newLoggingStatus);
+						handlers.get(i).doLogging(newLoggingStatus);
 					}
 					return;
 				} 
@@ -916,6 +918,7 @@ public class StammtischServer {
 				
 				// set logging status of just this handler
 				ClientRequestHandler thisHandler = handlers.get(p1);
+				System.out.printf("Set logging status for 1 handlers\n");
 				thisHandler.doLogging(newLoggingStatus);
 			}
 		});

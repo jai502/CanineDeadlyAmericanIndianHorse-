@@ -44,7 +44,7 @@ public class ClientRequestHandler implements Runnable {
 	private boolean blocked = false;			// user is allowed to make requests
 	private boolean done = false;			    // main loop complete
 	private boolean threadDone = false;			// thread running
-	private boolean doLogging = false;
+	private boolean doLogging;
 	private int transferBlockSize;
 	private int order;
 	
@@ -57,7 +57,7 @@ public class ClientRequestHandler implements Runnable {
 	
 	
 	// constructor for client request handler
-	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql, int blockSize){
+	public ClientRequestHandler(Socket thisSocket, int thisInstance, ArrayList<Response> responses, SQLHandler sql, int blockSize, boolean doLogging){
 		clientSocket = thisSocket;		 // client socket
 		handlerInstance = thisInstance;  // instance number
 		this.responses = responses;
@@ -75,6 +75,8 @@ public class ClientRequestHandler implements Runnable {
 		
 		// get transfer block size
 		this.transferBlockSize = blockSize;
+		this.doLogging = doLogging;
+		System.out.println(this.doLogging + "Lefuck?");
 	}
 	
 	
