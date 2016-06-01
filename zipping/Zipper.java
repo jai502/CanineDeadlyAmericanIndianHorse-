@@ -151,85 +151,100 @@ public class Zipper
 		Files.copy( sourceFile.toPath(), destFile.toPath() );
 	}
 	
-//	public static void deleteFolder(String locToDel) throws IOException
-//	{
-//		File toDelete = new File(locToDel);
-//		if(toDelete.exists())
-//		{
-//			File[] files = toDelete.listFiles();
-//			if(files!=null)
-//			{
-//				for(int i=0; i<files.length; i++)
-//				{
-//	                if(files[i].isDirectory()) 
-//	                {
-//	                    deleteFolder(files[i].getPath());
-//	                }
-//	                else 
-//	                {
-//	                    files[i].delete();
-//	                    System.out.println(files[i].getPath());
-//	                }
-//	            }
-//			}
-//		}
-//	}
+	//a method to delete a folder and all its entries
+		public static void deleteFolder(String folderToDelete) throws IOException
+		{
+			//read in the file to delete 
+			File toDelete = new File(folderToDelete);
+			
+			//if the file being deleted exists, delete it
+			if(toDelete.exists())
+			{
+				//create an array of files to contain all of the files within the directory
+				File[] files = toDelete.listFiles();
+				//if the array is not empty
+				if(files!=null)
+				{
+					//loop through every entry in the array and delete it in turn
+					for(int i=0; i<files.length; i++)
+					{
+		               //if the folder is a directory, delete sub entries, else delete individual files
+						if(files[i].isDirectory()) 
+		                {
+		                    //use recursion to delete items in the sub folders
+		                	deleteFolder(files[i].getPath());
+		                    //delete the parent folder
+		                    files[i].delete();
+		                    System.out.println("Deleting: "+files[i].getPath());
+		                }
+		                else 
+		                {
+		                    //delete the individual file
+		                	files[i].delete();
+		                    System.out.println("Deleting: "+files[i].getPath());
+		                }
+		            }
+				}
+				//delete the parent folder
+				toDelete.delete();
+			}
+		}
 	
-	public static void deleteFolder(String outputLocation)
-    {
-        //check if the location to delete exists and if it does, delete it
-        File toDelete = new File(outputLocation);
-        if(!toDelete.exists())
-        {
-            System.out.println("Nothing to delete");
-        }
-        else
-        {
-            try{
-                delete(toDelete);
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-                System.out.println("An error occured while deleting");
-            }
-        }
-    }
-	
-	private static void delete(File toDelete) throws IOException
-    {
-        //check if the file to delete is a directory or a file
-        if(toDelete.isDirectory())
-        {
-            //if the directory is empty, delete it 
-            if(toDelete.list().length==0)
-            {
-                toDelete.delete();
-                System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
-            }
-            else
-            {
-                //if the directory is not empty, recursively loop through and delete everything in the folder until it is empty
-                String filesToDelete[] = toDelete.list();
-                for (String temp: filesToDelete)
-                {
-                    File deleteThis = new File(toDelete, temp);
-                    delete(deleteThis);
-                }
-                if(toDelete.list().length==0)
-                {
-                    toDelete.delete();
-                    System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
-                }
-            }    
-        }
-        //if only a single file exists, delete it
-        else
-        {
-            toDelete.delete();
-            System.out.println("Deleted file:             "+toDelete.getAbsolutePath());
-        }
-    }
+//	public static void deleteFolder(String outputLocation)
+//    {
+//        //check if the location to delete exists and if it does, delete it
+//        File toDelete = new File(outputLocation);
+//        if(!toDelete.exists())
+//        {
+//            System.out.println("Nothing to delete");
+//        }
+//        else
+//        {
+//            try{
+//                delete(toDelete);
+//            }
+//            catch(IOException e)
+//            {
+//                e.printStackTrace();
+//                System.out.println("An error occured while deleting");
+//            }
+//        }
+//    }
+//	
+//	private static void delete(File toDelete) throws IOException
+//    {
+//        //check if the file to delete is a directory or a file
+//        if(toDelete.isDirectory())
+//        {
+//            //if the directory is empty, delete it 
+//            if(toDelete.list().length==0)
+//            {
+//                toDelete.delete();
+//                System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
+//            }
+//            else
+//            {
+//                //if the directory is not empty, recursively loop through and delete everything in the folder until it is empty
+//                String filesToDelete[] = toDelete.list();
+//                for (String temp: filesToDelete)
+//                {
+//                    File deleteThis = new File(toDelete, temp);
+//                    delete(deleteThis);
+//                }
+//                if(toDelete.list().length==0)
+//                {
+//                    toDelete.delete();
+//                    System.out.println("Deleted directory:         "+toDelete.getAbsolutePath());
+//                }
+//            }    
+//        }
+//        //if only a single file exists, delete it
+//        else
+//        {
+//            toDelete.delete();
+//            System.out.println("Deleted file:             "+toDelete.getAbsolutePath());
+//        }
+//    }
 	
 	public static String scan(String filepath)
 	{
