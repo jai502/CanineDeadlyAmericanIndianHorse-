@@ -61,12 +61,14 @@ public class ServerRequestHandler
 		try
 		{
 			//Set up the port using the specified host and port
+			System.out.println("Opening port to server: " + host);
 			socket = new Socket(host, port);
 			socket.setSoTimeout(timeOut);
 			System.out.println("[INFO] Socket successfully setup on: "
 					+ socket.getInetAddress().toString() 
 					+ " on port: " + socket.getPort());
 		}
+		
 		catch (UnknownHostException e)
 		{
 			e.printStackTrace();

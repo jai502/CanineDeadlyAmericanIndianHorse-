@@ -1,23 +1,13 @@
 
 /*
  * (C) Stammtisch
- * Created by:  Alexander Stassis & Mathew Gould (Design Team)
+ * Created by:  Alexander Stassis (as1574) & Mathew Gould (mg859) (Design Team)
  
- * Description: This CSS file is responsible for the look and feel of the system
+ * Description: This CSS file is responsible for the look, feel and aesthetic design of the GUI
+ *				It uses IDs for JavaFX nodes, which are set in the MainGuiPagination class
  */
 
 /* Default styles for every scenes */
-/*.root{
-    -fx-background-image: url("Main_Background.png"), url("logo5.png");
-	-fx-background-size: cover, 300 200;
-	-background-position: CENTER, TOP LEFT;
-	-fx-background-repeat: no-repeat, no-repeat;
-}*/
-
-/*.button{
-	-fx-font: 22 arial;
-	-fx-base: #BAE98A;
-}*/
 
 .menu-bar{
   -fx-background-color: #DAD6D4;
@@ -60,20 +50,6 @@
 .pagination .pagination-control .left-arrow, .right-arrow{
     -fx-background-color: #DDF1F8, #0E5D79;
 }
-
-/*.pagination{
-	-fx-page-information-visible: false;
-	-fx-max-page-indicator-count: 1;
-	-fx-arrows-visible: false;
-	-fx-tooltip-visible: false;
-	-fx-page-information-alignment: bottom;
-}*/
-
-/*.borders{ 
-	-fx-border-color: black; 
-	-fx-border-style: dashed; 
-	-fx-border-width: 2; 
-}*/
 
 /******************************************************************************/
 
@@ -193,39 +169,6 @@
 	-fx-outer-border: black;
 	-fx-outer-border-width: 20
 }
-
-/*#scrollPane{
-  -fx-background-color: transparent;
-  /*-fx-background-color: #DAD6D4;
-  -fx-border-color:  transparent;
-  -fx-border-width: 5
-}*/
-/*#listView{
-	-fx-border-width: 10
-}
-
-.list-view {
-    -fx-padding: 3px ;
-    /*-fx-background-color: orange;*/
-
-
-/*.list-view {
-    -fx-padding: 2px ;
-    -fx-background-color: magenta;
-}
-
-.list-cell {
-    -fx-padding: 2px ;
-    -fx-background-color: #814DFF, -fx-background ;
-    -fx-background-insets: 0px, 2px ;
-}
-*/
-/*.list-cell:empty {
-    -fx-padding: 2px ;
-    -fx-background-color: transparent ;
-    -fx-background-insets: 0 ;
-}*/
-
 
 /*****************************************************************************/
 
