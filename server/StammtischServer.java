@@ -4,10 +4,10 @@
 * Date of first version: 28/01/2016
 * 
 * Last version by: Alexander Cramb (ac1362)
-* Date of last update: 
+* Date of last update: 01/06/2016
 * Version number: 1.3.7
 * 
-* Commit date: 
+* Commit date: 01/06/2016
 * Description: 
 * 	Load bearing server for stammtisch application
 */
@@ -22,8 +22,10 @@ import com.*;
 import java.io.File;
 // java imports
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -211,7 +213,7 @@ public class StammtischServer {
 				} 
 				
 				// log user out of server
-				handler.log(handler.isLogging(), "User '%s' logged out\n", thisUser.getUsername());
+				handler.log(handler.isLogging(), "User '%s' logged out", thisUser.getUsername());
 				handler.setUser(null);
 				handler.respondOk(null);
 			}
@@ -303,14 +305,14 @@ public class StammtischServer {
 				Integer presId = presentation.getId();
 				
 				// open the file for transfer
-				String transferFailureReason = handler.sendFile("presentations/" + presId.toString() + ".zip");		
+				String presPath = "presentations/" + presId.toString() + ".zip";
+				String transferFailureReason = handler.sendFile(presPath);		
 				
 				// respond with failure of file transfer did not success
-				if(transferFailureReason != null){
-					handler.respondFail(transferFailureReason);
-					return;
-				} else {
+				if(transferFailureReason == null){
 					handler.respondOk(null);
+				} else {
+					handler.respondFail(transferFailureReason);
 				}
 			}
 		});
@@ -585,8 +587,7 @@ public class StammtischServer {
 	// sets up commands
 	public static void setUpCommands(){
 		// Usage string
-		String desc = "no description";
-		String usage = "Dont fuck up!";
+		String desc, usage;
 		
 		// clear commands
 		commands = new ArrayList<Command>();
@@ -989,80 +990,86 @@ public class StammtischServer {
 	
 	// loads configuration file
 	public static void loadConfig(String path){
-		FileInputStream file;		// file input stream
 		Scanner fs = null;			// file scanner
-		Scanner ls = null;			// file line scanner
 		String line;				// line from file
 		ArrayList<String> lineData;	// line data
-		boolean cfgDone = false;	// parsing done
-		boolean useDefault = false;	// signal variable for whether to use default or not
+	
+		//set default values
+		// these will be overridden with config file values if they are found to exist
+		port = defaultPort;
+		sqlPort = defaultSqlPort;
+		sqlHost = defaultSqlHost;
+		
+		// open the file and check that it exists
+		File cfgFile = new File(path);
+		if (!cfgFile.exists()) {
+			// create configuration file with default values
+			PrintWriter fos;
+			try {
+				fos = new PrintWriter(cfgFile);
+			} catch (FileNotFoundException e) {
+				System.out.printf("[ERR] Could not open file output stream for writing: %s", path);
+				e.printStackTrace();
+				return;
+			}
+			
+			// write default values to file
+			fos.println("serverPort: " + defaultPort);
+			fos.println("sqlPort: " + defaultSqlPort);
+			fos.println("sqlHost: " + defaultSqlHost);
+			
+			// print out that default file was created
+			System.out.printf("%s not found, creating file with default values\n", path);
+			
+			// close stream and return
+			fos.close();
+			return;
+		}
+		
+		// anything after here runs only if the file was found
 		
 		// open the file
+		FileInputStream fis;
 		try {
-			file = new FileInputStream(path);
-			System.out.printf("Config file %s open\n", path);
-		} catch (IOException e) {
-			// print to console
-			System.out.printf("Config file %s not found %s\n", path);
-			System.out.printf("Using default values.");
-			
-			// use default values
-			port = defaultPort;
-			sqlPort = defaultSqlPort;
-			sqlHost = defaultSqlHost;
+			fis = new FileInputStream(path);
+		} catch (Exception e) {
+			e.printStackTrace();
 			return;
 		}
 		
 		// parse the config file
-		fs = new Scanner(file);
-
-		while(!cfgDone){
-			// get a line from the file
-			line = fs.nextLine();
+		fs = new Scanner(fis);
+		
+		// while
+		while(fs.hasNextLine()){
+			line = fs.nextLine();						// get line from the file
+			lineData = getParams(new Scanner(line));	// get space delimited parameters
 			
-			// make a scanner for the line
-			ls = new Scanner(line);
-			
-			// get line data
-			lineData = getParams(ls);
-			
+			// handle line
 			switch(lineData.get(0)){
 				// server port parameter
 				case "serverPort:":
-					useDefault = false;
-					// no line data
-					if (lineData.size() < 2) useDefault = true;
-					// set server port accordingly
-					port = parseAsInt(lineData.get(1), 0, 65535);
-					// if parse failed use default port
-					if(port == null) useDefault = true;
-					if(useDefault) port = defaultPort;
-					else System.out.printf("Server port read from config file: %d\n", port);
-					break;
+					if (lineData.size() < 2) break;							// No data in line
+					Integer value = parseAsInt(lineData.get(1), 0, 65535);	// Get the server port
+					if(value != null) {										// Integer parse succeeded, set value
+						port = value;
+						System.out.printf("Server port read from config file: %d\n", port);
+					} break;
 				
 				// sql port parameter
 				case "sqlPort:":
-					useDefault = false;
-					// no line data
-					if (lineData.size() < 2) useDefault = true;
-					// set server port accordingly
-					sqlPort = parseAsInt(lineData.get(1), 0, 65535);
-					// if parse failed use default port
-					if(sqlPort == null) useDefault = true;
-					if(useDefault) sqlPort = defaultSqlPort;
-					else System.out.printf("SQL server port read from config file: %d\n", sqlPort);
-					break;
+					if (lineData.size() < 2) break;							// no data on line
+					value = parseAsInt(lineData.get(1), 0, 65535);			// get the server port
+					if(sqlPort != null) {									// Integer parse succeeded, set value
+						sqlPort = value;
+						System.out.printf("SQL server port read from config file: %d\n", sqlPort);
+					} break;
 				
 				// SQL server host parameter
 				case "sqlHost:":
-					useDefault = false;
-					// no line data
-					if (lineData.size() < 2) useDefault = true;
-					if (useDefault) sqlHost = defaultSqlHost;
-					else {
-						System.out.printf("Server host read from config file: %s\n", lineData.get(1));
-						sqlHost = lineData.get(1);
-					}
+					if (lineData.size() < 2) break;							// no data on line
+					sqlHost = lineData.get(1);
+					System.out.printf("Server host read from config file: %s\n", sqlHost);
 					break;
 					
 				// line tag not recognised
@@ -1070,14 +1077,10 @@ public class StammtischServer {
 					System.out.printf("Unrecognised config file tag: %s\n", lineData.get(0));
 					break;
 			}
-			
-			// configuration is done
-			if(!fs.hasNextLine()) cfgDone = true;
 		}
 		
 		// no resource leaks, thank you!
 		fs.close();
-		if (ls != null) ls.close();
 	}
 	
 	

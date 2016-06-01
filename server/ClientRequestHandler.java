@@ -76,7 +76,6 @@ public class ClientRequestHandler implements Runnable {
 		// get transfer block size
 		this.transferBlockSize = blockSize;
 		this.doLogging = doLogging;
-		System.out.println(this.doLogging + "Lefuck?");
 	}
 	
 	
@@ -240,6 +239,9 @@ public class ClientRequestHandler implements Runnable {
 	// sends file to client
 	// returns null on success
 	public String sendFile(String path){
+		// log download beginning
+		log(doLogging, "Initiating file download of: ", path);
+		
 		// buffer variables
 		int bufSize = transferBlockSize; 
 		int blockCount = 0;
@@ -254,8 +256,9 @@ public class ClientRequestHandler implements Runnable {
 			file = new FileInputStream(path);
 		} catch (FileNotFoundException e) {
 			// report failure to handler
+			e.printStackTrace();
 			doTransfer = false;
-			return "File not found";
+			return new String("File not found");
 		}
 		
 		// per loop variables
@@ -274,7 +277,7 @@ public class ClientRequestHandler implements Runnable {
 			}
 			
 			// put block of data into file transfer object
-			if ((count < 0) || (!doTransfer)) {
+			if (count < 0) {
 				log(doLogging, "Sent %s in %d blocks of %d bytes", path, blockCount, bufSize);
 				break;
 			}
@@ -288,8 +291,8 @@ public class ClientRequestHandler implements Runnable {
 			try {
 				sendResponse(responseData);
 			} catch (IOException e) {
-				logErr(doLogging, "Exception sending file block, halting transfer");
 				e.printStackTrace();
+				rString = String.format("Exception sending block %d, terminating transfer", blockCount);
 				doTransfer = false;
 			}
 			
