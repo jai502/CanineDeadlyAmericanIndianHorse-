@@ -66,7 +66,7 @@ public class StammtischServer {
 	
 	
 	
-	// server constructor. Launches connectio9n listener thread
+	// server constructor. Launches connection listener thread
 	public StammtischServer(int port) {
 		// Indicate that server is starting
 		System.out.printf("Starting server on port %d\n", port);
