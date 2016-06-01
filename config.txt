@@ -1,3 +1,0 @@
-serverPort: 26656
-sqlPort: 3306
-sqlHost: stammtischsql.ddns.net

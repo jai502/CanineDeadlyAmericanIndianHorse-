@@ -1,9 +1,0 @@
-Hello this is a paragraph.
-
-New Paragraph
-This
-Is
-A
-Text text file to show that <b> hello bold </b> works.
-<i> italic </i>
-Finish
