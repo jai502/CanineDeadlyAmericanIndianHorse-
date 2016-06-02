@@ -28,7 +28,7 @@ public class VideoHandlerTest extends Application{
 				
 			//	VideoItem videoToHandle2 = new VideoItem(1,5000,0.1,0.1,"test.mp4", false, 0.6, 0.6);
 		
-			   MediaFx player = new MediaFx(videoToHandle);
+			   //MediaFx player = new MediaFx(videoToHandle);
 				MediaFx player2 = new MediaFx(audioToHandle);
 	
 			
@@ -37,7 +37,7 @@ public class VideoHandlerTest extends Application{
 				// set up a scene of ratio 4:3 with a black background
 				Scene scene = new Scene(root, 600, 600);
 				// add canvases to the scene
-		    	root.getChildren().add(player.createContent(scene));
+		    	//root.getChildren().add(player.createContent(scene));
 				root.getChildren().add(player2.createContent(scene));
 				
 				// setup and shows

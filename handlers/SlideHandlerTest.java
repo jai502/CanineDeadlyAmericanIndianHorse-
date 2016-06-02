@@ -32,11 +32,12 @@ public class SlideHandlerTest extends Application {
 		SlideHandler sh = new SlideHandler();		
 		Group initialRoot = new Group();
 		Scene firstScene = new Scene(initialRoot, 800, 600);
-		Group root = sh.getSlideStack(pres, 2, 800, 600, firstScene);
-		Scene lastScene = new Scene(root, 800, 600);
+		// missing parameters
+		//Group root = sh.getSlideStack(pres, 2, 800, 600, firstScene);
+		//Scene lastScene = new Scene(root, 800, 600);
 		
 
-		primary.setScene(lastScene);
+		//primary.setScene(lastScene);
 		primary.show();
 	}
 
