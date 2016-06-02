@@ -42,6 +42,7 @@ public class StammtischServer {
 	public static Integer maxTransferBlockSize = 1048576;
 	public static Integer transferBlockSize = 32768;
 	public static String defaultSqlHost = "stammtischsql.ddns.net";
+	public static String dlDirPath = "presentations" + File.separator;
 	
 	// actual values from configuration file
 	public static Integer port = 0;
@@ -347,11 +348,23 @@ public class StammtischServer {
 				sql.addPresentation(presentation);
 				Integer presId = sql.getPresId(presentation);
 				
-				// get the file stream
+				// create the download directory if it doesn't already exist
+				File dlDir = new File(dlDirPath);
+				if(!dlDir.exists()) {
+					try {
+						dlDir.mkdirs();
+					} catch (Exception e) {
+						handler.respondFail("Could not create download directory");
+						e.printStackTrace();
+						return;
+					}
+				}
+				
+				// create the file output stream
+				String presPath = dlDirPath + presId.toString() + ".zip";
 				FileOutputStream fs = null;
-				String path = "presentations" + File.separator + presId.toString() + ".zip";
 				try {
-					fs = new FileOutputStream(path);
+					fs = new FileOutputStream(presPath);
 				} catch (Exception e) {
 					handler.respondFail("Server failed to create filestream");
 					sql.removePresentation(presId);
